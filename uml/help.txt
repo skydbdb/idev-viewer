@@ -1,0 +1,6 @@
+사용 예시
+1) uml 파일 생성
+flutter pub global run dcdg --builder=plantuml --search-path="./lib/src/board/src/widgets" > dock_stack_board.puml
+2) svg 파일 생성
+plantuml -tsvg dock_stack_board.puml
+3) 파워 포인트 작업

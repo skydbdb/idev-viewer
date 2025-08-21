@@ -1,0 +1,101 @@
+name: idev_v1
+description: A new Flutter project.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.0.0 # '>=2.18.2 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  dio: ^5.1.2
+  http: ^1.1.0
+  http_parser: ^4.0.2 # MediaType을 위한 패키지 추가
+  universal_html: ^2.2.4
+  get_it: ^7.6.4
+  flutter_bloc: ^8.1.1
+  bloc: ^8.1.0
+  rxdart: ^0.27.7
+  encrypt: ^5.0.3
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+  font_awesome_flutter: ^10.2.1
+  url_launcher: ^6.1.6
+  animated_tree_view:
+  pluto_grid_plus: ^8.3.0
+  pluto_menu_bar: ^2.0.1
+  pluto_layout: ^1.0.0
+  change_case: ^2.1.0
+  flutter_form_builder: ^9.2.1
+  form_builder_validators: ^11.1.2
+  docking: ^1.16.0
+  group_radio_button: ^1.3.0 # delete
+  intl:
+  adaptive_dialog: ^2.1.0
+  material_symbols_icons: ^4.2791.1
+  flutter_colorpicker: ^1.1.0
+  markdown_widget: ^2.3.2+6
+  petitparser: ^5.4.0
+  flutter_layout_grid: ^2.0.0
+  flutter_popup_card: ^0.0.6
+  pdf: ^3.11.3
+  collection: ^1.19.1
+  faker: ^2.2.0
+  uuid: ^4.5.1
+  file_saver: ^0.2.14
+  sorted_list: ^1.0.0
+  flutter_easyloading: ^3.0.5
+  easy_sidemenu: ^0.7.1
+  syncfusion_flutter_charts: ^30.1.38
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  json_serializable: ^6.7.1
+  build_runner: ^2.3.3
+  freezed: ^2.3.2
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/icons/
+    - assets/images/
+  fonts:
+    # - family: OpenSans
+    #   fonts:
+    #     - asset: assets/fonts/open_sans/OpenSans-ExtraBold.ttf
+    #       weight: 800
+    #     - asset: assets/fonts/open_sans/OpenSans-ExtraBoldItalic.ttf
+    #       weight: 800
+    #       style: italic
+    #     - asset: assets/fonts/open_sans/OpenSans-Bold.ttf
+    #       weight: 700
+    #     - asset: assets/fonts/open_sans/OpenSans-BoldItalic.ttf
+    #       weight: 700
+    #       style: italic
+    #     - asset: assets/fonts/open_sans/OpenSans-SemiBold.ttf
+    #       weight: 600
+    #     - asset: assets/fonts/open_sans/OpenSans-SemiBoldItalic.ttf
+    #       weight: 600
+    #       style: italic
+    #     - asset: assets/fonts/open_sans/OpenSans-Regular.ttf
+    #       weight: 400
+    #     - asset: assets/fonts/open_sans/OpenSans-Italic.ttf
+    #       weight: 400
+    #       style: italic
+    #     - asset: assets/fonts/open_sans/OpenSans-Light.ttf
+    #       weight: 300
+    #     - asset: assets/fonts/open_sans/OpenSans-LightItalic.ttf
+    #       weight: 300
+    #       style: italic
+    - family: NotoSansKR
+      fonts:
+        - asset: assets/fonts/noto_sans_kr/NotoSansKR-VariableFont_Regular.ttf
+          weight: 400
+        - asset: assets/fonts/noto_sans_kr/NotoSansKR-VariableFont_Bold.ttf
+          weight: 700

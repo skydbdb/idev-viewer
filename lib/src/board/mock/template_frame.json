@@ -1,0 +1,35 @@
+[
+    {
+        "boardId": "#TEMPLATE#",
+        "id": "Image_l91o01",
+        "type": "minified:uP",
+        "angle": 0,
+        "size": {
+            "width": 333,
+            "height": 267
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "url": "",
+            "assetName": "assets/images/idev.jpeg",
+            "color": "green",
+            "colorBlendMode": "color",
+            "fit": "scaleDown",
+            "repeat": "repeat"
+        }
+    }
+]

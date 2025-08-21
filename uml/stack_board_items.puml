@@ -1,0 +1,354 @@
+@startuml
+set namespaceSeparator ::
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::StackGridCase" {
+  +StackGridItem item
+  +State<StackGridCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::StackGridCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::StackGridItem"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::StackGridCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::_StackGridCaseState" {
+  +List<TrinaColumn> columns
+  +List<TrinaRow> rows
+  +TrinaGridStateManager? stateManager
+  +bool isLoaded
+  +FocusNode focusNode
+  +HomeRepo homeRepo
+  +String? apiId
+  -StackBoardController _controller()
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::_StackGridCaseState" o-- "pluto_grid_plus::src::manager::pluto_grid_state_manager.dart::TrinaGridStateManager"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::_StackGridCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::_StackGridCaseState" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_grid_case.dart::_StackGridCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::StackSearchCase" {
+  +StackSearchItem item
+  +State<StackSearchCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::StackSearchCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_search_item.dart::StackSearchItem"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::StackSearchCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_StackSearchCaseState" {
+  +bool isLoaded
+  +FocusNode focusNode
+  +HomeRepo homeRepo
+  +GlobalKey<FormBuilderState> formKey
+  +String savedValue
+  +List<String> reqApis
+  +dynamic item
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_StackSearchCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_StackSearchCaseState" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_StackSearchCaseState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormBuilderState>"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_StackSearchCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::NewField" {
+  +String name
+  +String? initialValue
+  +HomeRepo homeRepo
+  +State<NewField> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::NewField" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::NewField"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_NewFieldState" {
+  +TextEditingController controller
+  +String name
+  +HomeRepo homeRepo
+  +void initState()
+  +Widget build()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_NewFieldState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_NewFieldState" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_search_case.dart::_NewFieldState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::StackLayoutCase" {
+  +StackLayoutItem item
+  +State<StackLayoutCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::StackLayoutCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::StackLayoutItem"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::StackLayoutCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::_StackLayoutCaseState" {
+  +bool isLoaded
+  +int dockBoardIndex
+  +FocusNode focusNode
+  +MultiSplitViewTheme themeSplit
+  +HomeRepo homeRepo
+  +void initState()
+  +void dispose()
+  +DockBoard newDockBoard()
+  +void initSplit()
+  +Widget build()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::_StackLayoutCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::_StackLayoutCaseState" o-- "multi_split_view::src::theme_widget.dart::MultiSplitViewTheme"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::_StackLayoutCaseState" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_split_case.dart::_StackLayoutCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" {
+  +StackTextItem item
+  +InputDecoration? decoration
+  +TextEditingController? controller
+  +int? maxLength
+  +TextInputAction? textInputAction
+  +TextAlignVertical? textAlignVertical
+  +TextInputType? keyboardType
+  +dynamic Function(String)? onChanged
+  +dynamic Function()? onEditingComplete
+  +dynamic Function()? onTap
+  +bool readOnly
+  +bool autofocus
+  +bool obscureText
+  +int? maxLines
+  +List<TextInputFormatter>? inputFormatters
+  +FocusNode? focusNode
+  +bool enabled
+  +TextCapitalization textCapitalization
+  +TextItemContent? content
+  +State<StackTextCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::StackTextItem"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::material::input_decorator.dart::InputDecoration"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::services::text_input.dart::TextInputAction"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::painting::alignment.dart::TextAlignVertical"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::services::text_input.dart::TextInputType"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "null::dynamic Function(String)"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "null::dynamic Function()"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "flutter::src::services::text_input.dart::TextCapitalization"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::StackTextCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::_StackTextCaseState" {
+  +FocusNode focusNode
+  +void initState()
+  +void dispose()
+  +Widget build()
+  -Widget _buildNormal()
+  -Widget _buildEditing()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::_StackTextCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_text_case.dart::_StackTextCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::StackImageCase" {
+  +StackImageItem item
+  +State<StackImageCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::StackImageCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::StackImageItem"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::StackImageCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::_StackImageCaseState" {
+  +FocusNode focusNode
+  +ImageItemContent content
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::_StackImageCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::_StackImageCaseState" o-- "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_image_case.dart::_StackImageCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::StackFrameCase" {
+  +StackFrameItem item
+  +State<StackFrameCase> createState()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::StackFrameCase" o-- "spike_v2::src::board::src::stack_board_items::items::stack_dock_item.dart::StackFrameItem"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::StackFrameCase"
+
+class "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" {
+  +bool isLoaded
+  +FocusNode focusNode
+  +DockingLayout layout
+  +Docking docking
+  +int dockingItemIndex
+  +MultiSplitViewTheme themeSplitTab
+  +TabbedViewTheme themeActiveTab
+  +HomeRepo homeRepo
+  -String _lastStringify
+  +void saveLayout()
+  +void loadLayout()
+  +String idToString()
+  +dynamic stringToId()
+  +void initState()
+  +void dispose()
+  +List<TabButton> listTabButton()
+  +DockingItem newDockingItem()
+  +dynamic initDock()
+  +Widget build()
+  +DockingItem buildDockingItem()
+}
+
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "docking::src::layout::docking_layout.dart::DockingLayout"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "docking::src::docking.dart::Docking"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "multi_split_view::src::theme_widget.dart::MultiSplitViewTheme"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "tabbed_view::src::theme::theme_widget.dart::TabbedViewTheme"
+"spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState" o-- "spike_v2::src::repo::home_repo.dart::HomeRepo"
+"flutter::src::widgets::framework.dart::State" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState"
+"docking::src::layout::layout_parser.dart::LayoutParserMixin" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState"
+"docking::src::layout::area_builder.dart::AreaBuilderMixin" <|-- "spike_v2::src::board::src::stack_board_items::item_case::stack_dock_case.dart::_StackFrameCaseState"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_dock_item.dart::FrameItemContent" {
+  +String? lastStringify
+  +double? size
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_dock_item.dart::FrameItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_dock_item.dart::StackFrameItem" {
+  +StackFrameItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_dock_item.dart::StackFrameItem"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" {
+  -ImageProvider<Object> _image
+  +String? url
+  +String? assetName
+  +String? semanticLabel
+  +bool excludeFromSemantics
+  +double? width
+  +double? height
+  +Color? color
+  +BlendMode? colorBlendMode
+  +BoxFit fit
+  +ImageRepeat repeat
+  +bool matchTextDirection
+  +bool gaplessPlayback
+  +bool isAntiAlias
+  +FilterQuality filterQuality
+  +ImageProvider<Object> image
+  -void _init()
+  +void setRes()
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "flutter::src::painting::image_provider.dart::ImageProvider<Object>"
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "dart::ui::Color"
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "dart::ui::BlendMode"
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "flutter::src::painting::box_fit.dart::BoxFit"
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "flutter::src::painting::decoration_image.dart::ImageRepeat"
+"spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent" o-- "dart::ui::FilterQuality"
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::ImageItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::StackImageItem" {
+  +void setUrl()
+  +void setAssetName()
+  +StackImageItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_image_item.dart::StackImageItem"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::LayoutItemContent" {
+  +Axis? axis
+  +int? cell
+  -void _init()
+  +void setRes()
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::LayoutItemContent" o-- "flutter::src::painting::basic_types.dart::Axis"
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::LayoutItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::StackLayoutItem" {
+  +void setAxis()
+  +void setCell()
+  +StackLayoutItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_split_item.dart::StackLayoutItem"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" {
+  +String? data
+  +TextStyle? style
+  +StackTextStrutStyle? strutStyle
+  +TextAlign? textAlign
+  +TextDirection? textDirection
+  +Locale? locale
+  +bool? softWrap
+  +TextOverflow? overflow
+  +double? textScaleFactor
+  +int? maxLines
+  +String? semanticsLabel
+  +TextWidthBasis? textWidthBasis
+  +TextHeightBehavior? textHeightBehavior
+  +Color? selectionColor
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "flutter::src::painting::text_style.dart::TextStyle"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "spike_v2::src::board::src::widget_style_extension::stack_text_strut_style.dart::StackTextStrutStyle"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "dart::ui::TextAlign"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "dart::ui::TextDirection"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "dart::ui::Locale"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "flutter::src::painting::text_painter.dart::TextOverflow"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "flutter::src::painting::text_painter.dart::TextWidthBasis"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "dart::ui::TextHeightBehavior"
+"spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent" o-- "dart::ui::Color"
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::TextItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::StackTextItem" {
+  +void setData()
+  +StackTextItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_text_item.dart::StackTextItem"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_search_item.dart::SearchItemContent" {
+  +Map<String, List<String>>? reqApis
+  +double? size
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_search_item.dart::SearchItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_search_item.dart::StackSearchItem" {
+  +StackSearchItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_search_item.dart::StackSearchItem"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::GridItemContent" {
+  +String? apiId
+  +List<TrinaColumn>? columns
+  +List<TrinaRow>? rows
+  +TrinaGridMode? mode
+  +double? size
+  +Map<String, dynamic> toJson()
+}
+
+"spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::GridItemContent" o-- "pluto_grid_plus::src::pluto_grid_enums.dart::TrinaGridMode"
+"spike_v2::src::board::src::core::stack_board_item::stack_item_content.dart::StackItemContent" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::GridItemContent"
+
+class "spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::StackGridItem" {
+  +StackGridItem copyWith()
+}
+
+"spike_v2::src::board::src::core::stack_board_item::stack_item.dart::StackItem" <|-- "spike_v2::src::board::src::stack_board_items::items::stack_grid_item.dart::StackGridItem"
+
+
+@enduml
