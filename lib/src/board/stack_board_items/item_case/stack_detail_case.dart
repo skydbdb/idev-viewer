@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:idev_v1/src/board/board/dock_board.dart';
 import 'package:idev_v1/src/board/helpers.dart';
 import 'package:idev_v1/src/board/stack_board_items/common/new_field.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
@@ -19,27 +18,19 @@ import 'package:idev_v1/src/board/stack_board_items/common/models/api_config.dar
 
 /// * Draw object
 class StackDetailCase extends StatefulWidget {
-  StackDetailCase({
+  const StackDetailCase({
     super.key,
     required this.item,
-    this.editItemController,
   });
 
   /// * StackDetailItem
   final StackDetailItem item;
 
-  EditItemController? editItemController;
-
   @override
-  State<StackDetailCase> createState() =>
-      _StackDetailCaseState(editItemController);
+  State<StackDetailCase> createState() => _StackDetailCaseState();
 }
 
 class _StackDetailCaseState extends State<StackDetailCase> {
-  _StackDetailCaseState(EditItemController? editItemController) {
-    editItemController?.onMenu = onMenu;
-  }
-
   late HomeRepo homeRepo;
   GlobalKey<FormBuilderState> formKey = GlobalKey();
   String savedValue = '';
