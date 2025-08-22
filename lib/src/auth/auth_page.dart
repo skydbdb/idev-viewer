@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:html' as html;
 import '../core/auth/auth_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../repo/home_repo.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});

@@ -1,13 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import '/src/di/service_locator.dart';
 import '/src/board/stack_board_items/common/new_field.dart';
 import '/src/board/stack_items.dart';
 import '/src/repo/home_repo.dart';
-import '/src/repo/app_streams.dart';
 import 'package:idev_v1/src/board/stack_board_items/common/models/api_config.dart';
 
 class StackSearchCase extends StatefulWidget {
@@ -26,7 +22,6 @@ class _StackSearchCaseState extends State<StackSearchCase> {
   late HomeRepo homeRepo;
   dynamic get item => widget.item;
   GlobalKey<FormBuilderState> formKey = GlobalKey();
-  // String savedValue = '';
   List<ApiConfig> reqApis = [];
   List<ApiConfig> fields = [];
 
@@ -54,8 +49,6 @@ class _StackSearchCaseState extends State<StackSearchCase> {
 
   void _search() {
     formKey.currentState!.saveAndValidate();
-    // savedValue = formKey.currentState?.value.toString() ?? '';
-
     Map<String, Map<String, dynamic>>? apiParams = {};
     formKey.currentState?.value.forEach((key, value) {
       final apis = reqApis.where((api) => api.fieldNm == key);
@@ -79,9 +72,7 @@ class _StackSearchCaseState extends State<StackSearchCase> {
       FormBuilder(
           key: formKey,
           clearValueOnUnregister: true,
-          onChanged: () {
-            // print('1 changed: ${formKey.currentState?.value}');
-          },
+          onChanged: () {},
           child: ListView(
             children: [
               Wrap(children: <Widget>[

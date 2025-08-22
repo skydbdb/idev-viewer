@@ -1,5 +1,3 @@
-/// * More info of StackItem
-
 abstract class StackItemContent {
   const StackItemContent();
 

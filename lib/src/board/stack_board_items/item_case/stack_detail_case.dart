@@ -9,7 +9,6 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:idev_v1/src/theme/theme_table.dart';
 import '/src/board/stack_items.dart';
 import '/src/repo/home_repo.dart';
-import '/src/board/stack_board_item.dart';
 import 'package:idev_v1/src/board/stack_board_items/common/models/api_config.dart';
 
 /// * Draw object

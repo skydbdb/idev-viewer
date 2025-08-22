@@ -1,5 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 
 import '/src/board/core/stack_board_item/stack_item.dart';

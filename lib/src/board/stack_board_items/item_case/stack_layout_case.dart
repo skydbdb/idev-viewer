@@ -42,8 +42,6 @@ class _StackLayoutCaseState extends State<StackLayoutCase> {
   List<MenuConfig> reqMenus = [];
   late List<NavigationDestination> destinations;
   late TextDirection textDirection;
-  late final StreamSubscription _updateStackItemSub;
-  late final StreamSubscription _apiIdResponseSub;
   late HomeRepo homeRepo;
   late AppStreams appStreams;
   late String theme;
@@ -66,8 +64,6 @@ class _StackLayoutCaseState extends State<StackLayoutCase> {
   @override
   void dispose() {
     _rowResponseSub.cancel();
-    _updateStackItemSub.cancel();
-    _apiIdResponseSub.cancel();
     super.dispose();
   }
 
@@ -108,10 +104,7 @@ class _StackLayoutCaseState extends State<StackLayoutCase> {
     subBodyOptions = content.subBodyOptions ?? 'none';
     bodyRatio = content.bodyRatio ?? 0.5;
     _reqMenusDestinations();
-
     _subscribeRowResponse();
-    _subscribeApiIdResponse();
-    _subscribeUpdateStackItem();
   }
 
   void _onMenuSelected(int index) {
@@ -128,48 +121,6 @@ class _StackLayoutCaseState extends State<StackLayoutCase> {
       _selectedIndex = index;
       _isDetailMode = true;
       isActivedDetail = true;
-    });
-  }
-
-  void _subscribeApiIdResponse() {
-    _apiIdResponseSub = homeRepo.getApiIdResponseStream.listen((v) {
-      if (v != null) {}
-    });
-  }
-
-  void _subscribeUpdateStackItem() {
-    _updateStackItemSub = appStreams.updateStackItemStream.listen((v) {
-      if (v?.id == currentItem.id &&
-          v is StackLayoutItem &&
-          v.boardId == currentItem.boardId) {
-        final StackLayoutItem item = v;
-        final LayoutItemContent content = item.content!;
-
-        theme = item.theme;
-        reqMenus = content.reqMenus ?? _initReqMenus();
-        _selectedIndex = content.selectedIndex ?? 0;
-        textDirection = content.directionLtr == true
-            ? TextDirection.ltr
-            : TextDirection.rtl;
-        leftNavigation = content.leftNavigation!;
-        rightNavigation = content.rightNavigation!;
-        topNavigation = content.topNavigation!;
-        bottomNavigation = content.bottomNavigation!;
-        bodyRatio = content.bodyRatio!;
-        title = content.title!;
-        profile = content.profile!;
-        appBar = content.appBar!;
-        actions = content.actions!;
-        drawer = content.drawer!;
-        subBody = content.subBody!;
-        bodyOrientation = content.bodyOrientation!;
-        subBodyOptions = content.subBodyOptions!;
-
-        setState(() {
-          currentItem = item;
-          _reqMenusDestinations();
-        });
-      }
     });
   }
 
