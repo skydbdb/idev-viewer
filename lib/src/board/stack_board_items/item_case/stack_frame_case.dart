@@ -3,9 +3,7 @@ import 'dart:convert';
 
 import 'package:docking/docking.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '/src/board/board/dock_board.dart';
-import '/src/repo/home_repo.dart';
 import '/src/board/stack_items.dart';
 import '/src/board/helpers/compact_id_generator.dart';
 
@@ -24,7 +22,6 @@ class _StackFrameCaseState extends State<StackFrameCase>
     with LayoutParserMixin, AreaBuilderMixin {
   late DockingLayout layout;
   late Docking docking;
-  late HomeRepo homeRepo;
   late Map<String, double> weights;
   late List<String> boardIds;
   late TabbedViewThemeData tabbedViewThemeData;
@@ -35,7 +32,6 @@ class _StackFrameCaseState extends State<StackFrameCase>
   @override
   void initState() {
     super.initState();
-    homeRepo = context.read<HomeRepo>();
     currentItem = widget.item;
 
     _initializeLayout().then((_) {
@@ -103,7 +99,6 @@ class _StackFrameCaseState extends State<StackFrameCase>
 
   void _updateLayoutAreas() {
     try {
-      // 기존 레이아웃의 탭 이름 업데이트
       layout.layoutAreas().forEach((e) {
         if (e is DockingItem) {
           final actualBoardId = _getBoardIdForTabIndex(e.id);
@@ -114,7 +109,6 @@ class _StackFrameCaseState extends State<StackFrameCase>
         }
       });
 
-      // 레이아웃 재구성
       layout.rebuild();
     } catch (e) {
       // 레이아웃 업데이트 실패 시 무시
@@ -151,12 +145,9 @@ class _StackFrameCaseState extends State<StackFrameCase>
             final tabIndex = int.tryParse(components[2]);
             final weight = double.tryParse(components[3]) ?? 0.0;
 
-            // I 타입이고 isTab이 1인 경우가 tab을 나타냄
             if (type == 'I' && isTab == '1' && tabIndex != null) {
-              // 새로운 ID 시스템 사용
               final tabBoardId = CompactIdGenerator.generateFrameBoardId(
                   widget.item.id, tabIndex);
-
               tabBoardIds.add(tabBoardId);
               tabWeights[tabBoardId] = weight;
             }
@@ -174,11 +165,9 @@ class _StackFrameCaseState extends State<StackFrameCase>
   }
 
   int _getTabIndexForBoardId(String boardId) {
-    // Frame_id_tabIndex 패턴에서 tabIndex 추출
     if (boardId.startsWith('Frame_')) {
       final parts = boardId.split('_');
       if (parts.length >= 3) {
-        // 마지막 부분이 tabIndex
         final tabIndex = int.tryParse(parts.last);
         if (tabIndex != null) {
           return tabIndex;
@@ -186,7 +175,6 @@ class _StackFrameCaseState extends State<StackFrameCase>
       }
     }
 
-    // fallback: lastStringify에서 찾기
     final lastStringify = widget.item.content?.lastStringify ?? '';
     if (lastStringify.isNotEmpty) {
       final tabs = parseStringify(lastStringify);
