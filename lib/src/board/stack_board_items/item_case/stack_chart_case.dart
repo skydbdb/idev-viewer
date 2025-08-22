@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idev_v1/src/repo/home_repo.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '/src/board/flutter_stack_board.dart';
-import '/src/di/service_locator.dart';
-import '/src/repo/app_streams.dart';
-import '/src/board/core/stack_board_item/stack_item_status.dart';
 import '/src/board/stack_board_items/items/stack_chart_item.dart';
 import '/src/theme/theme_chart.dart';
 
@@ -26,8 +22,6 @@ class StackChartCase extends StatefulWidget {
 
 class _StackChartCaseState extends State<StackChartCase> {
   late HomeRepo homeRepo;
-  late AppStreams appStreams;
-  late StreamSubscription _updateStackItemSub;
   late StreamSubscription _apiIdResponseSub;
   late ChartItemContent content;
   late bool _enableMultiSelect;
@@ -45,7 +39,6 @@ class _StackChartCaseState extends State<StackChartCase> {
   void initState() {
     super.initState();
     homeRepo = context.read<HomeRepo>();
-    appStreams = sl<AppStreams>();
 
     content = widget.item.content!;
     cartesianSeries = [];
@@ -55,24 +48,43 @@ class _StackChartCaseState extends State<StackChartCase> {
     theme = widget.item.theme ?? 'White';
 
     _subscribeApiIdResponse();
-    _subscribeUpdateStackItem();
   }
 
   void _subscribeApiIdResponse() {
     _apiIdResponseSub = homeRepo.getApiIdResponseStream.listen((v) {
       if (v != null) {
-        final item =
-            _controller(context).getById(widget.item.id) as StackChartItem? ??
-                widget.item;
-        if (v['if_id'] != item.content?.apiId) {
-          return;
-        }
+        final controller =
+            homeRepo.hierarchicalControllers[widget.item.boardId];
+        final item = controller?.getById(widget.item.id);
+        final currentContent = item?.content as ChartItemContent;
+        final String receivedApiId = v['if_id'];
+        final String receivedApiNm =
+            v.keys.contains('apiNm') ? v['apiNm'] : v['apiNm'] ?? '';
 
-        final apiId = v['if_id'];
+        // 기설정된 API ID이거나 강제 주입 요청인지 검사
+        if (receivedApiId == currentContent.apiId) {
+          fetchResponseData(currentContent, receivedApiId, receivedApiNm);
+        }
+      }
+    });
+  }
+
+  void fetchResponseData(
+      final currentContent, final receivedApiId, final receivedApiNm) {
+    dynamic apiResponse = homeRepo.onApiResponse[receivedApiId];
+    if (apiResponse != null &&
+        apiResponse.keys.contains('if_id') &&
+        apiResponse['if_id'] == receivedApiId) {
+      try {
+        final apiId = receivedApiId;
         final result = homeRepo.onApiResponse[apiId]?['data']?['result'];
         if (result is Map<String, dynamic>) {
           setState(() {
-            content = item.content!.copyWith(dataSource: [result]);
+            content = currentContent.copyWith(
+              dataSource: [result],
+              apiId: receivedApiId,
+              title: receivedApiNm,
+            );
           });
         } else if (result is List &&
             result.isNotEmpty &&
@@ -80,8 +92,12 @@ class _StackChartCaseState extends State<StackChartCase> {
           try {
             final List<Map<String, dynamic>> dataSource =
                 result.cast<Map<String, dynamic>>();
-            final it = item.copyWith(
-              content: item.content!.copyWith(dataSource: dataSource),
+            final it = widget.item.copyWith(
+              content: widget.item.content!.copyWith(
+                dataSource: dataSource,
+                apiId: receivedApiId,
+                title: receivedApiNm,
+              ),
             );
             _controller(context).updateItem(it);
             homeRepo.addOnTapState(it);
@@ -93,27 +109,14 @@ class _StackChartCaseState extends State<StackChartCase> {
                 '[StackChartCase][_subscribeApiIdResponse] dataSource JSON parse error: $e');
           }
         }
+      } catch (e) {
+        debugPrint('[StackChartCase] fetchResponseData error: $e');
       }
-    });
-  }
-
-  void _subscribeUpdateStackItem() {
-    _updateStackItemSub = appStreams.updateStackItemStream.listen((v) {
-      if (v?.id == widget.item.id &&
-          v is StackChartItem &&
-          v.boardId == widget.item.boardId) {
-        final StackChartItem item = v;
-        setState(() {
-          content = item.content!;
-          theme = item.theme;
-        });
-      }
-    });
+    }
   }
 
   @override
   void dispose() {
-    _updateStackItemSub.cancel();
     _apiIdResponseSub.cancel();
     super.dispose();
   }
@@ -122,49 +125,9 @@ class _StackChartCaseState extends State<StackChartCase> {
   Widget build(BuildContext context) {
     final chartConfig = chartStyle(theme);
 
-    return Scaffold(
-        appBar: widget.item.status == StackItemStatus.editing
-            ? chartEditMenu(chartConfig)
-            : null,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [_buildChartWidget(chartConfig)],
-        ));
-  }
-
-  AppBar chartEditMenu(ChartThemeConfig chartConfig) {
-    return AppBar(
-      toolbarHeight: 150,
-      backgroundColor: chartConfig.appBarBackgroundColor,
-      title: TextFormField(
-        initialValue: _formatDataSource(content.dataSource),
-        style: chartConfig.appBarTextStyle,
-        decoration: InputDecoration(
-          labelText: '데이터 (JSON)',
-          labelStyle: chartConfig.appBarTextStyle,
-          border: const OutlineInputBorder(),
-          helperText: '예: [{"x": "A", "y": 10}, {"x": "B", "y": 20}]',
-          helperStyle: chartConfig.appBarTextStyle,
-        ),
-        maxLines: 3,
-        onChanged: (String value) {
-          try {
-            final List<dynamic> parsed = jsonDecode(value);
-            final List<Map<String, dynamic>> dataSource =
-                parsed.cast<Map<String, dynamic>>();
-            final item = widget.item.copyWith(
-              content: content.copyWith(dataSource: dataSource),
-            );
-            _controller(context).updateItem(item);
-            homeRepo.addOnTapState(item);
-            setState(() {
-              content = item.content!;
-            });
-          } catch (e) {
-            debugPrint('[StackChartCase] dataSource JSON parse error: \\$e');
-          }
-        },
-      ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [_buildChartWidget(chartConfig)],
     );
   }
 
@@ -518,13 +481,6 @@ class _StackChartCaseState extends State<StackChartCase> {
 
       if (apis.isNotEmpty) {
         apis.forEach((key, value) {
-          // Map<String, dynamic> params = {
-          //   'if_id': key,
-          //   'method': value['method'],
-          //   'uri': value['uri'],
-          //   'token': AuthService.token,
-          //   ...values,
-          // };
           homeRepo.addApiRequest(key, values);
         });
       }
@@ -700,11 +656,6 @@ class _StackChartCaseState extends State<StackChartCase> {
         }
         return null;
     }
-  }
-
-  String _formatDataSource(List<Map<String, dynamic>>? dataSource) {
-    if (dataSource == null) return '';
-    return jsonEncode(dataSource);
   }
 
   // 포맷 헬퍼 메서드들
