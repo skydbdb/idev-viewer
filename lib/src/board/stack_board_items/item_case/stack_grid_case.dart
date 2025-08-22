@@ -909,13 +909,7 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
 
         final api = homeRepo.apis[saveApiId];
         if (api != null) {
-          Map<String, dynamic> params = {
-            // 'if_id': api['apiId'],
-            // 'method': api['method'],
-            // 'uri': api['uri'],
-            // 'token': AuthService.token,
-            ...apiParams
-          };
+          Map<String, dynamic> params = {...apiParams};
 
           homeRepo.addApiRequest(saveApiId, params);
 
