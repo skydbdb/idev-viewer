@@ -24,27 +24,18 @@ class StackSearchCase extends StatefulWidget {
 
 class _StackSearchCaseState extends State<StackSearchCase> {
   late HomeRepo homeRepo;
-  late AppStreams appStreams;
   dynamic get item => widget.item;
   GlobalKey<FormBuilderState> formKey = GlobalKey();
-  String savedValue = '';
+  // String savedValue = '';
   List<ApiConfig> reqApis = [];
   List<ApiConfig> fields = [];
-
-  late StreamSubscription _updateStackItemSub;
 
   @override
   void initState() {
     super.initState();
-    _initStateSettings();
-    _mergeFields();
-    _subscribeUpdateStackItem();
-  }
-
-  void _initStateSettings() {
     homeRepo = context.read<HomeRepo>();
-    appStreams = sl<AppStreams>();
     reqApis = widget.item.content?.reqApis ?? [];
+    _mergeFields();
   }
 
   void _mergeFields() {
@@ -56,29 +47,14 @@ class _StackSearchCaseState extends State<StackSearchCase> {
     }
   }
 
-  void _subscribeUpdateStackItem() {
-    _updateStackItemSub = appStreams.updateStackItemStream.listen((v) {
-      if (v?.id == widget.item.id &&
-          v is StackSearchItem &&
-          v.boardId == widget.item.boardId) {
-        final StackSearchItem item = v;
-        setState(() {
-          reqApis = item.content?.reqApis ?? [];
-          _mergeFields();
-        });
-      }
-    });
-  }
-
   @override
   void dispose() {
-    _updateStackItemSub.cancel();
     super.dispose();
   }
 
   void _search() {
     formKey.currentState!.saveAndValidate();
-    savedValue = formKey.currentState?.value.toString() ?? '';
+    // savedValue = formKey.currentState?.value.toString() ?? '';
 
     Map<String, Map<String, dynamic>>? apiParams = {};
     formKey.currentState?.value.forEach((key, value) {
@@ -92,9 +68,7 @@ class _StackSearchCaseState extends State<StackSearchCase> {
       }
     });
 
-    // print('apiParams: $apiParams');
     apiParams.forEach((key, value) {
-      // homeRepo.addApiRequest((key, value));
       homeRepo.addApiRequest(key, value);
     });
   }
