@@ -43,16 +43,7 @@ class HomeBoardState extends State<HomeBoard> {
       // API 초기화는 한 번만 실행
       homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
       homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.versions);
-
-      // // 템플릿 미리보기 호출
-      // homeRepo.addJsonMenuState({
-      //   'templateId': 42,
-      //   'templateNm': 'preview',
-      //   'versionId': homeRepo.versionId,
-      //   'script': jsonString,
-      //   'commitInfo': 'preview',
-      // });
+      // homeRepo.reqIdeApi('get', ApiEndpointIDE.versions);
     }
   }
 

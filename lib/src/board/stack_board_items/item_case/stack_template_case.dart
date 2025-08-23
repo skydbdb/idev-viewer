@@ -105,6 +105,7 @@ class _StackTemplateCaseState extends State<StackTemplateCase> {
 
   /// Generate From Json
   Future<void> generateFromJson({String? json}) async {
+    debugPrint('🔘 [StackTemplateCase] generateFromJson: $json');
     String jsonString =
         BoardMenu.replaceTemplateJson(json ?? '', '#TEMPLATE#', widget.item.id);
 

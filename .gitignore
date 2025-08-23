@@ -8,6 +8,24 @@
 build/
 *.lock
 
+# idev-viewer-js specific
+idev-viewer-js/node_modules/
+idev-viewer-js/dist/
+idev-viewer-js/.npmignore
+idev-viewer-js/package-lock.json
+idev-viewer-js/examples/*/node_modules/
+idev-viewer-js/examples/*/dist/
+idev-viewer-js/examples/*/build/
+idev-viewer-js/examples/*/.next/
+idev-viewer-js/examples/*/.nuxt/
+idev-viewer-js/examples/*/.output/
+idev-viewer-js/examples/*/.cache/
+idev-viewer-js/examples/*/coverage/
+idev-viewer-js/examples/*/reports/
+idev-viewer-js/examples/*/logs/
+idev-viewer-js/examples/*/temp/
+idev-viewer-js/examples/*/tmp/
+
 # Dart compiler cache
 *.dill
 *.dill.track.dill
@@ -75,6 +93,15 @@ build/
 *.ipr
 *.iws
 
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+.envrc
+
 # OS
 .DS_Store
 .DS_Store?
@@ -90,6 +117,15 @@ Thumbs.db
 # Deployment
 deploy-idev.sh
 cloudfront-config.json
+
+# Project specific
+Dockerfile
+docker-compose.yml
+nginx.conf
+text_to_json_node.py
+scripts/
+uml/
+web/
 
 # Large files
 *.zip
