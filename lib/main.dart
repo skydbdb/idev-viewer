@@ -21,15 +21,15 @@ Future<void> main() async {
   AppConfig.initialize();
   initServiceLocator();
 
-  // iframe 통신 초기화 (임시 비활성화 - 인증 문제 해결 후 활성화)
-  // IframeCommunication.initialize();
-
   runApp(
     RepositoryProvider(
       create: (context) => HomeRepo(),
       child: const IDevViewerApp(),
     ),
   );
+
+  // iframe 통신 초기화 (임시 비활성화 - 인증 문제 해결 후 활성화)
+  IframeCommunication.initialize();
 }
 
 class IDevViewerApp extends StatelessWidget {

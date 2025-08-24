@@ -1,81 +1,105 @@
-# 본 idev_viewer 프로젝트에 대해 설명한다. 
- - 패키지형태 또는 웹 어플리케이션 뷰어로 배포하고 싶다.
- - 소스코드는 난독 또는 볼 수 없게하고 싶다. 
- - 템플릿 json스크립트를 받아서 렌더링 해주고 api연동 및 구독처리를 해준다.
- - 타 프레임워크(React, Vue)에서도 동일한 렌더링이 되게 사용하게 해준다.
+# IDev Viewer
 
-from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
+Flutter로 개발된 웹 애플리케이션을 타 프레임워크(React, Vue, Angular 등)에서 100% 동일한 렌더링으로 사용할 수 있도록 해주는 JavaScript 라이브러리입니다.
 
-def text_to_json_node(state):
-    # StackTableItem, TableItemContent의 JSON 스키마 정의
-    schema = '''
-    StackTableItem: {
-      "boardId": string,
-      "id": string,
-      "angle": double,
-      "size": {"width": double, "height": double},
-      "offset": {"dx": double, "dy": double},
-      "padding": double,
-      "status": int,  // StackItemStatus enum index
-      "lockZOrder": bool,
-      "dock": bool,
-      "permission": string,
-      "content": TableItemContent
-    }
-    TableItemContent: {
-      "columnGap": double,
-      "rowGap": double,
-      "gapColor": string,
-      "areas": string,
-      "columnSizes": string,
-      "rowSizes": string,
-      "reqApis": string,
-      "resApis": string
-    }
-    '''
-    # 예제 JSON
-    examples = '''
-    예시1: 인사관리 테이블 위젯
-    {
-      "boardId": "board-001",
-      "id": "item-123",
-      "angle": 0.0,
-      "size": {"width": 400.0, "height": 300.0},
-      "offset": {"dx": 100.0, "dy": 200.0},
-      "padding": 8.0,
-      "status": 1,
-      "lockZOrder": false,
-      "dock": false,
-      "permission": "admin",
-      "content": {
-        "columnGap": 8.0,
-        "rowGap": 4.0,
-        "gapColor": "#EEEEEE",
-        "areas": "header body footer",
-        "columnSizes": "100,200,100",
-        "rowSizes": "40,200,60",
-        "reqApis": "/api/hr/list",
-        "resApis": "/api/hr/response"
-      }
-    }
-    '''
-    prompt = PromptTemplate(
-        template="""
-아래는 Flutter 위젯 StackTableItem, TableItemContent의 JSON 스키마와 예제입니다.\n
-{schema}\n
-예제:\n{examples}\n
----\n
-아래 사용자 요청에 맞는 StackTableItem JSON을 생성하세요.\n
-사용자 요청: {query}\n
-생성할 JSON:
-""",
-        input_variables=["query"]
-    )
-    llm = OpenAI()
-    # state에 schema, examples를 추가
-    state["schema"] = schema
-    state["examples"] = examples
-    json_str = llm(prompt.format(query=state["query"], schema=schema, examples=examples))
-    state["generated_json"] = json_str
-    return state 
+## 🚀 빠른 시작
+
+### 1. 자동화 스크립트 사용 (권장)
+
+```bash
+# 전체 빌드 및 배포
+./build-and-deploy.sh
+
+# NPM 패키지 배포 포함
+./build-and-deploy.sh --publish
+```
+
+### 2. 수동 빌드
+
+```bash
+# Flutter Web 빌드
+flutter build web --release --dart-define=FLUTTER_WEB_USE_SKIA=false
+
+# 파일 복사
+cp -r build/web/* idev-viewer-js/
+cp -r build/web/* idev-viewer-js/flutter-app/
+
+# JavaScript 라이브러리 빌드
+cd idev-viewer-js && npm run build
+```
+
+## 📚 상세 가이드
+
+- **[통합 가이드](./IDEV_VIEWER_INTEGRATION_GUIDE.md)** - 타 프레임워크에서 사용하는 방법
+- **[실행 테스트 매뉴얼](./idev-viewer-js/EXECUTION_TEST_MANUAL.md)** - 상세한 테스트 절차
+
+## 🧪 테스트
+
+### 통합 테스트 실행
+
+```bash
+./test-integration.sh
+```
+
+### 개별 테스트
+
+```bash
+# Python HTTP 서버 시작
+python3 -m http.server 8080
+
+# 테스트 URL
+# http://localhost:8080/idev-viewer-js/test.html
+```
+
+## 📦 NPM 패키지
+
+```bash
+npm install @idev/viewer
+```
+
+## 🏗️ 프로젝트 구조
+
+```
+idev_viewer/
+├── lib/                          # Flutter 소스 코드
+├── idev-viewer-js/              # JavaScript 라이브러리
+│   ├── src/                     # 소스 코드
+│   ├── dist/                    # 빌드된 라이브러리
+│   ├── examples/                # React/Vue 예제
+│   ├── flutter-app/             # Flutter Web 앱
+│   └── package.json
+├── build-and-deploy.sh          # 자동화 스크립트
+├── test-integration.sh          # 테스트 스크립트
+└── README.md
+```
+
+## 🔧 개발 환경
+
+- Flutter 3.x
+- Node.js 18+
+- Python 3.x (테스트용 HTTP 서버)
+
+## 📋 주요 기능
+
+- ✅ Flutter Web 앱을 iframe으로 임베드
+- ✅ PostMessage를 통한 양방향 통신
+- ✅ 템플릿 동적 업데이트
+- ✅ 설정 변경 지원
+- ✅ React, Vue, Angular 등 모든 프레임워크 지원
+- ✅ TypeScript 지원
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## 📞 지원
+
+문제가 있거나 질문이 있으시면 GitHub Issues를 통해 문의해주세요. 
