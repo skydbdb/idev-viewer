@@ -13,11 +13,9 @@ import '/src/repo/home_repo.dart';
 import '/src/layout/tabs/tabs.dart';
 import '/src/board/board/viewer/template_viewer_page.dart';
 import '/src/auth/auth_page.dart';
-import '/src/web/iframe_communication.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   AppConfig.initialize();
   initServiceLocator();
 
@@ -27,9 +25,6 @@ Future<void> main() async {
       child: const IDevViewerApp(),
     ),
   );
-
-  // iframe 통신 초기화 (임시 비활성화 - 인증 문제 해결 후 활성화)
-  IframeCommunication.initialize();
 }
 
 class IDevViewerApp extends StatelessWidget {

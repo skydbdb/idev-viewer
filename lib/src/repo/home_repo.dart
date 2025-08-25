@@ -20,6 +20,7 @@ import '/src/core/error/api_error.dart';
 import 'app_streams.dart';
 import '../board/board/hierarchical_dock_board_controller.dart';
 import '../board/core/stack_board_controller.dart';
+import '../web/iframe_communication.dart';
 
 class HomeRepo {
   String? userId;
@@ -454,6 +455,9 @@ class HomeRepo {
       listener();
       _globalListenersSetup = true;
     }
+
+    // iframe 통신 초기화 (AppStreams와 HomeRepo가 준비된 후)
+    _initializeIframeCommunication();
   }
 
   void dispose() {
@@ -535,6 +539,331 @@ class HomeRepo {
         _handleGetApiRequestEvent(event);
       }
     });
+  }
+
+  // iframe 통신 관련 메소드들
+  void handleIframeMessage(Map<String, dynamic> data) {
+    try {
+      print('🔄 HomeRepo: iframe 메시지 수신 - ${data['type']}');
+
+      switch (data['type']) {
+        case 'init_template':
+          _handleIframeTemplateInit(data);
+          break;
+        case 'update_template':
+          _handleIframeTemplateUpdate(data);
+          break;
+        case 'update_config':
+          _handleIframeConfigUpdate(data);
+          break;
+        case 'api_request':
+          _handleIframeApiRequest(data);
+          break;
+        case 'get_state':
+          _handleIframeGetState();
+          break;
+        case 'resize':
+          _handleIframeResize(data);
+          break;
+        case 'subscribe_stream':
+          _handleIframeSubscribeStream(data);
+          break;
+        case 'unsubscribe_stream':
+          _handleIframeUnsubscribeStream(data);
+          break;
+        default:
+          print('⚠️ HomeRepo: 알 수 없는 iframe 메시지 타입: ${data['type']}');
+      }
+    } catch (e) {
+      print('❌ HomeRepo: iframe 메시지 처리 실패: $e');
+      _sendIframeErrorMessage('Message processing failed: $e');
+    }
+  }
+
+  void _handleIframeTemplateInit(Map<String, dynamic> data) {
+    try {
+      final template = data['template'];
+      final config = data['config'] ?? {};
+
+      print('📄 HomeRepo: iframe 템플릿 초기화 시작');
+      print('   - templateId: ${template['templateId']}');
+      print('   - templateNm: ${template['templateNm']}');
+
+      // AppStreams를 통해 템플릿 전달
+      _appStreams.addJsonMenuState({
+        'script': template['script'],
+        'templateId': template['templateId'],
+        'templateNm': template['templateNm'],
+        'commitInfo': template['commitInfo']
+      });
+
+      // 설정도 함께 업데이트
+      if (config.isNotEmpty) {
+        _updateIframeConfig(config);
+      }
+
+      _sendIframeSuccessMessage('Template initialized successfully');
+      print('✅ HomeRepo: iframe 템플릿 초기화 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 템플릿 초기화 실패: $e');
+      _sendIframeErrorMessage('Failed to initialize template: $e');
+    }
+  }
+
+  void _handleIframeTemplateUpdate(Map<String, dynamic> data) {
+    try {
+      print('🔄 HomeRepo: iframe 템플릿 업데이트 시작');
+
+      final template = data['template'];
+      print('📊 받은 템플릿 데이터:');
+      print('   - script 길이: ${template['script']?.length ?? 0}');
+      print('   - templateId: ${template['templateId']}');
+      print('   - templateNm: ${template['templateNm']}');
+      print('   - commitInfo: ${template['commitInfo']}');
+
+      // AppStreams를 통해 템플릿 업데이트
+      final jsonMenuData = {
+        'script': template['script'],
+        'templateId': template['templateId'],
+        'templateNm': template['templateNm'],
+        'commitInfo': template['commitInfo']
+      };
+
+      _appStreams.addJsonMenuState(jsonMenuData);
+      print('✅ HomeRepo: iframe 템플릿 업데이트 완료');
+
+      _sendIframeSuccessMessage('Template updated successfully');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 템플릿 업데이트 실패: $e');
+      _sendIframeErrorMessage('Failed to update template: $e');
+    }
+  }
+
+  void _handleIframeConfigUpdate(Map<String, dynamic> data) {
+    try {
+      final config = data['config'];
+      print('⚙️ HomeRepo: iframe 설정 업데이트 시작: $config');
+
+      _updateIframeConfig(config);
+      _sendIframeSuccessMessage('Config updated successfully');
+      print('✅ HomeRepo: iframe 설정 업데이트 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 설정 업데이트 실패: $e');
+      _sendIframeErrorMessage('Failed to update config: $e');
+    }
+  }
+
+  void _handleIframeApiRequest(Map<String, dynamic> data) {
+    try {
+      final method = data['method'];
+      final apiId = data['apiId'];
+      final params = data['params'] ?? {};
+      final versionId = data['versionId'];
+      final templateId = data['templateId'];
+      final commitId = data['commitId'];
+
+      print('📡 HomeRepo: iframe API 요청 처리 시작');
+      print('   - method: $method');
+      print('   - apiId: $apiId');
+      print('   - params: $params');
+
+      // HomeRepo를 통해 API 요청
+      reqIdeApi(method, apiId,
+          versionId: versionId,
+          templateId: templateId,
+          commitId: commitId,
+          params: params);
+
+      _sendIframeSuccessMessage('API request sent successfully');
+      print('✅ HomeRepo: iframe API 요청 처리 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe API 요청 처리 실패: $e');
+      _sendIframeErrorMessage('Failed to send API request: $e');
+    }
+  }
+
+  void _handleIframeGetState() {
+    try {
+      print('📊 HomeRepo: iframe 상태 요청 처리 시작');
+
+      // 현재 상태 정보 전송
+      final state = _getCurrentIframeState();
+      _sendIframeMessage('state_update', state);
+      print('✅ HomeRepo: iframe 상태 전송 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 상태 요청 처리 실패: $e');
+      _sendIframeErrorMessage('Failed to get state: $e');
+    }
+  }
+
+  void _handleIframeResize(Map<String, dynamic> data) {
+    try {
+      final width = data['width'];
+      final height = data['height'];
+
+      print('📏 HomeRepo: iframe 크기 조정 요청: ${width}x$height');
+
+      // iframe 크기에 맞춰 Flutter 앱 크기 조정
+      _resizeIframeApp(width, height);
+
+      _sendIframeSuccessMessage('App resized successfully');
+      print('✅ HomeRepo: iframe 크기 조정 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 크기 조정 실패: $e');
+      _sendIframeErrorMessage('Failed to resize app: $e');
+    }
+  }
+
+  void _handleIframeSubscribeStream(Map<String, dynamic> data) {
+    try {
+      final streamType = data['streamType'];
+      final callbackId = data['callbackId'];
+
+      print('📡 HomeRepo: iframe 스트림 구독 요청: $streamType');
+
+      // 스트림 구독 설정
+      switch (streamType) {
+        case 'json_menu':
+          _appStreams.jsonMenuStream.listen((data) {
+            _sendIframeMessage('stream_data', {
+              'streamType': streamType,
+              'callbackId': callbackId,
+              'data': data
+            });
+          });
+          break;
+        case 'api_response':
+          responseStream.listen((data) {
+            _sendIframeMessage('stream_data', {
+              'streamType': streamType,
+              'callbackId': callbackId,
+              'data': data
+            });
+          });
+          break;
+        case 'api_menu':
+          _appStreams.apiMenuStream.listen((data) {
+            _sendIframeMessage('stream_data', {
+              'streamType': streamType,
+              'callbackId': callbackId,
+              'data': data
+            });
+          });
+          break;
+        case 'on_tap':
+          _appStreams.onTapStream.listen((item) {
+            _sendIframeMessage('stream_data', {
+              'streamType': streamType,
+              'callbackId': callbackId,
+              'data': item?.toJson()
+            });
+          });
+          break;
+        case 'on_edit':
+          _appStreams.onEditStream.listen((item) {
+            _sendIframeMessage('stream_data', {
+              'streamType': streamType,
+              'callbackId': callbackId,
+              'data': item?.toJson()
+            });
+          });
+          break;
+        default:
+          print('⚠️ HomeRepo: 알 수 없는 스트림 타입: $streamType');
+      }
+
+      _sendIframeSuccessMessage('Stream subscription successful');
+      print('✅ HomeRepo: iframe 스트림 구독 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 스트림 구독 실패: $e');
+      _sendIframeErrorMessage('Failed to subscribe to stream: $e');
+    }
+  }
+
+  void _handleIframeUnsubscribeStream(Map<String, dynamic> data) {
+    try {
+      final callbackId = data['callbackId'];
+      print('📡 HomeRepo: iframe 스트림 구독 해제 요청: $callbackId');
+
+      // 스트림 구독 해제 로직 (필요시 구현)
+      // TODO: 구독된 스트림을 추적하고 해제하는 로직 추가
+
+      _sendIframeSuccessMessage('Stream unsubscription successful');
+      print('✅ HomeRepo: iframe 스트림 구독 해제 완료');
+    } catch (e) {
+      print('❌ HomeRepo: iframe 스트림 구독 해제 실패: $e');
+      _sendIframeErrorMessage('Failed to unsubscribe from stream: $e');
+    }
+  }
+
+  // iframe 설정 업데이트
+  void _updateIframeConfig(Map<String, dynamic> config) {
+    // TODO: 기존 설정 업데이트 로직과 연동
+    print('⚙️ HomeRepo: iframe 설정 업데이트: $config');
+
+    // 테마 설정
+    if (config.containsKey('theme')) {
+      selectedTheme = config['theme'];
+      print('🎨 HomeRepo: 테마 설정 변경: $selectedTheme');
+    }
+
+    // 로케일 설정
+    if (config.containsKey('locale')) {
+      print('🌐 HomeRepo: 로케일 설정 변경: ${config['locale']}');
+    }
+  }
+
+  // 현재 iframe 상태 반환
+  Map<String, dynamic> _getCurrentIframeState() {
+    return {
+      'template': {
+        'templateId': currentLeftMenu?.menuId?.toString(),
+        'templateNm': currentLeftMenu?.menuNm,
+        'commitInfo': 'v1.0.0'
+      },
+      'config': {'theme': selectedTheme, 'locale': 'ko'},
+      'timestamp': DateTime.now().millisecondsSinceEpoch
+    };
+  }
+
+  // iframe 앱 크기 조정
+  void _resizeIframeApp(double width, double height) {
+    // TODO: 앱 크기 조정 로직
+    print('📏 HomeRepo: iframe 앱 크기 조정: ${width}x$height');
+  }
+
+  // iframe 통신 초기화
+  void _initializeIframeCommunication() {
+    // AppStreams와 HomeRepo가 모두 준비된 후 초기화
+    Future.microtask(() {
+      try {
+        print('🌐 HomeRepo: iframe 통신 초기화 시작');
+        IframeCommunication.initialize();
+        print('✅ HomeRepo: iframe 통신 초기화 완료');
+      } catch (e) {
+        print('❌ HomeRepo: iframe 통신 초기화 실패: $e');
+      }
+    });
+  }
+
+  // iframe으로 메시지 전송하는 메소드들
+  void _sendIframeMessage(String type, dynamic data) {
+    // IframeCommunication을 통해 메시지 전송
+    _sendIframeMessageToParent(type, data);
+  }
+
+  void _sendIframeSuccessMessage(String message) {
+    _sendIframeMessage('success', {'message': message});
+  }
+
+  void _sendIframeErrorMessage(String message) {
+    _sendIframeMessage('error', {'message': message});
+  }
+
+  // 부모 창으로 메시지 전송 (IframeCommunication과 연동)
+  void _sendIframeMessageToParent(String type, dynamic data) {
+    // IframeCommunication의 sendMessage 메소드 호출
+    IframeCommunication.sendMessage(type, data);
   }
 
   Future<void> _handleGetApiRequestEvent(
