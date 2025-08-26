@@ -6,6 +6,7 @@ import '../error/api_error.dart';
 import './model/api_response.dart'; // ApiResponse 모델
 import './model/behavior.dart'; // Method enum 사용
 import '../auth/auth_service.dart'; // AuthService import 추가
+import '../auth/viewer_auth_service.dart'; // ViewerAuthService import 추가
 import '../../util/network_utils.dart'; // NetworkUtils import 추가
 import 'api_client.dart';
 
@@ -24,8 +25,8 @@ class ApiService {
     Map<String, String>? headers, // 추가적인 헤더
     String? ifId, // URL 구성 시 사용될 수 있음
   }) async {
-    // AuthService 초기화 보장
-    await AuthService.ensureInitialized();
+    // AuthService 초기화는 호출하는 쪽에서 처리하도록 변경
+    // await AuthService.ensureInitialized();
 
     // 네트워크 연결 상태 확인
     final isConnected = await NetworkUtils.isInternetConnected();
@@ -59,7 +60,12 @@ class ApiService {
     else if (data?['token'] != null && data!['token'].toString().isNotEmpty) {
       tokenValue = data['token'].toString();
     }
-    // 우선순위 3: AuthService에서 토큰 가져오기 시도
+    // 우선순위 3: ViewerAuthService에서 뷰어 토큰 가져오기
+    else if (ViewerAuthService.isViewerAuthenticated &&
+        ViewerAuthService.viewerToken != null) {
+      tokenValue = ViewerAuthService.viewerToken;
+    }
+    // 우선순위 4: AuthService에서 토큰 가져오기 시도
     else {
       try {
         if (AuthService.token != null && AuthService.token!.isNotEmpty) {
@@ -79,8 +85,17 @@ class ApiService {
           data: {'auth_status': 'no_token'});
     }
 
-    // 5. Bearer 토큰을 헤더에 설정
-    headerMap['Authorization'] = 'Bearer $tokenValue';
+    // 5. 토큰을 헤더에 설정
+    if (ViewerAuthService.isViewerAuthenticated &&
+        ViewerAuthService.viewerToken == tokenValue) {
+      // 뷰어 토큰인 경우 X-Viewer-Token 헤더 사용
+      headerMap['X-Viewer-Token'] = tokenValue;
+      // 뷰어 토큰은 Authorization 헤더도 함께 설정 (서버 호환성)
+      headerMap['Authorization'] = 'Bearer $tokenValue';
+    } else {
+      // 일반 토큰인 경우 Bearer 토큰 사용
+      headerMap['Authorization'] = 'Bearer $tokenValue';
+    }
 
     // 6. data에서 token 제거하여 중복 방지
     final cleanData = Map<String, dynamic>.from(data ?? {});

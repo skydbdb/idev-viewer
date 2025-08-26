@@ -798,6 +798,10 @@ class HomeRepo {
 
   // iframe 설정 업데이트
   void _updateIframeConfig(Map<String, dynamic> config) {
+    // 테스트 뷰어 인증키
+    config['apiKey'] =
+        "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
+
     // TODO: 기존 설정 업데이트 로직과 연동
     print('⚙️ HomeRepo: iframe 설정 업데이트: $config');
 

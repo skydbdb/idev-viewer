@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:html' as html;
+
 import '../core/auth/auth_service.dart';
+import '../core/auth/viewer_auth_service.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -25,17 +26,11 @@ class _AuthPageState extends State<AuthPage> {
     try {
       // print('AuthPage: 인증 초기화 시작');
 
-      // URL 파라미터 확인
-      if (kIsWeb) {
-        final uri = Uri.parse(html.window.location.href);
-        print('AuthPage: 현재 URL - ${html.window.location.href}');
-        print('AuthPage: URL 파라미터 - ${uri.queryParameters}');
-      }
-
       final isAuthenticated = await AuthService.initializeAuth();
 
       // 디버그 정보 출력
       AuthService.printDebugInfo();
+      ViewerAuthService.printDebugInfo();
 
       if (mounted) {
         setState(() {
@@ -48,6 +43,11 @@ class _AuthPageState extends State<AuthPage> {
           final token = AuthService.token;
           if (token != null) {
             print('AuthPage: 인증 성공 - ${token.substring(0, 20)}...');
+          }
+
+          // 뷰어 인증 상태 확인
+          if (ViewerAuthService.isViewerAuthenticated) {
+            print('AuthPage: 뷰어 인증으로 로그인됨');
           }
 
           // print('AuthPage: 인증 성공! 메인 앱으로 이동');
@@ -121,6 +121,26 @@ class _AuthPageState extends State<AuthPage> {
                   fontSize: 18,
                 ),
               ),
+              if (ViewerAuthService.isViewerAuthenticated) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.blue, width: 1),
+                  ),
+                  child: const Text(
+                    'IDEV 뷰어로 인증됨',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ] else ...[
               const Icon(
                 Icons.error,

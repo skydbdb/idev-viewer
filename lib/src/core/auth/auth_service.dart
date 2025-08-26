@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';
 import '../api/api_service.dart';
 import '../api/model/behavior.dart';
+import 'viewer_auth_service.dart';
 
 class AuthService {
   static String? _token;
@@ -12,7 +12,7 @@ class AuthService {
   /// 토큰 변경 시 콜백 등록
   static final List<Function(String?)> _tokenChangeCallbacks = [];
 
-  /// 인증 초기화 - URL 파라미터에서 토큰 추출
+  /// 인증 초기화 - 뷰어 인증 또는 로컬 개발 환경 인증
   static Future<bool> initializeAuth() async {
     if (_isInitialized) {
       return _token != null;
@@ -20,45 +20,53 @@ class AuthService {
 
     try {
       if (kIsWeb) {
-        // 웹 환경에서 URL 파라미터 추출
-        final uri = Uri.parse(html.window.location.href);
-        final token = uri.queryParameters['token'];
-        final userStr = uri.queryParameters['user'];
+        // 뷰어 인증 시도 (ViewerAuthService가 이미 초기화되어 있으면 재사용)
+        print('AuthService: 뷰어 인증 상태 확인');
 
-        print('AuthService: URL 파라미터 확인');
-        print('전체 URL: ${html.window.location.href}');
-        print('Token: ${token != null ? '존재' : '없음'}');
-        print('User: ${userStr != null ? '존재' : '없음'}');
+        // ViewerAuthService가 이미 초기화되어 있으면 그 결과 사용
+        if (ViewerAuthService.isViewerInitialized) {
+          if (ViewerAuthService.isViewerAuthenticated) {
+            final viewerToken = ViewerAuthService.viewerToken;
+            final viewerInfo = ViewerAuthService.viewerInfo;
 
-        if (token != null) {
-          print('Token 값: ${token.substring(0, 20)}...');
-        }
-
-        if (userStr != null) {
-          print('User 값 (원본): $userStr');
-          try {
-            // 이미 JSON 형태인지 확인
-            String decodedUser;
-            if (userStr.startsWith('{') && userStr.endsWith('}')) {
-              // 이미 디코딩된 JSON 문자열
-              decodedUser = userStr;
-            } else {
-              // URL 인코딩된 문자열이므로 디코딩
-              decodedUser = Uri.decodeComponent(userStr);
+            if (viewerToken != null) {
+              setToken(viewerToken);
+              _userInfo = viewerInfo ??
+                  {
+                    'name': 'IDEV 뷰어',
+                    'id': 'viewer_user',
+                    'role': 'viewer',
+                    'type': 'viewer'
+                  };
+              _isInitialized = true;
+              print('AuthService: 기존 뷰어 인증 사용');
+              return true;
             }
+          }
+        } else {
+          // ViewerAuthService 초기화가 안 되어 있으면 초기화
+          print('AuthService: 뷰어 인증 초기화');
+          final viewerAuthResult =
+              await ViewerAuthService.initializeViewerAuth();
 
-            // JSON 파싱 시도
-            final userMap = jsonDecode(decodedUser);
-            print('User 파싱 성공: 사용자명 = ${userMap['name']}');
+          if (viewerAuthResult) {
+            // 뷰어 인증 성공
+            final viewerToken = ViewerAuthService.viewerToken;
+            final viewerInfo = ViewerAuthService.viewerInfo;
 
-            setToken(token); // 토큰 설정 및 콜백 실행
-            _userInfo = userMap;
-            _isInitialized = true;
-            print('AuthService: 실제 토큰과 사용자 정보로 인증 성공');
-            return true;
-          } catch (e) {
-            print('AuthService: User 파싱 실패 - $e');
-            print('AuthService: 파싱 실패로 인해 인증 실패');
+            if (viewerToken != null) {
+              setToken(viewerToken);
+              _userInfo = viewerInfo ??
+                  {
+                    'name': 'IDEV 뷰어',
+                    'id': 'viewer_user',
+                    'role': 'viewer',
+                    'type': 'viewer'
+                  };
+              _isInitialized = true;
+              print('AuthService: 뷰어 인증으로 인증 성공');
+              return true;
+            }
           }
         }
 
@@ -89,8 +97,8 @@ class AuthService {
           return true;
         }
 
-        // 다른 환경에서는 실제 토큰과 사용자 정보가 있어야만 인증 성공
-        print('AuthService: 인증 실패 - 토큰 또는 사용자 정보 없음');
+        // 다른 환경에서는 뷰어 인증이 실패하면 인증 실패
+        print('AuthService: 뷰어 인증 실패');
         _isInitialized = true;
         return false;
       }
