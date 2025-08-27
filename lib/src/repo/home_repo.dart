@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:idev_v1/src/auth/auth_page.dart';
 import 'package:idev_v1/src/core/api/api_endpoint_ide.dart';
 import 'package:idev_v1/src/core/auth/auth_service.dart';
+import 'package:idev_v1/src/core/auth/viewer_auth_service.dart';
 import 'package:idev_v1/src/layout/tabs/new_tab.dart';
 import '/src/model/menu.dart';
 import 'package:pluto_layout/pluto_layout.dart';
@@ -797,13 +799,21 @@ class HomeRepo {
   }
 
   // iframe 설정 업데이트
-  void _updateIframeConfig(Map<String, dynamic> config) {
-    // 테스트 뷰어 인증키
-    config['apiKey'] =
-        "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
+  void _updateIframeConfig(Map<String, dynamic> config) async {
+    // // 테스트 뷰어 인증키
+    // config['apiKey'] =
+    //     "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
 
     // TODO: 기존 설정 업데이트 로직과 연동
     print('⚙️ HomeRepo: iframe 설정 업데이트: $config');
+
+    // 뷰어 인증키 설정
+    // if (config.containsKey('apiKey')) {
+    //   ViewerAuthService.viewerApiKey = config['apiKey'] ??
+    //       '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
+    //   await ViewerAuthService.initializeViewerAuth();
+    //   await AuthService.initializeAuth();
+    // }
 
     // 테마 설정
     if (config.containsKey('theme')) {
@@ -843,6 +853,11 @@ class HomeRepo {
       try {
         print('🌐 HomeRepo: iframe 통신 초기화 시작');
         IframeCommunication.initialize();
+        // _updateIframeConfig({
+        //   'apiKey':
+        //       '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011'
+        // });
+
         print('✅ HomeRepo: iframe 통신 초기화 완료');
       } catch (e) {
         print('❌ HomeRepo: iframe 통신 초기화 실패: $e');

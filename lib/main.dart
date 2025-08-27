@@ -12,7 +12,13 @@ import '/src/auth/auth_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // AppConfig를 먼저 초기화
   AppConfig.initialize();
+
+  // AppConfig 초기화 완료 후 다른 서비스 초기화
+  await Future.delayed(const Duration(milliseconds: 200)); // 초기화 완료 대기
+
   initServiceLocator();
 
   runApp(
@@ -43,7 +49,7 @@ class IDevViewerApp extends StatelessWidget {
     );
   }
 
-  /// 초기 라우트 결정 - 항상 인증 페이지로 이동
+  // 초기 라우트 결정 - 항상 인증 페이지로 이동
   String _getInitialRoute() {
     // 항상 인증 페이지로 이동
     print('main.dart: 인증 페이지로 이동');

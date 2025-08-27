@@ -20,8 +20,8 @@ class AuthService {
 
     try {
       if (kIsWeb) {
-        // 뷰어 인증 시도 (ViewerAuthService가 이미 초기화되어 있으면 재사용)
-        print('AuthService: 뷰어 인증 상태 확인');
+        // 환경에 관계없이 항상 뷰어 인증을 먼저 시도
+        print('AuthService: 뷰어 인증 시도 (환경에 관계없이)');
 
         // ViewerAuthService가 이미 초기화되어 있으면 그 결과 사용
         if (ViewerAuthService.isViewerInitialized) {
@@ -70,36 +70,36 @@ class AuthService {
           }
         }
 
-        // local 환경에서는 임시 인증 허용
-        const environment =
-            String.fromEnvironment('ENVIRONMENT', defaultValue: 'local');
-        print('AuthService: 현재 환경 - $environment');
+        // // 뷰어 인증이 실패한 경우에만 로컬 개발 환경에서 임시 인증 허용
+        // const environment =
+        //     String.fromEnvironment('ENVIRONMENT', defaultValue: 'dev');
+        // print('AuthService: 현재 환경 - $environment');
 
-        // localhost 또는 개발 환경에서 임시 인증 허용
-        final currentUrl = html.window.location.href;
-        final isLocalhost = currentUrl.contains('localhost') ||
-            currentUrl.contains('127.0.0.1') ||
-            currentUrl.contains(':49516'); // Flutter 웹 기본 포트
+        // // localhost 또는 개발 환경에서 임시 인증 허용
+        // final currentUrl = html.window.location.href;
+        // final isLocalhost = currentUrl.contains('localhost') ||
+        //     currentUrl.contains('127.0.0.1') ||
+        //     currentUrl.contains(':49516'); // Flutter 웹 기본 포트
 
-        print('AuthService: 현재 URL - $currentUrl');
-        print('AuthService: localhost 감지 - $isLocalhost');
+        // print('AuthService: 현재 URL - $currentUrl');
+        // print('AuthService: localhost 감지 - $isLocalhost');
 
-        if (environment == 'local' || isLocalhost) {
-          print('AuthService: 개발 환경에서 임시 인증 허용');
-          setToken(
-              'local_temp_token_${DateTime.now().millisecondsSinceEpoch}'); // 토큰 설정 및 콜백 실행
-          _userInfo = {
-            'name': '로컬 개발자',
-            'id': 'local_user',
-            'role': 'developer'
-          };
-          _isInitialized = true;
-          return true;
-        }
+        // if (environment == 'dev' || isLocalhost) {
+        //   print('AuthService: 뷰어 인증 실패 후 개발 환경에서 임시 인증 허용');
+        //   setToken(
+        //       'local_temp_token_${DateTime.now().millisecondsSinceEpoch}'); // 토큰 설정 및 콜백 실행
+        //   _userInfo = {
+        //     'name': '로컬 개발자',
+        //     'id': 'local_user',
+        //     'role': 'developer'
+        //   };
+        //   _isInitialized = true;
+        //   return true;
+        // }
 
         // 다른 환경에서는 뷰어 인증이 실패하면 인증 실패
         print('AuthService: 뷰어 인증 실패');
-        _isInitialized = true;
+        _isInitialized = false;
         return false;
       }
     } catch (e) {

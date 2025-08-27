@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:idev_v1/src/repo/home_repo.dart';
 import '../core/auth/auth_service.dart';
 import '../core/auth/viewer_auth_service.dart';
 
@@ -12,12 +12,14 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  // late HomeRepo homeRepo;
   bool _isLoading = true;
   bool _isAuthenticated = false;
   String _errorMessage = '';
 
   @override
   void initState() {
+    // homeRepo = context.read<HomeRepo>();
     super.initState();
     _initializeAuth();
   }

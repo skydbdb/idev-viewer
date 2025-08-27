@@ -1,3 +1,5 @@
+import '../auth/viewer_auth_service.dart';
+
 enum Environment {
   development,
   production,
@@ -6,6 +8,7 @@ enum Environment {
 
 class AppConfig {
   static late final AppConfig instance;
+  static bool _isInitialized = false;
 
   late final Environment currentEnvironment;
   late final String mode;
@@ -37,7 +40,7 @@ class AppConfig {
 
   static void initialize() {
     const String envString =
-        String.fromEnvironment('ENVIRONMENT', defaultValue: 'local');
+        String.fromEnvironment('ENVIRONMENT', defaultValue: 'development');
     Environment envEnum;
     switch (envString.toLowerCase()) {
       case 'production':
@@ -50,7 +53,7 @@ class AppConfig {
         break;
       case 'local':
       default:
-        envEnum = Environment.local;
+        envEnum = Environment.development; // local 대신 development를 기본값으로 설정
         break;
     }
 
@@ -64,6 +67,9 @@ class AppConfig {
       apiHostLegacyHaksa: apiHosts['legacyHaksa']!,
       s3ImageBaseUrl: _getS3ImageBaseUrlForEnvironment(envEnum),
     );
+
+    _isInitialized = true;
+    print('AppConfig: 초기화 완료 - 환경: $envEnum, AWS API: ${apiHosts['aws']}');
   }
 
   /// 환경별 API 호스트 설정 반환
@@ -120,7 +126,20 @@ class AppConfig {
   }
 
   String getApiHost(String apiPath, {String? ifId}) {
-    // 모든 API를 AWS API로 통일
-    return apiHostAws;
+    // 초기화되지 않은 경우 기본 AWS API 호스트 사용
+    if (!_isInitialized) {
+      print('AppConfig: 초기화되지 않음, 기본 AWS API 호스트 사용');
+      return 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+    }
+
+    // 환경에 관계없이 항상 AWS API 사용 (강제)
+    final isViewerAuthenticated = ViewerAuthService.isViewerAuthenticated;
+    const selectedHost =
+        'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+
+    print(
+        'AppConfig: API 호스트 선택 - 뷰어 인증: $isViewerAuthenticated, 호스트: $selectedHost (강제 AWS API 사용)');
+
+    return selectedHost;
   }
 }

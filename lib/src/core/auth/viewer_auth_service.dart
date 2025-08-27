@@ -8,8 +8,13 @@ class ViewerAuthService {
   static bool _isAuthenticated = false;
 
   // 뷰어 API 키 (VIEWER_AUTH_GUIDE.md에서 가져온 값)
-  static const String _viewerApiKey =
+  static String _viewerApiKey =
       "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
+
+  static set viewerApiKey(String? value) {
+    _viewerApiKey = value ?? '';
+    // '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
+  }
 
   /// 뷰어 인증 초기화
   static Future<bool> initializeViewerAuth() async {
