@@ -29,6 +29,12 @@ class HomeRepo {
   int? domainId;
   int? versionId;
   String? get token => AuthService.token;
+  static bool _isInitialized = false;
+  static set isInitialized(bool value) {
+    _isInitialized = value;
+  }
+
+  static bool get isInitialized => _isInitialized;
 
   Map<String, dynamic> apis = {};
   Map<String, dynamic> fxs = {};
@@ -787,9 +793,6 @@ class HomeRepo {
       final callbackId = data['callbackId'];
       print('📡 HomeRepo: iframe 스트림 구독 해제 요청: $callbackId');
 
-      // 스트림 구독 해제 로직 (필요시 구현)
-      // TODO: 구독된 스트림을 추적하고 해제하는 로직 추가
-
       _sendIframeSuccessMessage('Stream unsubscription successful');
       print('✅ HomeRepo: iframe 스트림 구독 해제 완료');
     } catch (e) {
@@ -800,20 +803,13 @@ class HomeRepo {
 
   // iframe 설정 업데이트
   void _updateIframeConfig(Map<String, dynamic> config) async {
-    // // 테스트 뷰어 인증키
-    // config['apiKey'] =
-    //     "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
-
-    // TODO: 기존 설정 업데이트 로직과 연동
     print('⚙️ HomeRepo: iframe 설정 업데이트: $config');
 
     // 뷰어 인증키 설정
-    // if (config.containsKey('apiKey')) {
-    //   ViewerAuthService.viewerApiKey = config['apiKey'] ??
-    //       '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
-    //   await ViewerAuthService.initializeViewerAuth();
-    //   await AuthService.initializeAuth();
-    // }
+    if (config.containsKey('apiKey')) {
+      ViewerAuthService.viewerApiKey = config['apiKey'] ?? '';
+      _isInitialized = true;
+    }
 
     // 테마 설정
     if (config.containsKey('theme')) {
@@ -853,10 +849,6 @@ class HomeRepo {
       try {
         print('🌐 HomeRepo: iframe 통신 초기화 시작');
         IframeCommunication.initialize();
-        // _updateIframeConfig({
-        //   'apiKey':
-        //       '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011'
-        // });
 
         print('✅ HomeRepo: iframe 통신 초기화 완료');
       } catch (e) {

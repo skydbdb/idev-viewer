@@ -41,9 +41,14 @@ class HomeBoardState extends State<HomeBoard> {
 
     if (mounted) {
       // API 초기화는 한 번만 실행
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-      // homeRepo.reqIdeApi('get', ApiEndpointIDE.versions);
+      Future(() async {
+        while (!HomeRepo.isInitialized) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        // await Future.delayed(const Duration(milliseconds: 2000));
+        homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
+        homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
+      });
     }
   }
 

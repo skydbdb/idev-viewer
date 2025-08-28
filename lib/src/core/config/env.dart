@@ -15,14 +15,14 @@ class AppConfig {
 
   final String apiHostAws;
   final String apiHostLegacyBase;
-  final String apiHostLegacyHaksa;
+  final String apiHostLegacySite;
   final String s3ImageBaseUrl; // S3 이미지 기본 URL 추가
 
   AppConfig._({
     required this.currentEnvironment,
     required this.apiHostAws,
     required this.apiHostLegacyBase,
-    required this.apiHostLegacyHaksa,
+    required this.apiHostLegacySite,
     required this.s3ImageBaseUrl,
   }) {
     switch (currentEnvironment) {
@@ -64,7 +64,7 @@ class AppConfig {
       currentEnvironment: envEnum,
       apiHostAws: apiHosts['aws']!,
       apiHostLegacyBase: apiHosts['legacyBase']!,
-      apiHostLegacyHaksa: apiHosts['legacyHaksa']!,
+      apiHostLegacySite: apiHosts['legacyHaksa']!,
       s3ImageBaseUrl: _getS3ImageBaseUrlForEnvironment(envEnum),
     );
 
@@ -141,5 +141,9 @@ class AppConfig {
         'AppConfig: API 호스트 선택 - 뷰어 인증: $isViewerAuthenticated, 호스트: $selectedHost (강제 AWS API 사용)');
 
     return selectedHost;
+  }
+
+  String getApiKey(String apiPath, {String? ifId}) {
+    return ViewerAuthService.viewerApiKey;
   }
 }

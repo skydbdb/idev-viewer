@@ -17,7 +17,7 @@ Future<void> main() async {
   AppConfig.initialize();
 
   // AppConfig 초기화 완료 후 다른 서비스 초기화
-  await Future.delayed(const Duration(milliseconds: 200)); // 초기화 완료 대기
+  await Future.delayed(const Duration(milliseconds: 100)); // 초기화 완료 대기
 
   initServiceLocator();
 

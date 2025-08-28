@@ -8,13 +8,13 @@ class ViewerAuthService {
   static bool _isAuthenticated = false;
 
   // 뷰어 API 키 (VIEWER_AUTH_GUIDE.md에서 가져온 값)
-  static String _viewerApiKey =
-      "7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011";
+  static String _viewerApiKey = '';
 
   static set viewerApiKey(String? value) {
     _viewerApiKey = value ?? '';
-    // '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
   }
+
+  static String get viewerApiKey => _viewerApiKey;
 
   /// 뷰어 인증 초기화
   static Future<bool> initializeViewerAuth() async {
@@ -70,25 +70,25 @@ class ViewerAuthService {
             print(
                 'ViewerAuthService: 뷰어 인증 실패 - ${responseData['reason']?.toString() ?? '알 수 없는 오류'}');
             _isAuthenticated = false;
-            _isInitialized = true;
+            _isInitialized = false;
             return false;
           }
         } else {
           print('ViewerAuthService: HTTP 요청 실패 - 상태 코드: ${response.status}');
           _isAuthenticated = false;
-          _isInitialized = true;
+          _isInitialized = false;
           return false;
         }
       } catch (e) {
         print('ViewerAuthService: HTTP 요청 오류 - $e');
         _isAuthenticated = false;
-        _isInitialized = true;
+        _isInitialized = false;
         return false;
       }
     } catch (e) {
       print('ViewerAuthService: 뷰어 인증 오류 - $e');
       _isAuthenticated = false;
-      _isInitialized = true;
+      _isInitialized = false;
       return false;
     }
   }

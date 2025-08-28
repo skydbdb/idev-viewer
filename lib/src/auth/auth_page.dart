@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:idev_v1/src/repo/home_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idev_v1/src/repo/home_repo.dart';
 import '../core/auth/auth_service.dart';
 import '../core/auth/viewer_auth_service.dart';
+
+class AuthViewer {
+  Future<void> initializeAuth() async {
+    try {
+      // print('AuthPage: 인증 초기화 시작');
+
+      final isAuthenticated = await AuthService.initializeAuth();
+
+      // 디버그 정보 출력
+      AuthService.printDebugInfo();
+      ViewerAuthService.printDebugInfo();
+
+      if (isAuthenticated) {
+        // 토큰을 HomeRepo와 동기화
+        final token = AuthService.token;
+        if (token != null) {
+          print('AuthPage: 인증 성공 - ${token.substring(0, 20)}...');
+        }
+
+        // 뷰어 인증 상태 확인
+        if (ViewerAuthService.isViewerAuthenticated) {
+          print('AuthPage: 뷰어 인증으로 로그인됨');
+        }
+      }
+    } catch (e) {
+      print('AuthViewer: 인증 중 오류가 발생했습니다: $e');
+    }
+  }
+}
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -12,19 +41,27 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  // late HomeRepo homeRepo;
+  late HomeRepo homeRepo;
   bool _isLoading = true;
   bool _isAuthenticated = false;
   String _errorMessage = '';
 
   @override
   void initState() {
-    // homeRepo = context.read<HomeRepo>();
+    homeRepo = context.read<HomeRepo>();
     super.initState();
-    _initializeAuth();
+    _initializeHomeRepo();
   }
 
-  Future<void> _initializeAuth() async {
+  Future<void> _initializeHomeRepo() async {
+    while (!HomeRepo.isInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      print('AuthPage: 인증 초기화 중...${HomeRepo.isInitialized}');
+    }
+    await initializeAuth();
+  }
+
+  Future<void> initializeAuth() async {
     try {
       // print('AuthPage: 인증 초기화 시작');
 
@@ -72,22 +109,6 @@ class _AuthPageState extends State<AuthPage> {
       }
     }
   }
-
-  // void _openIdevWebsite() {
-  //   HapticFeedback.lightImpact();
-  //   if (kIsWeb) {
-  //     html.window.open('https://idev.biz', '_blank');
-  //   }
-  // }
-
-  // void _retryAuth() {
-  //   HapticFeedback.lightImpact();
-  //   setState(() {
-  //     _isLoading = true;
-  //     _errorMessage = '';
-  //   });
-  //   _initializeAuth();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +186,7 @@ class _AuthPageState extends State<AuthPage> {
                     _isLoading = true;
                     _errorMessage = '';
                   });
-                  _initializeAuth();
+                  initializeAuth();
                 },
                 child: const Text('다시 시도'),
               ),
