@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idev_v1/src/board/board/viewer/template_viewer.dart';
 import 'package:idev_v1/src/core/api/api_endpoint_ide.dart';
-import 'package:pluto_layout/pluto_layout.dart';
-import '/src/model/menu.dart';
+import 'package:idev_v1/src/core/auth/viewer_auth_service.dart';
+// import 'package:pluto_layout/pluto_layout.dart';
+// import '/src/model/menu.dart';
 import '/src/repo/home_repo.dart';
 
 class HomeBoard extends StatefulWidget {
@@ -15,6 +17,8 @@ class HomeBoard extends StatefulWidget {
 class HomeBoardState extends State<HomeBoard> {
   late HomeRepo homeRepo;
   bool _isInitialized = false; // 중복 초기화 방지 플래그
+  String boardId = 'new_1';
+  final tabKey = const GlobalObjectKey('NewTab_1');
 
   @override
   void initState() {
@@ -27,9 +31,9 @@ class HomeBoardState extends State<HomeBoard> {
     _isInitialized = true;
 
     homeRepo = context.read<HomeRepo>();
-    homeRepo.eventStreamController =
-        PlutoLayout.getEventStreamController(context);
-    homeRepo.addTabItemState(Menu(menuId: 0));
+    // homeRepo.eventStreamController =
+    //     PlutoLayout.getEventStreamController(context);
+    // homeRepo.addTabItemState(Menu(menuId: 0));
 
     // String userId = '202205104';
     int versionId = 7;
@@ -40,20 +44,27 @@ class HomeBoardState extends State<HomeBoard> {
     homeRepo.versionId = versionId;
 
     if (mounted) {
-      // API 초기화는 한 번만 실행
-      Future(() async {
-        while (!HomeRepo.isInitialized) {
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-        // await Future.delayed(const Duration(milliseconds: 2000));
-        homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
-        homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-      });
+      _initializeHomeRepo();
+
+      homeRepo.createHierarchicalController(boardId, null);
     }
+  }
+
+  Future<void> _initializeHomeRepo() async {
+    while (!ViewerAuthService.isViewerAuthenticated) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      print('AuthPage: 인증 초기화 중...${ViewerAuthService.isViewerAuthenticated}');
+    }
+    homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
+    homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
   }
 
   @override
   Widget build(BuildContext context) {
-    return const PlutoLayoutTabsOrChild();
+    // return const PlutoLayoutTabsOrChild();
+    return TemplateViewer(
+      key: tabKey,
+      boardId: boardId,
+    );
   }
 }

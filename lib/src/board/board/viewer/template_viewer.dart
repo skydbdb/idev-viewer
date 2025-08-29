@@ -100,10 +100,10 @@ class _TemplateViewerState extends State<TemplateViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return TemplateViewerPage(
+    return const TemplateViewerPage(
       templateId: 0,
       templateNm: 'preview',
-      script: jsonEncode(testTemplate), // null,
+      script: null, // jsonEncode(testTemplate),
       commitInfo: 'preview',
     );
   }

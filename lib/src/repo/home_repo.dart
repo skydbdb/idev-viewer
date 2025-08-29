@@ -143,14 +143,23 @@ class HomeRepo {
   }
 
   void addApiRequest(String apiId, Map<String, dynamic> params) {
+    print('HomeRepo: addApiRequest: $apiId, $params');
+    print('HomeRepo: addApiRequest apis length: ${apis.length}');
     final api = apis[apiId];
+    print('HomeRepo: addApiRequest api: $api');
     Map<String, dynamic> reqParams = Map.from(params);
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
     reqParams['if_id'] = apiId;
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
     reqParams['method'] = api['method'];
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
     reqParams['uri'] = api['uri'];
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
     reqParams['domainId'] = domainId;
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
 
     // 중복 요청 방지 - 파라미터 JSON 값도 포함
+    print('HomeRepo: addApiRequest reqParams: $reqParams');
     final paramsJson = jsonEncode(params);
     final requestKey =
         '${api['method']}_${apiId}_${reqParams['versionId']}_${reqParams['templateId']}_${reqParams['commitId']}_$paramsJson';
@@ -666,9 +675,9 @@ class HomeRepo {
       final method = data['method'];
       final apiId = data['apiId'];
       final params = data['params'] ?? {};
-      final versionId = data['versionId'];
-      final templateId = data['templateId'];
-      final commitId = data['commitId'];
+      // final versionId = data['versionId'];
+      // final templateId = data['templateId'];
+      // final commitId = data['commitId'];
 
       print('📡 HomeRepo: iframe API 요청 처리 시작');
       print('   - method: $method');
@@ -676,11 +685,17 @@ class HomeRepo {
       print('   - params: $params');
 
       // HomeRepo를 통해 API 요청
-      reqIdeApi(method, apiId,
-          versionId: versionId,
-          templateId: templateId,
-          commitId: commitId,
-          params: params);
+      Map<String, dynamic> apiParams = {};
+      params.forEach((key, value) {
+        apiParams = {
+          ...apiParams,
+          key: value.toString().isEmpty ? null : value,
+        };
+      });
+
+      print('apiParams: $apiParams');
+
+      addApiRequest(apiId, apiParams);
 
       _sendIframeSuccessMessage('API request sent successfully');
       print('✅ HomeRepo: iframe API 요청 처리 완료');
@@ -957,6 +972,9 @@ class HomeRepo {
     onApiResponse[apiId] = successData;
     updateSelectedApisFromResponse(apiId, successData['data']);
 
+    // ✅ responseStream으로 응답 전달 (iframe 통신용)
+    addResponse(successData);
+
     // 요청 완료 후 처리 중인 요청 목록에서 제거 - 파라미터 JSON 값도 포함
     if (reqParams != null) {
       final paramsJson = jsonEncode(reqParams);
@@ -994,6 +1012,7 @@ class HomeRepo {
         }
       }
     }
+    print('HomeRepo: initApis apis length: ${apis.length}');
   }
 
   void initParams(dynamic dataList) {
@@ -1101,6 +1120,15 @@ class HomeRepo {
         'data': responseData
       };
     }
+
+    // ✅ 실패한 응답도 responseStream으로 전달 (iframe 통신용)
+    addResponse({
+      'if_id': ifId,
+      'reqParams': reqParams,
+      'data': responseData,
+      'status': 'error'
+    });
+
     _getApiIdResponse
         .add({'if_id': ifId, 'reqParams': reqParams, 'error': responseData});
   }

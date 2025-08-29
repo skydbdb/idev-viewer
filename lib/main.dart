@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:idev_v1/src/core/auth/viewer_auth_service.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'src/core/config/env.dart';
 import '/src/layout/home/home_board.dart';
@@ -51,6 +52,12 @@ class IDevViewerApp extends StatelessWidget {
 
   // 초기 라우트 결정 - 항상 인증 페이지로 이동
   String _getInitialRoute() {
+    // test start
+    // ViewerAuthService.viewerApiKey =
+    //     '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
+    // HomeRepo.isInitialized = true;
+    // test end
+
     // 항상 인증 페이지로 이동
     print('main.dart: 인증 페이지로 이동');
     return '/auth';
@@ -71,23 +78,25 @@ class HomePage extends StatelessWidget {
             },
             scrollbars: true,
           ),
-          child: const PlutoLayout(
-            body: PlutoLayoutContainer(
-              child: HomeBoard(),
-            ),
-            top: PlutoLayoutContainer(
-              child: TopTab(),
-            ),
-            left: PlutoLayoutContainer(
-              child: LeftTab(),
-            ),
-            right: PlutoLayoutContainer(
-              child: RightTab(),
-            ),
-            bottom: PlutoLayoutContainer(
-              child: BottomTab(),
-            ),
-          )),
+          child: const HomeBoard()
+          //     const PlutoLayout(
+          //   body: PlutoLayoutContainer(
+          //     child: HomeBoard(),
+          //   ),
+          //   top: PlutoLayoutContainer(
+          //     child: TopTab(),
+          //   ),
+          //   left: PlutoLayoutContainer(
+          //     child: LeftTab(),
+          //   ),
+          //   right: PlutoLayoutContainer(
+          //     child: RightTab(),
+          //   ),
+          //   bottom: PlutoLayoutContainer(
+          //     child: BottomTab(),
+          //   ),
+          // )
+          ),
     );
   }
 }
