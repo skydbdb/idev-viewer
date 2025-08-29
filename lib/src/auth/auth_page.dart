@@ -25,6 +25,7 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Future<void> _initializeHomeRepo() async {
+    homeRepo.initializeIframeCommunication();
     while (!HomeRepo.isInitialized) {
       await Future.delayed(const Duration(milliseconds: 100));
       print('AuthPage: 인증 초기화 중...${HomeRepo.isInitialized}');

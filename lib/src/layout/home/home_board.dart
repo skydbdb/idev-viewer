@@ -53,7 +53,7 @@ class HomeBoardState extends State<HomeBoard> {
   Future<void> _initializeHomeRepo() async {
     while (!ViewerAuthService.isViewerAuthenticated) {
       await Future.delayed(const Duration(milliseconds: 100));
-      print('AuthPage: 인증 초기화 중...${ViewerAuthService.isViewerAuthenticated}');
+      print('HomeBoard: 인증 초기화 중...${ViewerAuthService.isViewerAuthenticated}');
     }
     homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
     homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
