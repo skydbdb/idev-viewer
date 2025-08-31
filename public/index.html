@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Vue에서 IDev Viewer를 사용하는 예제" />
+    <title>IDev Viewer Vue 예제</title>
+
+    <!-- IDev Viewer 라이브러리 로드 -->
+    <script src="%PUBLIC_URL%/idev-viewer.js"></script>
+    <script>
+        // 라이브러리 로드 확인
+        window.addEventListener('load', function () {
+            console.log('🌐 Vue 예제: 페이지 로드 완료');
+            if (typeof window.IdevViewer !== 'undefined') {
+                console.log('✅ Vue 예제: IDev Viewer 라이브러리 로드 확인됨');
+                console.log('버전:', window.IdevViewer.getVersion());
+            } else {
+                console.error('❌ Vue 예제: IDev Viewer 라이브러리 로드 실패');
+            }
+        });
+
+        // Flutter 앱의 환경 설정을 강제로 변경
+        function forceFlutterEnvironment() {
+            // iframe 내부의 환경 설정 강제 변경
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                try {
+                    if (iframe.contentWindow) {
+                        // Flutter 앱의 전역 객체에서 환경 설정 변경
+                        const flutterWindow = iframe.contentWindow;
+
+                        // 1. window.ENVIRONMENT 설정
+                        flutterWindow.ENVIRONMENT = 'development';
+
+                        // 2. String.fromEnvironment 함수 오버라이드
+                        if (flutterWindow.String && flutterWindow.String.fromEnvironment) {
+                            const originalStringFromEnvironment = flutterWindow.String.fromEnvironment;
+                            flutterWindow.String.fromEnvironment = function (name, { defaultValue } = {}) {
+                                if (name === 'ENVIRONMENT') {
+                                    console.log('Vue 예제: String.fromEnvironment 오버라이드 - ENVIRONMENT를 development로 강제 설정');
+                                    return 'development';
+                                }
+                                return originalStringFromEnvironment.call(this, name, { defaultValue });
+                            };
+                        }
+
+                        // 3. AppConfig 클래스 직접 조작
+                        if (flutterWindow.AppConfig && flutterWindow.AppConfig.instance) {
+                            try {
+                                flutterWindow.AppConfig.instance.currentEnvironment = 'development';
+                                console.log('Vue 예제: AppConfig.instance.currentEnvironment를 development로 변경');
+                            } catch (e) {
+                                console.log('Vue 예제: AppConfig 조작 시도 중 오류:', e.message);
+                            }
+                        }
+
+                        // 4. API 호스트 설정 강제 변경
+                        if (flutterWindow.AppConfig && flutterWindow.AppConfig.instance) {
+                            try {
+                                flutterWindow.AppConfig.instance.apiHostAws = 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+                                flutterWindow.AppConfig.instance.apiHostLegacyBase = 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+                                flutterWindow.AppConfig.instance.apiHostLegacySite = 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+                                console.log('Vue 예제: API 호스트 설정을 AWS URL로 강제 변경');
+                            } catch (e) {
+                                console.log('Vue 예제: API 호스트 설정 변경 중 오류:', e.message);
+                            }
+                        }
+
+                        // 5. fetch와 XMLHttpRequest 가로채기
+                        if (flutterWindow.fetch) {
+                            const originalFetch = flutterWindow.fetch;
+                            flutterWindow.fetch = function (url, options) {
+                                if (typeof url === 'string' && url.includes('localhost:3000')) {
+                                    const newUrl = url.replace('localhost:3000', '17kj30av8h.execute-api.ap-northeast-2.amazonaws.com');
+                                    console.log('Vue 예제: fetch 요청 URL 변경:', url, '->', newUrl);
+                                    return originalFetch.call(this, newUrl, options);
+                                }
+                                return originalFetch.call(this, url, options);
+                            };
+                        }
+
+                        if (flutterWindow.XMLHttpRequest) {
+                            const originalOpen = flutterWindow.XMLHttpRequest.prototype.open;
+                            flutterWindow.XMLHttpRequest.prototype.open = function (method, url, ...args) {
+                                if (typeof url === 'string' && url.includes('localhost:3000')) {
+                                    const newUrl = url.replace('localhost:3000', '17kj30av8h.execute-api.ap-northeast-2.amazonaws.com');
+                                    console.log('Vue 예제: XMLHttpRequest 요청 URL 변경:', url, '->', newUrl);
+                                    return originalOpen.call(this, method, newUrl, ...args);
+                                }
+                                return originalOpen.call(this, method, url, ...args);
+                            };
+                        }
+
+                        console.log('Vue 예제: iframe 환경 설정 강제 변경 완료');
+                    }
+                } catch (e) {
+                    // CORS 오류 무시
+                }
+            });
+        }
+
+        // DOM 변경 감지하여 iframe 로드 시 환경 설정 강제 적용
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.tagName === 'IFRAME') {
+                            console.log('Vue 예제: iframe 감지됨, 환경 설정 강제 적용');
+                            setTimeout(forceFlutterEnvironment, 100);
+                        }
+                    });
+                }
+            });
+        });
+
+        // 페이지 로드 완료 후 감지 시작
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                observer.observe(document.body, { childList: true, subtree: true });
+                forceFlutterEnvironment();
+            });
+        } else {
+            observer.observe(document.body, { childList: true, subtree: true });
+            forceFlutterEnvironment();
+        }
+
+        // 주기적으로 환경 설정 확인 및 강제 적용
+        setInterval(forceFlutterEnvironment, 2000);
+
+        console.log('Vue 예제: Flutter 앱 환경 설정 강제 변경 준비 완료');
+    </script>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -29,11 +29,9 @@ class AppConfig {
       case Environment.production:
         mode = 'production';
         break;
+      case Environment.local:
       case Environment.development:
         mode = 'develop';
-        break;
-      case Environment.local:
-        mode = 'local';
         break;
     }
   }
@@ -49,8 +47,6 @@ class AppConfig {
         break;
       case 'development':
       case 'dev':
-        envEnum = Environment.development;
-        break;
       case 'local':
       default:
         envEnum = Environment.development; // local 대신 development를 기본값으로 설정
@@ -64,7 +60,7 @@ class AppConfig {
       currentEnvironment: envEnum,
       apiHostAws: apiHosts['aws']!,
       apiHostLegacyBase: apiHosts['legacyBase']!,
-      apiHostLegacySite: apiHosts['legacyHaksa']!,
+      apiHostLegacySite: apiHosts['legacySite']!,
       s3ImageBaseUrl: _getS3ImageBaseUrlForEnvironment(envEnum),
     );
 
@@ -81,7 +77,7 @@ class AppConfig {
               'https://production-api.execute-api.ap-northeast-2.amazonaws.com',
           'legacyBase':
               'https://production-api.execute-api.ap-northeast-2.amazonaws.com',
-          'legacyHaksa':
+          'legacySite':
               'https://production-api.execute-api.ap-northeast-2.amazonaws.com',
         };
       case Environment.development:
@@ -89,14 +85,17 @@ class AppConfig {
           'aws': 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
           'legacyBase':
               'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
-          'legacyHaksa':
+          'legacySite':
               'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
         };
       case Environment.local:
+        // local 환경에서도 AWS API 사용 (vanilla-example, react-example과 동일하게)
         return {
-          'aws': 'http://localhost:3000',
-          'legacyBase': 'http://localhost:3000',
-          'legacyHaksa': 'http://localhost:3000',
+          'aws': 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+          'legacyBase':
+              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+          'legacySite':
+              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
         };
     }
   }
@@ -109,7 +108,7 @@ class AppConfig {
       case Environment.development:
         return 'https://s3.ap-northeast-2.amazonaws.com/i-dev-template-images';
       case Environment.local:
-        return 'http://localhost:4566'; // LocalStack S3 포트
+        return 'https://s3.ap-northeast-2.amazonaws.com/i-dev-template-images'; // LocalStack S3 포트
     }
   }
 
