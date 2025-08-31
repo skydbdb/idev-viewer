@@ -41,13 +41,13 @@ else
 fi
 
 # 2. 빌드된 파일 복사
-print_step "2. 빌드된 파일 복사..."
-if cp -r build/web/* idev-viewer-js/; then
-    print_success "idev-viewer-js 디렉토리로 파일 복사 완료"
-else
-    print_error "파일 복사 실패"
-    exit 1
-fi
+# print_step "2. 빌드된 파일 복사..."
+# if cp -r build/web/* idev-viewer-js/; then
+#     print_success "idev-viewer-js 디렉토리로 파일 복사 완료"
+# else
+#     print_error "파일 복사 실패"
+#     exit 1
+# fi
 
 if cp -r build/web/* idev-viewer-js/flutter-app/; then
     print_success "flutter-app 디렉토리로 파일 복사 완료"
