@@ -92,9 +92,23 @@ class ApiService {
       headerMap['X-Viewer-Token'] = tokenValue;
       // 뷰어 토큰은 Authorization 헤더도 함께 설정 (서버 호환성)
       headerMap['Authorization'] = 'Bearer $tokenValue';
+
+      // 뷰어 인증 시 동적으로 생성된 테넌트 ID 사용
+      final tenantId = ViewerAuthService.tenantId;
+      if (tenantId != null) {
+        headerMap['X-Tenant-Id'] = tenantId;
+        print('ApiService: 뷰어 인증 - X-Tenant-Id 헤더 추가 - $tenantId');
+      } else {
+        // 테넌트 ID 생성 실패 시 기본값 사용
+        headerMap['X-Tenant-Id'] = '10001';
+        print('ApiService: 뷰어 인증 - 기본 X-Tenant-Id 사용 - 10001');
+      }
     } else {
       // 일반 토큰인 경우 Bearer 토큰 사용
       headerMap['Authorization'] = 'Bearer $tokenValue';
+      // 일반 인증 시에도 기본 테넌트 ID 사용
+      headerMap['X-Tenant-Id'] = '10001';
+      print('ApiService: 일반 인증 - 기본 X-Tenant-Id 사용 - 10001');
     }
 
     // 6. data에서 token 제거하여 중복 방지

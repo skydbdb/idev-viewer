@@ -51,9 +51,9 @@ class IDevViewerApp extends StatelessWidget {
   // 초기 라우트 결정 - 항상 인증 페이지로 이동
   String _getInitialRoute() {
     // test start
-    // ViewerAuthService.viewerApiKey =
-    //     '7dcf950962fad7b84cb38a1989bde22ca6d1761a7ee0bfcc39cba72266b09011';
-    // HomeRepo.isInitialized = true;
+    ViewerAuthService.viewerApiKey =
+        '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50';
+    HomeRepo.isInitialized = true;
     // test end
 
     // 항상 인증 페이지로 이동
@@ -77,22 +77,22 @@ class HomePage extends StatelessWidget {
             scrollbars: true,
           ),
           child: const HomeBoard()
-          //     const PlutoLayout(
-          //   body: PlutoLayoutContainer(
-          //     child: HomeBoard(),
-          //   ),
-          //   top: PlutoLayoutContainer(
-          //     child: TopTab(),
-          //   ),
-          //   left: PlutoLayoutContainer(
-          //     child: LeftTab(),
-          //   ),
-          //   right: PlutoLayoutContainer(
-          //     child: RightTab(),
-          //   ),
-          //   bottom: PlutoLayoutContainer(
-          //     child: BottomTab(),
-          //   ),
+          //   const PlutoLayout(
+          // body: PlutoLayoutContainer(
+          //   child: HomeBoard(),
+          // ),
+          // top: PlutoLayoutContainer(
+          //   child: TopTab(),
+          // ),
+          // left: PlutoLayoutContainer(
+          //   child: LeftTab(),
+          // ),
+          // right: PlutoLayoutContainer(
+          //   child: RightTab(),
+          // ),
+          // bottom: PlutoLayoutContainer(
+          //   child: BottomTab(),
+          // ),
           // )
           ),
     );

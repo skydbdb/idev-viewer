@@ -6,6 +6,7 @@ class ViewerAuthService {
   static Map<String, dynamic>? _viewerInfo;
   static bool _isInitialized = false;
   static bool _isAuthenticated = false;
+  static String? _userEmail; // 사용자 이메일 저장
 
   // 뷰어 API 키 (VIEWER_AUTH_GUIDE.md에서 가져온 값)
   static String _viewerApiKey = '';
@@ -27,7 +28,7 @@ class ViewerAuthService {
 
       // 뷰어 API 키로 인증 시도 (직접 HTTP 요청)
       const url =
-          'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/authenticate';
+          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/authenticate';
 
       try {
         final response = await html.HttpRequest.request(
@@ -57,12 +58,17 @@ class ViewerAuthService {
                   'type': 'viewer',
                   'apiKey': _viewerApiKey,
                 };
+
+            // 사용자 이메일 저장 (테넌트 ID 생성용)
+            _userEmail = responseData['data']?['user']?['email']?.toString();
+
             _isAuthenticated = true;
             _isInitialized = true;
 
             print('ViewerAuthService: 뷰어 인증 성공');
             print(
                 'ViewerAuthService: 뷰어 토큰 - ${_viewerToken?.substring(0, 20)}...');
+            print('ViewerAuthService: 사용자 이메일 - $_userEmail');
 
             return true;
           } else {
@@ -105,6 +111,38 @@ class ViewerAuthService {
   /// 뷰어 초기화 완료 여부 확인
   static bool get isViewerInitialized => _isInitialized;
 
+  /// 사용자 이메일에서 테넌트 ID 생성
+  /// 예: skydbdb@gmail.com -> skydbdbgmail
+  static String? get tenantId {
+    if (_userEmail == null || _userEmail!.isEmpty) {
+      return null;
+    }
+
+    try {
+      // @ 문자로 분리
+      final parts = _userEmail!.split('@');
+      if (parts.length != 2) {
+        return null;
+      }
+
+      final localPart = parts[0]; // @ 앞부분 (예: skydbdb)
+      final domainPart = parts[1]; // @ 뒷부분 (예: gmail.com)
+
+      // 도메인 부분을 '.'으로 분리하여 첫 번째 부분만 사용
+      final domainParts = domainPart.split('.');
+      final firstDomainPart = domainParts.isNotEmpty ? domainParts[0] : '';
+
+      // 조합하여 테넌트 ID 생성
+      final tenantId = '$localPart$firstDomainPart';
+
+      print('ViewerAuthService: 이메일 $_userEmail -> 테넌트 ID $tenantId');
+      return tenantId;
+    } catch (e) {
+      print('ViewerAuthService: 테넌트 ID 생성 오류 - $e');
+      return null;
+    }
+  }
+
   /// 뷰어 인증 강제 초기화
   static Future<void> ensureViewerInitialized() async {
     if (!_isInitialized) {
@@ -118,7 +156,7 @@ class ViewerAuthService {
 
     try {
       const url =
-          'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/validate';
+          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/validate';
 
       final response = await html.HttpRequest.request(
         url,
@@ -154,7 +192,7 @@ class ViewerAuthService {
 
     try {
       final url =
-          'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com$uri';
+          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com$uri';
 
       // 기본 뷰어 헤더 - X-Viewer-Token을 우선으로 설정
       final headers = <String, String>{
@@ -163,6 +201,13 @@ class ViewerAuthService {
         'Content-Type': 'application/json',
         ...?additionalHeaders,
       };
+
+      // 동적으로 생성된 테넌트 ID 추가
+      final tenantId = ViewerAuthService.tenantId;
+      if (tenantId != null) {
+        headers['X-Tenant-Id'] = tenantId;
+        print('ViewerAuthService: X-Tenant-Id 헤더 추가 - $tenantId');
+      }
 
       final response = await html.HttpRequest.request(
         url,
@@ -204,6 +249,7 @@ class ViewerAuthService {
   static void resetViewerAuth() {
     _viewerToken = null;
     _viewerInfo = null;
+    _userEmail = null;
     _isAuthenticated = false;
     _isInitialized = false;
     print('ViewerAuthService: 뷰어 인증 정보 초기화됨');

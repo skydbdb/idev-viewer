@@ -123,7 +123,6 @@ Dockerfile
 docker-compose.yml
 nginx.conf
 text_to_json_node.py
-scripts/
 uml/
 web/
 

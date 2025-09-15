@@ -82,20 +82,20 @@ class AppConfig {
         };
       case Environment.development:
         return {
-          'aws': 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+          'aws': 'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
           'legacyBase':
-              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
           'legacySite':
-              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
         };
       case Environment.local:
         // local 환경에서도 AWS API 사용 (vanilla-example, react-example과 동일하게)
         return {
-          'aws': 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+          'aws': 'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
           'legacyBase':
-              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
           'legacySite':
-              'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com',
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
         };
     }
   }
@@ -128,13 +128,13 @@ class AppConfig {
     // 초기화되지 않은 경우 기본 AWS API 호스트 사용
     if (!_isInitialized) {
       print('AppConfig: 초기화되지 않음, 기본 AWS API 호스트 사용');
-      return 'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+      return 'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com';
     }
 
     // 환경에 관계없이 항상 AWS API 사용 (강제)
     final isViewerAuthenticated = ViewerAuthService.isViewerAuthenticated;
     const selectedHost =
-        'https://17kj30av8h.execute-api.ap-northeast-2.amazonaws.com';
+        'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com';
 
     print(
         'AppConfig: API 호스트 선택 - 뷰어 인증: $isViewerAuthenticated, 호스트: $selectedHost (강제 AWS API 사용)');
