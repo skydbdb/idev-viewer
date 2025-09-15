@@ -73,6 +73,9 @@ fi
 # Vanilla 예제
 if cp -r build/web/* idev-viewer-js/examples/vanilla-example/flutter-app/; then
     print_success "Vanilla 예제 flutter-app 복사 완료"
+    # Vanilla 예제의 base href 수정
+    sed -i '' 's|<base href="/">|<base href="/idev-viewer-js/examples/vanilla-example/flutter-app/">|g' idev-viewer-js/examples/vanilla-example/flutter-app/index.html
+    print_success "Vanilla 예제 base href 수정 완료"
 else
     print_error "Vanilla 예제 flutter-app 복사 실패"
     exit 1
@@ -89,11 +92,13 @@ else
     exit 1
 fi
 
+cd .. # 원래 디렉토리로 돌아가기
+
 # 5. 예제들에 빌드된 라이브러리 복사
 print_step "5. 예제들에 빌드된 라이브러리 복사..."
 
 # React 예제
-if cp dist/idev-viewer.js examples/react-example/public/idev-viewer.js; then
+if cp idev-viewer-js/dist/idev-viewer.js idev-viewer-js/examples/react-example/public/idev-viewer.js; then
     print_success "React 예제에 라이브러리 복사 완료"
 else
     print_error "React 예제 라이브러리 복사 실패"
@@ -101,7 +106,7 @@ else
 fi
 
 # Vue 예제
-if cp dist/idev-viewer.js examples/vue-example/public/idev-viewer.js; then
+if cp idev-viewer-js/dist/idev-viewer.js idev-viewer-js/examples/vue-example/public/idev-viewer.js; then
     print_success "Vue 예제에 라이브러리 복사 완료"
 else
     print_error "Vue 예제 라이브러리 복사 실패"
@@ -109,7 +114,7 @@ else
 fi
 
 # Vanilla 예제
-if cp dist/idev-viewer.js examples/vanilla-example/idev-viewer.js; then
+if cp idev-viewer-js/dist/idev-viewer.js idev-viewer-js/examples/vanilla-example/idev-viewer.js; then
     print_success "Vanilla 예제에 라이브러리 복사 완료"
 else
     print_error "Vanilla 예제 라이브러리 복사 실패"
@@ -119,23 +124,24 @@ fi
 # 6. 빌드 결과 확인
 print_step "6. 빌드 결과 확인..."
 echo "📁 빌드된 JavaScript 라이브러리:"
-ls -la dist/
+ls -la idev-viewer-js/dist/
 echo ""
 echo "📁 메인 Flutter 앱 파일들:"
-ls -la flutter-app/main.dart.js flutter-app/flutter.js flutter-app/index.html
+ls -la idev-viewer-js/flutter-app/main.dart.js idev-viewer-js/flutter-app/flutter.js idev-viewer-js/flutter-app/index.html
 echo ""
 echo "📁 React 예제 Flutter 앱 파일들:"
-ls -la examples/react-example/public/flutter-app/main.dart.js examples/react-example/public/flutter-app/flutter.js examples/react-example/public/flutter-app/index.html
+ls -la idev-viewer-js/examples/react-example/public/flutter-app/main.dart.js idev-viewer-js/examples/react-example/public/flutter-app/flutter.js idev-viewer-js/examples/react-example/public/flutter-app/index.html
 echo ""
 echo "📁 Vue 예제 Flutter 앱 파일들:"
-ls -la examples/vue-example/public/flutter-app/main.dart.js examples/vue-example/public/flutter-app/flutter.js examples/vue-example/public/flutter-app/index.html
+ls -la idev-viewer-js/examples/vue-example/public/flutter-app/main.dart.js idev-viewer-js/examples/vue-example/public/flutter-app/flutter.js idev-viewer-js/examples/vue-example/public/flutter-app/index.html
 echo ""
 echo "📁 Vanilla 예제 Flutter 앱 파일들:"
-ls -la examples/vanilla-example/flutter-app/main.dart.js examples/vanilla-example/flutter-app/flutter.js examples/vanilla-example/flutter-app/index.html
+ls -la idev-viewer-js/examples/vanilla-example/flutter-app/main.dart.js idev-viewer-js/examples/vanilla-example/flutter-app/flutter.js idev-viewer-js/examples/vanilla-example/flutter-app/index.html
 
 # 7. NPM 패키지 배포 (옵션)
 if [[ $1 == "--publish" ]]; then
     print_step "7. NPM 패키지 배포..."
+    cd idev-viewer-js
     
     # 현재 버전 확인
     CURRENT_VERSION=$(node -p "require('./package.json').version")
@@ -154,6 +160,7 @@ if [[ $1 == "--publish" ]]; then
     else
         print_warning "배포가 취소되었습니다"
     fi
+    cd .. # 원래 디렉토리로 돌아가기
 else
     print_warning "NPM 배포를 건너뜁니다. 배포하려면 --publish 옵션을 사용하세요"
 fi
@@ -171,4 +178,4 @@ echo "   - Vue 예제: cd idev-viewer-js/examples/vue-example && npm start"
 echo "3. NPM 패키지 사용법 확인"
 echo "4. 통합 테스트: ./scripts/test-integration.sh"
 
-cd ..
+print_success "✨ 모든 작업이 완료되었습니다!"
