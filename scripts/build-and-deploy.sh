@@ -76,6 +76,17 @@ else
     exit 1
 fi
 
+# Next.js 예제
+if cp -r build/web/* idev-viewer-js/examples/nextjs-example/public/flutter-app/; then
+    print_success "Next.js 예제 flutter-app 복사 완료"
+    # Next.js 예제의 base href 수정
+    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/nextjs-example/public/flutter-app/index.html
+    print_success "Next.js 예제 base href 수정 완료"
+else
+    print_error "Next.js 예제 flutter-app 복사 실패"
+    exit 1
+fi
+
 # Vanilla 예제
 if cp -r build/web/* idev-viewer-js/examples/vanilla-example/flutter-app/; then
     print_success "Vanilla 예제 flutter-app 복사 완료"
@@ -119,6 +130,14 @@ else
     exit 1
 fi
 
+# Next.js 예제
+if cp idev-viewer-js/dist/idev-viewer.js idev-viewer-js/examples/nextjs-example/public/idev-viewer.js; then
+    print_success "Next.js 예제에 라이브러리 복사 완료"
+else
+    print_error "Next.js 예제 라이브러리 복사 실패"
+    exit 1
+fi
+
 # Vanilla 예제
 if cp idev-viewer-js/dist/idev-viewer.js idev-viewer-js/examples/vanilla-example/idev-viewer.js; then
     print_success "Vanilla 예제에 라이브러리 복사 완료"
@@ -140,6 +159,9 @@ ls -la idev-viewer-js/examples/react-example/public/flutter-app/main.dart.js ide
 echo ""
 echo "📁 Vue 예제 Flutter 앱 파일들:"
 ls -la idev-viewer-js/examples/vue-example/public/flutter-app/main.dart.js idev-viewer-js/examples/vue-example/public/flutter-app/flutter.js idev-viewer-js/examples/vue-example/public/flutter-app/index.html
+echo ""
+echo "📁 Next.js 예제 Flutter 앱 파일들:"
+ls -la idev-viewer-js/examples/nextjs-example/public/flutter-app/main.dart.js idev-viewer-js/examples/nextjs-example/public/flutter-app/flutter.js idev-viewer-js/examples/nextjs-example/public/flutter-app/index.html
 echo ""
 echo "📁 Vanilla 예제 Flutter 앱 파일들:"
 ls -la idev-viewer-js/examples/vanilla-example/flutter-app/main.dart.js idev-viewer-js/examples/vanilla-example/flutter-app/flutter.js idev-viewer-js/examples/vanilla-example/flutter-app/index.html
@@ -181,6 +203,7 @@ echo "2. 테스트 URL들:"
 echo "   - Vanilla 예제: http://localhost:8080/idev-viewer-js/examples/vanilla-example/"
 echo "   - React 예제: cd idev-viewer-js/examples/react-example && npm start"
 echo "   - Vue 예제: cd idev-viewer-js/examples/vue-example && npm start"
+echo "   - Next.js 예제: cd idev-viewer-js/examples/nextjs-example && npm run dev"
 echo "3. NPM 패키지 사용법 확인"
 echo "4. 통합 테스트: ./scripts/test-integration.sh"
 
