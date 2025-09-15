@@ -80,7 +80,7 @@ fi
 if cp -r build/web/* idev-viewer-js/examples/vanilla-example/flutter-app/; then
     print_success "Vanilla 예제 flutter-app 복사 완료"
     # Vanilla 예제의 base href 수정
-    sed -i '' 's|<base href="/">|<base href="/idev-viewer-js/examples/vanilla-example/flutter-app/">|g' idev-viewer-js/examples/vanilla-example/flutter-app/index.html
+    sed -i '' 's|<base href="/">|<base href="./">|g' idev-viewer-js/examples/vanilla-example/flutter-app/index.html
     print_success "Vanilla 예제 base href 수정 완료"
 else
     print_error "Vanilla 예제 flutter-app 복사 실패"
