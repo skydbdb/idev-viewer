@@ -57,6 +57,9 @@ print_step "3. 예제들의 flutter-app 디렉토리로 복사..."
 # React 예제
 if cp -r build/web/* idev-viewer-js/examples/react-example/public/flutter-app/; then
     print_success "React 예제 flutter-app 복사 완료"
+    # React 예제의 base href 수정
+    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/react-example/public/flutter-app/index.html
+    print_success "React 예제 base href 수정 완료"
 else
     print_error "React 예제 flutter-app 복사 실패"
     exit 1
@@ -65,6 +68,9 @@ fi
 # Vue 예제
 if cp -r build/web/* idev-viewer-js/examples/vue-example/public/flutter-app/; then
     print_success "Vue 예제 flutter-app 복사 완료"
+    # Vue 예제의 base href 수정
+    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/vue-example/public/flutter-app/index.html
+    print_success "Vue 예제 base href 수정 완료"
 else
     print_error "Vue 예제 flutter-app 복사 실패"
     exit 1
