@@ -8,10 +8,10 @@ Flutter로 개발된 웹 애플리케이션을 타 프레임워크(React, Vue, A
 
 ```bash
 # 전체 빌드 및 배포
-./build-and-deploy.sh
+./scripts/build-and-deploy.sh
 
 # NPM 패키지 배포 포함
-./build-and-deploy.sh --publish
+./scripts/build-and-deploy.sh --publish
 ```
 
 ### 2. 수동 빌드
@@ -38,7 +38,7 @@ cd idev-viewer-js && npm run build
 ### 통합 테스트 실행
 
 ```bash
-./test-integration.sh
+./scripts/test-integration.sh
 ```
 
 ### 개별 테스트
@@ -47,8 +47,10 @@ cd idev-viewer-js && npm run build
 # Python HTTP 서버 시작
 python3 -m http.server 8080
 
-# 테스트 URL
-# http://localhost:8080/idev-viewer-js/test.html
+# 테스트 URL들
+# - Vanilla 예제: http://localhost:8080/idev-viewer-js/examples/vanilla-example/
+# - React 예제: cd idev-viewer-js/examples/react-example && npm start
+# - Vue 예제: cd idev-viewer-js/examples/vue-example && npm start
 ```
 
 ## 📦 NPM 패키지
