@@ -43,58 +43,58 @@ fi
 # 2. Flutter 앱 파일 복사
 print_step "2. Flutter 앱 파일 복사..."
 
-# 메인 flutter-app 디렉토리로 복사
-if cp -r build/web/* idev-viewer-js/flutter-app/; then
-    print_success "메인 flutter-app 디렉토리로 파일 복사 완료"
+# 메인 idev-app 디렉토리로 복사
+if cp -r build/web/* idev-viewer-js/idev-app/; then
+    print_success "메인 idev-app 디렉토리로 파일 복사 완료"
 else
-    print_error "메인 flutter-app 파일 복사 실패"
+    print_error "메인 idev-app 파일 복사 실패"
     exit 1
 fi
 
-# 예제들의 flutter-app 디렉토리로 복사
-print_step "3. 예제들의 flutter-app 디렉토리로 복사..."
+# 예제들의 idev-app 디렉토리로 복사
+print_step "3. 예제들의 idev-app 디렉토리로 복사..."
 
 # React 예제
-if cp -r build/web/* idev-viewer-js/examples/react-example/public/flutter-app/; then
-    print_success "React 예제 flutter-app 복사 완료"
+if cp -r build/web/* idev-viewer-js/examples/react-example/public/idev-app/; then
+    print_success "React 예제 idev-app 복사 완료"
     # React 예제의 base href 수정
-    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/react-example/public/flutter-app/index.html
+    sed -i '' 's|<base href="/">|<base href="/idev-app/">|g' idev-viewer-js/examples/react-example/public/idev-app/index.html
     print_success "React 예제 base href 수정 완료"
 else
-    print_error "React 예제 flutter-app 복사 실패"
+    print_error "React 예제 idev-app 복사 실패"
     exit 1
 fi
 
 # Vue 예제
-if cp -r build/web/* idev-viewer-js/examples/vue-example/public/flutter-app/; then
-    print_success "Vue 예제 flutter-app 복사 완료"
+if cp -r build/web/* idev-viewer-js/examples/vue-example/public/idev-app/; then
+    print_success "Vue 예제 idev-app 복사 완료"
     # Vue 예제의 base href 수정
-    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/vue-example/public/flutter-app/index.html
+    sed -i '' 's|<base href="/">|<base href="/idev-app/">|g' idev-viewer-js/examples/vue-example/public/idev-app/index.html
     print_success "Vue 예제 base href 수정 완료"
 else
-    print_error "Vue 예제 flutter-app 복사 실패"
+    print_error "Vue 예제 idev-app 복사 실패"
     exit 1
 fi
 
 # Next.js 예제
-if cp -r build/web/* idev-viewer-js/examples/nextjs-example/public/flutter-app/; then
-    print_success "Next.js 예제 flutter-app 복사 완료"
+if cp -r build/web/* idev-viewer-js/examples/nextjs-example/public/idev-app/; then
+    print_success "Next.js 예제 idev-app 복사 완료"
     # Next.js 예제의 base href 수정
-    sed -i '' 's|<base href="/">|<base href="/flutter-app/">|g' idev-viewer-js/examples/nextjs-example/public/flutter-app/index.html
+    sed -i '' 's|<base href="/">|<base href="/idev-app/">|g' idev-viewer-js/examples/nextjs-example/public/idev-app/index.html
     print_success "Next.js 예제 base href 수정 완료"
 else
-    print_error "Next.js 예제 flutter-app 복사 실패"
+    print_error "Next.js 예제 idev-app 복사 실패"
     exit 1
 fi
 
 # Vanilla 예제
-if cp -r build/web/* idev-viewer-js/examples/vanilla-example/flutter-app/; then
-    print_success "Vanilla 예제 flutter-app 복사 완료"
+if cp -r build/web/* idev-viewer-js/examples/vanilla-example/idev-app/; then
+    print_success "Vanilla 예제 idev-app 복사 완료"
     # Vanilla 예제의 base href 수정
-    sed -i '' 's|<base href="/">|<base href="./">|g' idev-viewer-js/examples/vanilla-example/flutter-app/index.html
+    sed -i '' 's|<base href="/">|<base href="./">|g' idev-viewer-js/examples/vanilla-example/idev-app/index.html
     print_success "Vanilla 예제 base href 수정 완료"
 else
-    print_error "Vanilla 예제 flutter-app 복사 실패"
+    print_error "Vanilla 예제 idev-app 복사 실패"
     exit 1
 fi
 
@@ -151,20 +151,20 @@ print_step "6. 빌드 결과 확인..."
 echo "📁 빌드된 JavaScript 라이브러리:"
 ls -la idev-viewer-js/dist/
 echo ""
-echo "📁 메인 Flutter 앱 파일들:"
-ls -la idev-viewer-js/flutter-app/main.dart.js idev-viewer-js/flutter-app/flutter.js idev-viewer-js/flutter-app/index.html
+echo "📁 메인 IDev 앱 파일들:"
+ls -la idev-viewer-js/idev-app/main.dart.js idev-viewer-js/idev-app/flutter.js idev-viewer-js/idev-app/index.html
 echo ""
-echo "📁 React 예제 Flutter 앱 파일들:"
-ls -la idev-viewer-js/examples/react-example/public/flutter-app/main.dart.js idev-viewer-js/examples/react-example/public/flutter-app/flutter.js idev-viewer-js/examples/react-example/public/flutter-app/index.html
+echo "📁 React 예제 IDev 앱 파일들:"
+ls -la idev-viewer-js/examples/react-example/public/idev-app/main.dart.js idev-viewer-js/examples/react-example/public/idev-app/flutter.js idev-viewer-js/examples/react-example/public/idev-app/index.html
 echo ""
-echo "📁 Vue 예제 Flutter 앱 파일들:"
-ls -la idev-viewer-js/examples/vue-example/public/flutter-app/main.dart.js idev-viewer-js/examples/vue-example/public/flutter-app/flutter.js idev-viewer-js/examples/vue-example/public/flutter-app/index.html
+echo "📁 Vue 예제 IDev 앱 파일들:"
+ls -la idev-viewer-js/examples/vue-example/public/idev-app/main.dart.js idev-viewer-js/examples/vue-example/public/idev-app/flutter.js idev-viewer-js/examples/vue-example/public/idev-app/index.html
 echo ""
-echo "📁 Next.js 예제 Flutter 앱 파일들:"
-ls -la idev-viewer-js/examples/nextjs-example/public/flutter-app/main.dart.js idev-viewer-js/examples/nextjs-example/public/flutter-app/flutter.js idev-viewer-js/examples/nextjs-example/public/flutter-app/index.html
+echo "📁 Next.js 예제 IDev 앱 파일들:"
+ls -la idev-viewer-js/examples/nextjs-example/public/idev-app/main.dart.js idev-viewer-js/examples/nextjs-example/public/idev-app/flutter.js idev-viewer-js/examples/nextjs-example/public/idev-app/index.html
 echo ""
-echo "📁 Vanilla 예제 Flutter 앱 파일들:"
-ls -la idev-viewer-js/examples/vanilla-example/flutter-app/main.dart.js idev-viewer-js/examples/vanilla-example/flutter-app/flutter.js idev-viewer-js/examples/vanilla-example/flutter-app/index.html
+echo "📁 Vanilla 예제 IDev 앱 파일들:"
+ls -la idev-viewer-js/examples/vanilla-example/idev-app/main.dart.js idev-viewer-js/examples/vanilla-example/idev-app/flutter.js idev-viewer-js/examples/vanilla-example/idev-app/index.html
 
 # 7. NPM 패키지 배포 (옵션)
 if [[ $1 == "--publish" ]]; then
