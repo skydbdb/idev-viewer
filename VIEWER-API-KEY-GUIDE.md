@@ -16,14 +16,14 @@
 
 ### 기본 URL
 ```
-https://your-domain.com/viewer-api-keys
+https://your-domain.com/idev/v1/viewer-api-keys
 ```
 
 ## 1. API 키 생성
 
 ### 엔드포인트
 ```
-POST /viewer-api-keys/generate
+POST /idev/v1/viewer-api-keys/generate
 ```
 
 ### 인증
@@ -40,7 +40,7 @@ POST /viewer-api-keys/generate
 
 ### 요청 예시
 ```bash
-curl -X POST https://your-domain.com/viewer-api-keys/generate \
+curl -X POST https://your-domain.com/idev/v1/viewer-api-keys/generate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -68,7 +68,7 @@ curl -X POST https://your-domain.com/viewer-api-keys/generate \
 
 ### 엔드포인트
 ```
-POST /viewer-api-keys/authenticate
+POST /idev/v1/viewer-api-keys/authenticate
 ```
 
 ### 인증
@@ -83,7 +83,7 @@ POST /viewer-api-keys/authenticate
 
 ### 요청 예시
 ```bash
-curl -X POST https://your-domain.com/viewer-api-keys/authenticate \
+curl -X POST https://your-domain.com/idev/v1/viewer-api-keys/authenticate \
   -H "Content-Type: application/json" \
   -d '{
     "apiKey": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6"
@@ -118,7 +118,7 @@ curl -X POST https://your-domain.com/viewer-api-keys/authenticate \
 
 ### 엔드포인트
 ```
-GET /viewer-api-keys/list
+GET /idev/v1/viewer-api-keys/list
 ```
 
 ### 인증
@@ -126,7 +126,7 @@ GET /viewer-api-keys/list
 
 ### 요청 예시
 ```bash
-curl -X GET https://your-domain.com/viewer-api-keys/list \
+curl -X GET https://your-domain.com/idev/v1/viewer-api-keys/list \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -163,7 +163,7 @@ curl -X GET https://your-domain.com/viewer-api-keys/list \
 
 ### 엔드포인트
 ```
-DELETE /viewer-api-keys/deactivate/{apiKey}
+DELETE /idev/v1/viewer-api-keys/deactivate/{apiKey}
 ```
 
 ### 인증
@@ -171,7 +171,7 @@ DELETE /viewer-api-keys/deactivate/{apiKey}
 
 ### 요청 예시
 ```bash
-curl -X DELETE https://your-domain.com/viewer-api-keys/deactivate/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6 \
+curl -X DELETE https://your-domain.com/idev/v1/viewer-api-keys/deactivate/a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -190,7 +190,7 @@ curl -X DELETE https://your-domain.com/viewer-api-keys/deactivate/a1b2c3d4e5f6g7
 
 ### 엔드포인트
 ```
-POST /viewer-api-keys/cleanup
+POST /idev/v1/viewer-api-keys/cleanup
 ```
 
 ### 인증
@@ -199,7 +199,7 @@ POST /viewer-api-keys/cleanup
 
 ### 요청 예시
 ```bash
-curl -X POST https://your-domain.com/viewer-api-keys/cleanup \
+curl -X POST https://your-domain.com/idev/v1/viewer-api-keys/cleanup \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -271,7 +271,7 @@ const axios = require('axios');
 // API 키로 인증
 async function authenticateWithApiKey(apiKey) {
   try {
-    const response = await axios.post('https://your-domain.com/viewer-api-keys/authenticate', {
+    const response = await axios.post('https://your-domain.com/idev/v1/viewer-api-keys/authenticate', {
       apiKey: apiKey
     });
     
@@ -306,7 +306,7 @@ import requests
 # API 키로 인증
 def authenticate_with_api_key(api_key):
     response = requests.post(
-        'https://your-domain.com/viewer-api-keys/authenticate',
+        'https://your-domain.com/idev/v1/viewer-api-keys/authenticate',
         json={'apiKey': api_key}
     )
     

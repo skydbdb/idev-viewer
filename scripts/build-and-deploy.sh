@@ -178,9 +178,9 @@ if [[ $1 == "--publish" ]]; then
     read -p "배포를 진행하시겠습니까? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        if npm publish; then
+        if npm publish --access public; then
             print_success "NPM 패키지 배포 완료!"
-            echo "📦 패키지 URL: https://www.npmjs.com/package/@idev/viewer"
+            echo "📦 패키지 URL: https://www.npmjs.com/package/idev-viewer"
         else
             print_error "NPM 패키지 배포 실패"
             exit 1

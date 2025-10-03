@@ -76,25 +76,24 @@ class HomePage extends StatelessWidget {
             },
             scrollbars: true,
           ),
-          child: const HomeBoard()
-          //   const PlutoLayout(
-          // body: PlutoLayoutContainer(
-          //   child: HomeBoard(),
-          // ),
-          // top: PlutoLayoutContainer(
-          //   child: TopTab(),
-          // ),
-          // left: PlutoLayoutContainer(
-          //   child: LeftTab(),
-          // ),
-          // right: PlutoLayoutContainer(
-          //   child: RightTab(),
-          // ),
-          // bottom: PlutoLayoutContainer(
-          //   child: BottomTab(),
-          // ),
-          // )
-          ),
+          child: // const HomeBoard()
+              const PlutoLayout(
+            body: PlutoLayoutContainer(
+              child: HomeBoard(),
+            ),
+            top: PlutoLayoutContainer(
+              child: TopTab(),
+            ),
+            left: PlutoLayoutContainer(
+              child: LeftTab(),
+            ),
+            right: PlutoLayoutContainer(
+              child: RightTab(),
+            ),
+            bottom: PlutoLayoutContainer(
+              child: BottomTab(),
+            ),
+          )),
     );
   }
 }

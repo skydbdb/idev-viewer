@@ -28,7 +28,7 @@ class ViewerAuthService {
 
       // 뷰어 API 키로 인증 시도 (직접 HTTP 요청)
       const url =
-          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/authenticate';
+          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/idev/v1/viewer-api-keys/authenticate';
 
       try {
         final response = await html.HttpRequest.request(
@@ -156,7 +156,7 @@ class ViewerAuthService {
 
     try {
       const url =
-          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/viewer-api-keys/validate';
+          'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com/idev/v1/viewer-api-keys/validate';
 
       final response = await html.HttpRequest.request(
         url,
@@ -232,7 +232,7 @@ class ViewerAuthService {
   /// 템플릿 목록 조회:
   /// ```dart
   /// final templates = await ViewerAuthService.callViewerApi(
-  ///   uri: '/templates',
+  ///   uri: '/idev/v1/templates',
   ///   method: Method.get,
   /// );
   /// ```
@@ -240,7 +240,7 @@ class ViewerAuthService {
   /// 특정 템플릿 조회:
   /// ```dart
   /// final template = await ViewerAuthService.callViewerApi(
-  ///   uri: '/templates/123',
+  ///   uri: '/idev/v1/templates/123',
   ///   method: Method.get,
   /// );
   /// ```

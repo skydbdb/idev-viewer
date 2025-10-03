@@ -26,13 +26,13 @@ IDev Viewer는 Flutter Web 앱을 iframe으로 임베드하여 다른 프레임�
 ### 1. NPM 패키지 설치
 
 ```bash
-npm install @idev/viewer
+npm install idev-viewer
 ```
 
 ### 2. 기본 사용법
 
 ```javascript
-import { IdevViewer } from '@idev/viewer';
+import { IdevViewer } from 'idev-viewer';
 
 // IdevViewer 인스턴스 생성
 const viewer = new IdevViewer({
@@ -160,7 +160,7 @@ viewer.destroy();
 
 ```jsx
 import React, { useEffect, useRef, useState } from 'react';
-import { IdevViewer } from '@idev/viewer';
+import { IdevViewer } from 'idev-viewer';
 
 function IdevViewerComponent({ template, config }) {
     const containerRef = useRef(null);
@@ -217,7 +217,7 @@ export default IdevViewerComponent;
 </template>
 
 <script>
-import { IdevViewer } from '@idev/viewer';
+import { IdevViewer } from 'idev-viewer';
 
 export default {
     name: 'IdevViewerComponent',
@@ -465,18 +465,18 @@ idev_viewer/
 
 ```bash
 # 설치
-npm install @idev/viewer
+npm install idev-viewer
 
 # 또는 yarn
-yarn add @idev/viewer
+yarn add idev-viewer
 
 # 또는 pnpm
-pnpm add @idev/viewer
+pnpm add idev-viewer
 ```
 
 ### 패키지 정보
 
-- **패키지명**: `@idev/viewer`
+- **패키지명**: `idev-viewer`
 - **버전**: `1.0.0`
 - **설명**: "Flutter-based template viewer with 100% identical rendering"
 - **키워드**: flutter, viewer, template, iframe, react, vue, angular
