@@ -15,6 +15,14 @@ class ImageItemContent extends Equatable implements StackItemContent {
     this.colorBlendMode,
     this.fit = BoxFit.scaleDown,
     this.repeat = ImageRepeat.noRepeat,
+    // this.width,
+    // this.height,
+    // this.semanticLabel,
+    // this.matchTextDirection = false,
+    // this.gaplessPlayback = false,
+    // this.isAntiAlias = false,
+    // this.filterQuality = FilterQuality.low,
+    // this.excludeFromSemantics = false,
   });
 
   factory ImageItemContent.fromJson(Map<String, dynamic> json) {
@@ -31,6 +39,17 @@ class ImageItemContent extends Equatable implements StackItemContent {
       repeat: json['repeat'] != null
           ? ImageRepeat.values.byName(json['repeat'])
           : ImageRepeat.noRepeat,
+      // width: asNullT<double>(json['width']),
+      // height: asNullT<double>(json['height']),
+      // semanticLabel: asNullT<String>(json['semanticLabel']),
+      // matchTextDirection: asNullT<bool>(json['matchTextDirection']) ?? false,
+      // gaplessPlayback: asNullT<bool>(json['gaplessPlayback']) ?? false,
+      // isAntiAlias: asNullT<bool>(json['isAntiAlias']) ?? true,
+      // filterQuality: json['filterQuality'] != null
+      //     ? FilterQuality.values[asT<int>(json['filterQuality'])]
+      //     : FilterQuality.high,
+      //   excludeFromSemantics:
+      // asNullT<bool>(json['excludeFromSemantics']) ?? false,
     );
   }
 
@@ -40,15 +59,36 @@ class ImageItemContent extends Equatable implements StackItemContent {
   final BlendMode? colorBlendMode;
   final BoxFit fit;
   final ImageRepeat repeat;
+  // final double? width;
+  // final double? height;
+  // final String? semanticLabel;
+  // final bool matchTextDirection;
+  // final bool gaplessPlayback;
+  // final bool isAntiAlias;
+  // final FilterQuality filterQuality;
+  // final bool excludeFromSemantics;
 
   ImageProvider get image {
     if (url != null && url!.isNotEmpty) {
-      return NetworkImage(url!);
+      // CORS 문제 해결을 위해 프록시 URL 사용
+      String proxiedUrl = _getProxiedImageUrl(url!);
+      return NetworkImage(proxiedUrl);
     } else if (assetName != null && assetName!.isNotEmpty) {
       return AssetImage(assetName!);
     } else {
       throw Exception('url과 assetName 중 하나는 반드시 필요합니다');
     }
+  }
+
+  String _getProxiedImageUrl(String originalUrl) {
+    // 모든 외부 이미지 URL에 대해 CORS 문제를 해결하기 위한 프록시 URL 생성
+    if (originalUrl.startsWith('http://') ||
+        originalUrl.startsWith('https://')) {
+      // 더 안정적인 프록시 서버 사용
+      return 'https://corsproxy.io/?${Uri.encodeComponent(originalUrl)}';
+    }
+
+    return originalUrl;
   }
 
   ImageItemContent copyWith({
@@ -58,6 +98,14 @@ class ImageItemContent extends Equatable implements StackItemContent {
     BlendMode? colorBlendMode,
     BoxFit? fit,
     ImageRepeat? repeat,
+    // double? width,
+    // double? height,
+    // String? semanticLabel,
+    // bool? matchTextDirection,
+    // bool? gaplessPlayback,
+    // bool? isAntiAlias,
+    // FilterQuality? filterQuality,
+    // bool? excludeFromSemantics,
   }) {
     return ImageItemContent(
       url: url ?? this.url,
@@ -66,6 +114,14 @@ class ImageItemContent extends Equatable implements StackItemContent {
       colorBlendMode: colorBlendMode ?? this.colorBlendMode,
       fit: fit ?? this.fit,
       repeat: repeat ?? this.repeat,
+      // width: width ?? this.width,
+      // height: height ?? this.height,
+      // semanticLabel: semanticLabel ?? this.semanticLabel,
+      // matchTextDirection: matchTextDirection ?? this.matchTextDirection,
+      // gaplessPlayback: gaplessPlayback ?? this.gaplessPlayback,
+      // isAntiAlias: isAntiAlias ?? this.isAntiAlias,
+      // filterQuality: filterQuality ?? this.filterQuality,
+      // excludeFromSemantics: excludeFromSemantics ?? this.excludeFromSemantics,
     );
   }
 
@@ -82,6 +138,15 @@ class ImageItemContent extends Equatable implements StackItemContent {
       if (colorBlendMode != null) 'colorBlendMode': colorBlendMode?.name,
       if (fit != BoxFit.cover) 'fit': fit.name,
       if (repeat != ImageRepeat.noRepeat) 'repeat': repeat.name,
+      // if (width != null) 'width': width,
+      // if (height != null) 'height': height,
+      // if (semanticLabel != null) 'semanticLabel': semanticLabel,
+      // if (matchTextDirection) 'matchTextDirection': matchTextDirection,
+      // if (gaplessPlayback) 'gaplessPlayback': gaplessPlayback,
+      // if (isAntiAlias) 'isAntiAlias': isAntiAlias,
+      // if (filterQuality != FilterQuality.low)
+      //   'filterQuality': filterQuality.index,
+      // if (excludeFromSemantics) 'excludeFromSemantics': excludeFromSemantics,
     };
   }
 
@@ -110,6 +175,7 @@ class StackImageItem extends StackItem<ImageItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackImageItem.fromJson(Map<String, dynamic> data) {
@@ -140,6 +206,7 @@ class StackImageItem extends StackItem<ImageItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content: ImageItemContent.fromJson(asMap(data['content'])),
     );
   }
@@ -165,6 +232,7 @@ class StackImageItem extends StackItem<ImageItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     ImageItemContent? content,
   }) {
     return StackImageItem(
@@ -179,6 +247,7 @@ class StackImageItem extends StackItem<ImageItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }

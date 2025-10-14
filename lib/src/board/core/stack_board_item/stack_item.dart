@@ -28,6 +28,7 @@ abstract class StackItem<T extends StackItemContent> {
     bool? dock = false,
     String? permission,
     String? theme,
+    double? borderRadius,
     this.content,
   })  : id = id ?? _genId(),
         offset = offset ?? Offset.zero,
@@ -37,6 +38,7 @@ abstract class StackItem<T extends StackItemContent> {
         permission = permission ?? 'read',
         theme = theme ?? 'White',
         padding = padding ?? EdgeInsets.zero,
+        borderRadius = borderRadius ?? 0,
         status = status ?? StackItemStatus.selected;
 
   const StackItem.empty({
@@ -51,6 +53,7 @@ abstract class StackItem<T extends StackItemContent> {
     required this.dock,
     required this.permission,
     required this.theme,
+    required this.borderRadius,
   }) : id = '';
 
   /// boardId
@@ -82,6 +85,9 @@ abstract class StackItem<T extends StackItemContent> {
 
   final String theme;
 
+  /// Border radius
+  final double borderRadius;
+
   /// Content
   final T? content;
 
@@ -97,6 +103,7 @@ abstract class StackItem<T extends StackItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     T? content,
   });
 
@@ -115,6 +122,7 @@ abstract class StackItem<T extends StackItemContent> {
         'right': padding.right,
         'bottom': padding.bottom,
       },
+      'borderRadius': borderRadius,
       'status': status.index,
       'lockZOrder': lockZOrder,
       'dock': dock,
@@ -142,6 +150,7 @@ abstract class StackItem<T extends StackItemContent> {
         dock,
         permission,
         theme,
+        borderRadius,
         content,
       );
 
@@ -161,6 +170,7 @@ abstract class StackItem<T extends StackItemContent> {
             dock == other.dock &&
             permission == other.permission &&
             theme == other.theme &&
+            borderRadius == other.borderRadius &&
             content == other.content;
   }
 }

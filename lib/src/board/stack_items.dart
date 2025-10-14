@@ -10,3 +10,4 @@ export '/src/board/stack_board_items/items/stack_button_item.dart';
 export '/src/board/stack_board_items/items/stack_template_item.dart';
 export '/src/board/stack_board_items/items/stack_detail_item.dart';
 export '/src/board/stack_board_items/items/stack_chart_item.dart';
+export '/src/board/stack_board_items/items/stack_scheduler_item.dart';

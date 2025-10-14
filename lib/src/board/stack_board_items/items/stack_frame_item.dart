@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:equatable/equatable.dart';
 
 import '/src/board/core/stack_board_item/stack_item.dart';
@@ -85,6 +85,7 @@ class StackFrameItem extends StackItem<FrameItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackFrameItem.fromJson(Map<String, dynamic> data) {
@@ -114,6 +115,7 @@ class StackFrameItem extends StackItem<FrameItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content:
           FrameItemContent.fromJson(data['content'] as Map<String, dynamic>),
     );
@@ -132,6 +134,7 @@ class StackFrameItem extends StackItem<FrameItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     FrameItemContent? content,
   }) {
     return StackFrameItem(
@@ -146,6 +149,7 @@ class StackFrameItem extends StackItem<FrameItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }

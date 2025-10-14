@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:idev_v1/src/board/helpers/json_list.dart';
 import '/src/grid/trina_grid/trina_grid.dart';
 import '/src/board/core/stack_board_item/stack_item.dart';
@@ -14,8 +14,9 @@ class GridItemContent extends Equatable implements StackItemContent {
   const GridItemContent({
     this.headerTitle,
     this.apiId,
-    this.saveApiId,
-    this.saveApiParams,
+    this.postApiId,
+    this.putApiId,
+    this.deleteApiId,
     this.reqApis = const [],
     this.resApis = const [],
     this.colGroups = const [],
@@ -35,8 +36,9 @@ class GridItemContent extends Equatable implements StackItemContent {
 
   final String? headerTitle;
   final String? apiId;
-  final String? saveApiId;
-  final String? saveApiParams;
+  final String? postApiId;
+  final String? putApiId;
+  final String? deleteApiId;
   final List<ApiConfig> reqApis;
   final List<ApiConfig> resApis;
   final List<dynamic> colGroups;
@@ -56,8 +58,9 @@ class GridItemContent extends Equatable implements StackItemContent {
   GridItemContent copyWith({
     String? headerTitle,
     String? apiId,
-    String? saveApiId,
-    String? saveApiParams,
+    String? postApiId,
+    String? putApiId,
+    String? deleteApiId,
     List<ApiConfig>? reqApis,
     List<ApiConfig>? resApis,
     List<dynamic>? colGroups,
@@ -77,8 +80,9 @@ class GridItemContent extends Equatable implements StackItemContent {
     return GridItemContent(
       headerTitle: headerTitle ?? this.headerTitle,
       apiId: apiId ?? this.apiId,
-      saveApiId: saveApiId ?? this.saveApiId,
-      saveApiParams: saveApiParams ?? this.saveApiParams,
+      postApiId: postApiId ?? this.postApiId,
+      putApiId: putApiId ?? this.putApiId,
+      deleteApiId: deleteApiId ?? this.deleteApiId,
       reqApis: reqApis ?? this.reqApis,
       resApis: resApis ?? this.resApis,
       colGroups: colGroups ?? this.colGroups,
@@ -142,8 +146,9 @@ class GridItemContent extends Equatable implements StackItemContent {
     return GridItemContent(
       headerTitle: asNullT<String>(data['headerTitle']),
       apiId: asNullT<String>(data['apiId']),
-      saveApiId: asNullT<String>(data['saveApiId']),
-      saveApiParams: asNullT<String>(data['saveApiParams']),
+      postApiId: asNullT<String>(data['postApiId']),
+      putApiId: asNullT<String>(data['putApiId']),
+      deleteApiId: asNullT<String>(data['deleteApiId']),
       reqApis: reqApis,
       resApis: resApis,
       colGroups: colGroups,
@@ -167,8 +172,9 @@ class GridItemContent extends Equatable implements StackItemContent {
     return <String, dynamic>{
       if (headerTitle != null) 'headerTitle': headerTitle,
       if (apiId != null) 'apiId': apiId,
-      if (saveApiId != null) 'saveApiId': saveApiId,
-      if (saveApiParams != null) 'saveApiParams': saveApiParams,
+      if (postApiId != null) 'postApiId': postApiId,
+      if (putApiId != null) 'putApiId': putApiId,
+      if (deleteApiId != null) 'deleteApiId': deleteApiId,
       'reqApis': apiConfigsToJsonString(reqApis),
       'resApis': apiConfigsToJsonString(resApis),
       'colGroups': jsonListToString(colGroups),
@@ -191,8 +197,9 @@ class GridItemContent extends Equatable implements StackItemContent {
   List<Object?> get props => [
         headerTitle,
         apiId,
-        saveApiId,
-        saveApiParams,
+        postApiId,
+        putApiId,
+        deleteApiId,
         reqApis,
         resApis,
         colGroups,
@@ -226,6 +233,7 @@ class StackGridItem extends StackItem<GridItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackGridItem.fromJson(Map<String, dynamic> data) {
@@ -257,6 +265,7 @@ class StackGridItem extends StackItem<GridItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: asT<String>(data['permission']),
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content:
           GridItemContent.fromJson(data['content'] as Map<String, dynamic>),
     );
@@ -275,6 +284,7 @@ class StackGridItem extends StackItem<GridItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     GridItemContent? content,
   }) {
     return StackGridItem(
@@ -289,6 +299,7 @@ class StackGridItem extends StackItem<GridItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:idev_v1/src/board/core/stack_board_item/stack_item_status.dart';
 import 'package:idev_v1/src/board/helpers.dart';
@@ -46,7 +47,7 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
   List<TrinaRow> rows = [];
   String boardId = '', permission = '', headerTitle = '';
   String theme = '';
-  String apiId = '', saveApiId = '', saveApiParams = '';
+  String apiId = '', postApiId = '', putApiId = '', deleteApiId = '';
   String columnState = '';
   List<ApiConfig> reqApis = [];
   List<ApiConfig> resApis = [];
@@ -117,17 +118,18 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
   }
 
   Future<void> _initStateSettings() async {
-    permission = widget.item.permission ?? '';
-    theme = widget.item.theme ?? '';
-    boardId = widget.item.boardId ?? '';
+    permission = widget.item.permission;
+    theme = widget.item.theme;
+    boardId = widget.item.boardId;
 
     final GridItemContent content = widget.item.content!;
     mode = content.mode == 'normal'
         ? TrinaGridMode.normal
         : TrinaGridMode.selectWithOneTap;
     apiId = content.apiId ?? '';
-    saveApiId = content.saveApiId ?? '';
-    saveApiParams = content.saveApiParams ?? '';
+    postApiId = content.postApiId ?? '';
+    putApiId = content.putApiId ?? '';
+    deleteApiId = content.deleteApiId ?? '';
     headerTitle = content.headerTitle ?? '제목';
     rowHeight = content.rowHeight ?? 25;
     showColumn = content.showColumn ?? true;
@@ -137,11 +139,11 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
     showRowNum = content.showRowNum ?? true;
     enableRowChecked = content.enableRowChecked ?? false;
 
-    reqApis = content.reqApis ?? [];
-    resApis = content.resApis ?? [];
-    colGroups = content.colGroups ?? [];
-    columnAggregate = content.columnAggregate ?? {};
-    groupByColumns = content.groupByColumns ?? {};
+    reqApis = content.reqApis;
+    resApis = content.resApis;
+    colGroups = content.colGroups;
+    columnAggregate = content.columnAggregate;
+    groupByColumns = content.groupByColumns;
 
     if (resApis.isNotEmpty) {
       columnState = resetColumn(apiId);
@@ -240,11 +242,11 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
         enableColumnAggregate = currentContent.enableColumnAggregate ?? false;
         showFooter = currentContent.showFooter ?? true;
 
-        reqApis = currentContent.reqApis ?? [];
-        resApis = currentContent.resApis ?? [];
-        colGroups = currentContent.colGroups ?? [];
-        columnAggregate = currentContent.columnAggregate ?? {};
-        groupByColumns = currentContent.groupByColumns ?? {};
+        reqApis = currentContent.reqApis;
+        resApis = currentContent.resApis;
+        colGroups = currentContent.colGroups;
+        columnAggregate = currentContent.columnAggregate;
+        groupByColumns = currentContent.groupByColumns;
 
         if (columnState != apiId) {
           resApis = [];
@@ -378,7 +380,10 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
 
   bool _isStateManagerReady() {
     try {
-      return stateManager != null;
+      // touch the late variable; will throw if not initialized
+      // ignore: unnecessary_statements
+      stateManager.toString();
+      return true;
     } catch (e) {
       return false;
     }
@@ -889,40 +894,198 @@ class StackGridCaseState extends State<StackGridCase> with GridRendererMixin {
         rowColorCallback: rowColorContext);
 
     if (result != null && result.buttonKey == 'ok') {
-      List<Map> json = selectedRows.map((e) {
-        Map<String, dynamic> em = {
-          ...e.toJson(),
-          'crud_gb': onChanged[e.key]['cud'],
-          'CUD': onChanged[e.key]['cud'],
-        };
-        em.removeWhere((key, value) => value.toString().isEmpty);
-        return em;
-      }).toList();
-
       final currentContent = widget.item.content;
-      final saveApiId = currentContent?.saveApiId;
-      final saveApiParams = currentContent?.saveApiParams;
 
-      if (currentContent != null && saveApiId != null && saveApiId.isNotEmpty) {
-        final apiParams = saveApiParams != null ? asMap(saveApiParams) : {};
-        apiParams['data'] = json;
+      // Create (POST)
+      final createEntries =
+          onChanged.entries.where((e) => e.value['cud'] == 'C').toList();
+      for (final e in createEntries) {
+        if (currentContent != null && postApiId.isNotEmpty) {
+          final row = selectedRows.firstWhereOrNull((row) => row.key == e.key);
+          if (row != null && row.cells.isNotEmpty) {
+            final params = _buildCrudParams(postApiId, row);
+            homeRepo.addApiRequest(postApiId, params);
 
-        final api = homeRepo.apis[saveApiId];
-        if (api != null) {
-          Map<String, dynamic> params = {...apiParams};
+            final resp = await _waitForApiResponse(postApiId, params);
+            if (resp == null) {
+              _showErrorSnackBar('생성 응답 타임아웃 (5초)');
+              continue;
+            }
 
-          homeRepo.addApiRequest(saveApiId, params);
+            _showSuccessSnackBar('데이터가 생성되었습니다.');
+            await _refreshDataWithRetry();
+          }
+        } else {
+          _showErrorSnackBar('POST API가 설정되어 있지 않습니다.');
+          break;
+        }
+      }
 
+      // Update (PUT)
+      final updateEntries =
+          onChanged.entries.where((e) => e.value['cud'] == 'U').toList();
+      for (final e in updateEntries) {
+        if (currentContent != null && putApiId.isNotEmpty) {
+          final row = selectedRows.firstWhereOrNull((row) => row.key == e.key);
+          if (row != null && row.cells.isNotEmpty) {
+            final params = _buildCrudParams(putApiId, row);
+            homeRepo.addApiRequest(putApiId, params);
+
+            final resp = await _waitForApiResponse(putApiId, params);
+            if (resp == null) {
+              _showErrorSnackBar('수정 응답 타임아웃 (5초)');
+              continue;
+            }
+
+            _showSuccessSnackBar('데이터가 수정되었습니다.');
+            await _refreshDataWithRetry();
+          }
+        } else {
+          _showErrorSnackBar('PUT API가 설정되어 있지 않습니다.');
+          break;
+        }
+      }
+
+      // Delete (DELETE)
+      final deleteEntries =
+          onChanged.entries.where((e) => e.value['cud'] == 'D').toList();
+      for (final e in deleteEntries) {
+        if (currentContent != null && deleteApiId.isNotEmpty) {
+          final row = selectedRows.firstWhereOrNull((row) => row.key == e.key);
+          if (row != null && row.cells.isNotEmpty) {
+            final params = _buildCrudParams(deleteApiId, row);
+            homeRepo.addApiRequest(deleteApiId, params);
+
+            final resp = await _waitForApiResponse(deleteApiId, params);
+            if (resp == null) {
+              _showErrorSnackBar('삭제 응답 타임아웃 (5초)');
+              continue;
+            }
+
+            _showSuccessSnackBar('데이터가 삭제되었습니다.');
+            await _refreshDataWithRetry();
+          }
+        } else {
+          _showErrorSnackBar('DELETE API가 설정되어 있지 않습니다.');
+          break;
+        }
+      }
+
+      setState(() {
+        onChanged.forEach((key, value) {
+          rows.removeWhere((row) => row.key == key && value['cud'] == 'D');
+        });
+        onChanged.clear();
+        renderKey = ValueKey(DateTime.now().millisecondsSinceEpoch);
+      });
+    }
+  }
+
+  Map<String, dynamic> _buildCrudParams(String apiId, TrinaRow row) {
+    final params = <String, dynamic>{};
+    final api = homeRepo.apis[apiId];
+    if (api == null) return params;
+
+    List<dynamic> paramDefs = [];
+    try {
+      final raw = api['parameters'];
+      if (raw != null && raw.toString().isNotEmpty) {
+        paramDefs = raw is String ? jsonDecode(raw) : (raw as List<dynamic>);
+      }
+    } catch (_) {}
+
+    final columnMap = <String, ApiConfig>{};
+    for (final apiConfig in resApis) {
+      if (apiConfig.field != null) {
+        columnMap[apiConfig.field!] = apiConfig;
+      }
+    }
+
+    for (final def in paramDefs) {
+      if (def is! Map) continue;
+      final key = def['paramKey']?.toString();
+      if (key == null || key.isEmpty) continue;
+
+      dynamic value;
+      if (columnMap.containsKey(key)) {
+        value = row.cells[key]?.value ?? '';
+      } else {
+        switch (key) {
+          case 'id':
+            value = row.cells['id']?.value ?? '';
+            break;
+          case 'data':
+            value = row.toJson();
+            break;
+          case 'created_by':
+          case 'user_id':
+            value = '1';
+            break;
+          default:
+            value = '';
+        }
+      }
+
+      value ??= '';
+      params[key] = value;
+    }
+
+    return params;
+  }
+
+  Future<Map<String, dynamic>?> _waitForApiResponse(
+      String apiId, Map<String, dynamic> expectedParams) async {
+    int attempts = 0;
+    const maxAttempts = 50;
+    while (attempts < maxAttempts) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      attempts++;
+      final apiResponse = homeRepo.onApiResponse[apiId];
+      if (apiResponse != null && apiResponse['data'] != null) {
+        return apiResponse;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _refreshDataWithRetry() async {
+    const int maxAttempts = 3;
+    for (int i = 0; i < maxAttempts; i++) {
+      if (apiId.isNotEmpty) {
+        reloadApiIdResponse(apiId);
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
           setState(() {
-            onChanged.forEach((key, value) {
-              rows.removeWhere((row) => row.key == key && value['cud'] == 'D');
-            });
             renderKey = ValueKey(DateTime.now().millisecondsSinceEpoch);
-            onChanged.clear();
           });
-        } else {}
-      } else {}
-    } else {}
+        }
+        break;
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void resetColumnGroups() {

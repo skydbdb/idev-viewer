@@ -227,6 +227,14 @@ class _StackTemplateCaseState extends State<StackTemplateCase> {
             lockZOrder: true,
           );
           hierarchicalController.controller.addItem(chartItem);
+        } else if (itemType == 'StackSchedulerItem') {
+          final schedulerItem = StackSchedulerItem.fromJson(item).copyWith(
+            boardId: boardId,
+            id: itemId,
+            status: StackItemStatus.locked,
+            lockZOrder: true,
+          );
+          hierarchicalController.controller.addItem(schedulerItem);
         }
       } catch (e) {
         // 에러 처리
@@ -277,6 +285,8 @@ class _StackTemplateCaseState extends State<StackTemplateCase> {
           return StackFrameCase(item: item);
         } else if (item is StackLayoutItem) {
           return StackLayoutCase(item: item);
+        } else if (item is StackSchedulerItem) {
+          return StackSchedulerCase(item: item);
         }
         return const SizedBox.shrink();
       },

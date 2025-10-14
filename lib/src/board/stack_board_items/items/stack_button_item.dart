@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 
 import '/src/board/core/stack_board_item/stack_item.dart';
@@ -13,6 +14,7 @@ class ButtonItemContent extends Equatable implements StackItemContent {
     this.buttonName,
     this.url,
     this.options,
+    this.icon,
     this.buttonType, // 'api', 'url', 'template'
     this.apiId,
     this.templateId,
@@ -20,11 +22,13 @@ class ButtonItemContent extends Equatable implements StackItemContent {
     this.versionId,
     this.script,
     this.commitInfo,
+    this.apiParameters, // API 호출 시 사용할 파라미터 정보
   });
 
   final String? buttonName;
   final String? url;
   final String? options;
+  final String? icon;
   final String? buttonType; // 'api', 'url', 'template'
   final String? apiId;
   final int? templateId;
@@ -32,11 +36,13 @@ class ButtonItemContent extends Equatable implements StackItemContent {
   final int? versionId;
   final String? script;
   final String? commitInfo;
+  final String? apiParameters; // JSON 형태의 파라미터 정보
 
   ButtonItemContent copyWith({
     String? buttonName,
     String? url,
     String? options,
+    String? icon,
     String? buttonType,
     String? apiId,
     int? templateId,
@@ -44,11 +50,13 @@ class ButtonItemContent extends Equatable implements StackItemContent {
     int? versionId,
     String? script,
     String? commitInfo,
+    String? apiParameters,
   }) {
     return ButtonItemContent(
       buttonName: buttonName ?? this.buttonName,
       url: url ?? this.url,
       options: options ?? this.options,
+      icon: icon ?? this.icon ?? '',
       buttonType: buttonType ?? this.buttonType,
       apiId: apiId ?? this.apiId,
       templateId: templateId ?? this.templateId,
@@ -56,6 +64,7 @@ class ButtonItemContent extends Equatable implements StackItemContent {
       versionId: versionId ?? this.versionId,
       script: script ?? this.script,
       commitInfo: commitInfo ?? this.commitInfo,
+      apiParameters: apiParameters ?? this.apiParameters,
     );
   }
 
@@ -66,6 +75,7 @@ class ButtonItemContent extends Equatable implements StackItemContent {
       buttonName: asNullT<String>(data['buttonName']),
       url: asNullT<String>(data['url']),
       options: asNullT<String>(data['options']),
+      icon: asNullT<String>(data['icon']),
       buttonType: asNullT<String>(data['buttonType']),
       apiId: asNullT<String>(data['apiId']),
       templateId: asNullT<int>(data['templateId']),
@@ -73,21 +83,19 @@ class ButtonItemContent extends Equatable implements StackItemContent {
       versionId: asNullT<int>(data['versionId']),
       script: asNullT<String>(data['script']),
       commitInfo: asNullT<String>(data['commitInfo']),
+      apiParameters: asNullT<String>(data['apiParameters']),
     );
 
-    debugPrint(
-        '🔘 [ButtonItemContent] fromJson 완료 - buttonType: ${content.buttonType}, buttonName: ${content.buttonName}');
     return content;
   }
 
   @override
   Map<String, dynamic> toJson() {
-    debugPrint('🔘 [ButtonItemContent] toJson 호출');
-
     final json = <String, dynamic>{
       if (buttonName != null) 'buttonName': buttonName,
       if (url != null) 'url': url,
       if (options != null) 'options': options,
+      if (icon != null) 'icon': icon,
       if (buttonType != null) 'buttonType': buttonType,
       if (apiId != null) 'apiId': apiId,
       if (templateId != null) 'templateId': templateId,
@@ -95,9 +103,9 @@ class ButtonItemContent extends Equatable implements StackItemContent {
       if (versionId != null) 'versionId': versionId,
       if (script != null) 'script': script,
       if (commitInfo != null) 'commitInfo': commitInfo,
+      if (apiParameters != null) 'apiParameters': apiParameters,
     };
 
-    debugPrint('🔘 [ButtonItemContent] toJson 완료 - json: $json');
     return json;
   }
 
@@ -106,6 +114,7 @@ class ButtonItemContent extends Equatable implements StackItemContent {
         buttonName,
         url,
         options,
+        icon,
         buttonType,
         apiId,
         templateId,
@@ -113,6 +122,7 @@ class ButtonItemContent extends Equatable implements StackItemContent {
         versionId,
         script,
         commitInfo,
+        apiParameters,
       ];
 }
 
@@ -131,11 +141,10 @@ class StackButtonItem extends StackItem<ButtonItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackButtonItem.fromJson(Map<String, dynamic> data) {
-    debugPrint('🔘 [StackButtonItem] fromJson 호출 - data: $data');
-
     final paddingJson = data['padding'];
     EdgeInsets padding;
     if (paddingJson is Map) {
@@ -163,12 +172,11 @@ class StackButtonItem extends StackItem<ButtonItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content:
           ButtonItemContent.fromJson(data['content'] as Map<String, dynamic>),
     );
 
-    debugPrint(
-        '🔘 [StackButtonItem] fromJson 완료 - ID: ${item.id}, buttonType: ${item.content?.buttonType}');
     return item;
   }
 
@@ -185,11 +193,9 @@ class StackButtonItem extends StackItem<ButtonItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     ButtonItemContent? content,
   }) {
-    debugPrint(
-        '🔘 [StackButtonItem] copyWith 호출 - ID: $id, content: ${content?.toJson()}');
-
     final newItem = StackButtonItem(
       boardId: boardId ?? this.boardId,
       id: id ?? this.id,
@@ -202,11 +208,10 @@ class StackButtonItem extends StackItem<ButtonItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
 
-    debugPrint(
-        '🔘 [StackButtonItem] copyWith 완료 - ID: ${newItem.id}, buttonType: ${newItem.content?.buttonType}');
     return newItem;
   }
 }

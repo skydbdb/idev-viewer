@@ -174,6 +174,7 @@ class StackTextItem extends StackItem<TextItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackTextItem.fromJson(Map<String, dynamic> data) {
@@ -204,6 +205,7 @@ class StackTextItem extends StackItem<TextItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content: TextItemContent.fromJson(asMap(data['content'])),
     );
   }
@@ -226,6 +228,7 @@ class StackTextItem extends StackItem<TextItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     TextItemContent? content,
   }) {
     return StackTextItem(
@@ -240,6 +243,7 @@ class StackTextItem extends StackItem<TextItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }

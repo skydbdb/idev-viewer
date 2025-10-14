@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:idev_v1/src/board/stack_board_items/common/models/menu_config.dart';
 
 import '/src/board/core/stack_board_item/stack_item.dart';
 import '/src/board/core/stack_board_item/stack_item_content.dart';
@@ -7,14 +6,12 @@ import '/src/board/core/stack_board_item/stack_item_status.dart';
 import '/src/board/widget_style_extension/ex_offset.dart';
 import '/src/board/widget_style_extension/ex_size.dart';
 import '/src/board/helpers.dart';
-import 'package:equatable/equatable.dart';
 
-class LayoutItemContent extends Equatable implements StackItemContent {
-  const LayoutItemContent({
+class SideMenuItemContent implements StackItemContent {
+  const SideMenuItemContent({
+    this.selectedIndex,
     this.directionLtr,
-    this.bodyOrientation = Axis.horizontal,
     this.title,
-    this.profile,
     this.appBar,
     this.actions,
     this.drawer,
@@ -22,88 +19,64 @@ class LayoutItemContent extends Equatable implements StackItemContent {
     this.leftNavigation,
     this.rightNavigation,
     this.bottomNavigation,
-    this.subBody,
-    this.subBodyOptions,
     this.bodyRatio,
-    this.reqMenus,
-    this.selectedIndex,
+    this.navigationItems,
   });
 
   final int? selectedIndex;
   final bool? directionLtr;
-  final Axis? bodyOrientation;
-  final String? subBodyOptions;
   final String? title;
-  final String? profile;
   final String? appBar;
   final String? actions;
   final String? drawer;
-  final String? subBody;
   final String? topNavigation;
   final String? leftNavigation;
   final String? rightNavigation;
   final String? bottomNavigation;
   final double? bodyRatio;
-  final List<MenuConfig>? reqMenus;
+  final String? navigationItems;
 
-  LayoutItemContent copyWith({
+  SideMenuItemContent copyWith({
     int? selectedIndex,
     bool? directionLtr,
-    Axis? bodyOrientation,
-    String? subBodyOptions,
     String? title,
-    String? profile,
     String? appBar,
     String? actions,
     String? drawer,
-    String? subBody,
     String? topNavigation,
     String? leftNavigation,
     String? rightNavigation,
     String? bottomNavigation,
     double? bodyRatio,
-    List<MenuConfig>? reqMenus,
+    String? navigationItems,
   }) {
-    return LayoutItemContent(
+    return SideMenuItemContent(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       directionLtr: directionLtr ?? this.directionLtr,
-      bodyOrientation: bodyOrientation ?? this.bodyOrientation,
-      subBodyOptions: subBodyOptions ?? this.subBodyOptions,
       title: title ?? this.title,
-      profile: profile ?? this.profile,
       appBar: appBar ?? this.appBar,
       actions: actions ?? this.actions,
       drawer: drawer ?? this.drawer,
-      subBody: subBody ?? this.subBody,
       topNavigation: topNavigation ?? this.topNavigation,
       leftNavigation: leftNavigation ?? this.leftNavigation,
       rightNavigation: rightNavigation ?? this.rightNavigation,
       bottomNavigation: bottomNavigation ?? this.bottomNavigation,
       bodyRatio: bodyRatio ?? this.bodyRatio,
-      reqMenus: reqMenus ?? this.reqMenus,
+      navigationItems: navigationItems ?? this.navigationItems,
     );
   }
 
-  factory LayoutItemContent.fromJson(Map<String, dynamic> data) {
+  factory SideMenuItemContent.fromJson(Map<String, dynamic> data) {
     bool parseBool(dynamic v, {bool defaultValue = false}) {
       if (v is bool) return v;
       if (v is String) return v.toLowerCase() == 'true';
       return defaultValue;
     }
 
-    final reqMenusRaw = data['reqMenus'];
-    final reqMenus = menuConfigsFromJsonString(asNullT<String>(reqMenusRaw));
-    return LayoutItemContent(
+    return SideMenuItemContent(
+      selectedIndex: int.tryParse(data['selectedIndex']?.toString() ?? ''),
       directionLtr: parseBool(data['directionLtr']),
-      bodyOrientation: (() {
-        final v = data['bodyOrientation'];
-        if (v == null) return Axis.horizontal;
-        if (v is String) return Axis.values.byName(v);
-        if (v is Axis) return v;
-        return Axis.horizontal;
-      })(),
       title: asNullT<String>(data['title']),
-      profile: asNullT<String>(data['profile']),
       appBar: asNullT<String>(data['appBar']),
       actions: asNullT<String>(data['actions']),
       drawer: asNullT<String>(data['drawer']),
@@ -111,28 +84,17 @@ class LayoutItemContent extends Equatable implements StackItemContent {
       leftNavigation: asNullT<String>(data['leftNavigation']),
       rightNavigation: asNullT<String>(data['rightNavigation']),
       bottomNavigation: asNullT<String>(data['bottomNavigation']),
-      subBody: asNullT<String>(data['subBody']),
-      subBodyOptions: asNullT<String>(data['subBodyOptions']),
-      bodyRatio: (() {
-        final v = data['bodyRatio'];
-        if (v == null) return 0.5;
-        if (v is String) return double.parse(v);
-        if (v is num) return v.toDouble();
-        return 0.5;
-      })(),
-      reqMenus: reqMenus,
-      selectedIndex: int.tryParse(data['selectedIndex']?.toString() ?? ''),
+      bodyRatio: double.tryParse(data['bodyRatio']?.toString() ?? ''),
+      navigationItems: asNullT<String>(data['navigationItems']),
     );
   }
 
   @override
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      if (selectedIndex != null) 'selectedIndex': selectedIndex,
       if (directionLtr != null) 'directionLtr': directionLtr,
-      if (bodyOrientation != null) 'bodyOrientation': bodyOrientation!.name,
-      if (bodyRatio != null) 'bodyRatio': bodyRatio,
       if (title != null) 'title': title,
-      if (profile != null) 'profile': profile,
       if (appBar != null) 'appBar': appBar,
       if (actions != null) 'actions': actions,
       if (drawer != null) 'drawer': drawer,
@@ -140,37 +102,15 @@ class LayoutItemContent extends Equatable implements StackItemContent {
       if (leftNavigation != null) 'leftNavigation': leftNavigation,
       if (rightNavigation != null) 'rightNavigation': rightNavigation,
       if (bottomNavigation != null) 'bottomNavigation': bottomNavigation,
-      if (subBody != null) 'subBody': subBody,
-      if (subBodyOptions != null) 'subBodyOptions': subBodyOptions,
-      'reqMenus': menuConfigsToJsonString(reqMenus),
-      if (selectedIndex != null) 'selectedIndex': selectedIndex,
+      if (bodyRatio != null) 'bodyRatio': bodyRatio,
+      if (navigationItems != null) 'navigationItems': navigationItems,
     };
   }
-
-  @override
-  List<Object?> get props => [
-        selectedIndex,
-        directionLtr,
-        bodyOrientation,
-        subBodyOptions,
-        title,
-        profile,
-        appBar,
-        actions,
-        drawer,
-        subBody,
-        topNavigation,
-        leftNavigation,
-        rightNavigation,
-        bottomNavigation,
-        bodyRatio,
-        reqMenus,
-      ];
 }
 
-/// StackLayoutItem
-class StackLayoutItem extends StackItem<LayoutItemContent> {
-  StackLayoutItem({
+/// StackSideMenuItem
+class StackSideMenuItem extends StackItem<SideMenuItemContent> {
+  StackSideMenuItem({
     super.content,
     required super.boardId,
     super.id,
@@ -186,7 +126,7 @@ class StackLayoutItem extends StackItem<LayoutItemContent> {
     super.borderRadius,
   });
 
-  factory StackLayoutItem.fromJson(Map<String, dynamic> data) {
+  factory StackSideMenuItem.fromJson(Map<String, dynamic> data) {
     final paddingJson = data['padding'];
     EdgeInsets padding;
     if (paddingJson is Map) {
@@ -201,7 +141,7 @@ class StackLayoutItem extends StackItem<LayoutItemContent> {
     } else {
       padding = EdgeInsets.zero;
     }
-    return StackLayoutItem(
+    return StackSideMenuItem(
       boardId: asT<String>(data['boardId']),
       id: asT<String>(data['id']),
       angle: asT<double>(data['angle']),
@@ -215,14 +155,13 @@ class StackLayoutItem extends StackItem<LayoutItemContent> {
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
       borderRadius: data['borderRadius'] as double? ?? 8.0,
-      content: LayoutItemContent.fromJson(asMap(data['content'])),
+      content: SideMenuItemContent.fromJson(asMap(data['content'])),
     );
   }
 
   @override
-  StackLayoutItem copyWith({
+  StackSideMenuItem copyWith({
     String? boardId,
-    String? id,
     double? angle,
     Size? size,
     Offset? offset,
@@ -233,11 +172,11 @@ class StackLayoutItem extends StackItem<LayoutItemContent> {
     String? permission,
     String? theme,
     double? borderRadius,
-    LayoutItemContent? content,
+    SideMenuItemContent? content,
   }) {
-    return StackLayoutItem(
+    return StackSideMenuItem(
       boardId: boardId ?? this.boardId,
-      id: id ?? this.id,
+      id: id,
       angle: angle ?? this.angle,
       size: size ?? this.size,
       offset: offset ?? this.offset,

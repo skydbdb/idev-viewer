@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:equatable/equatable.dart';
 
 import '/src/board/core/stack_board_item/stack_item.dart';
@@ -65,6 +65,7 @@ class StackSearchItem extends StackItem<SearchItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackSearchItem.fromJson(Map<String, dynamic> data) {
@@ -95,6 +96,7 @@ class StackSearchItem extends StackItem<SearchItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content: SearchItemContent.fromJson(asMap(data['content'])),
     );
   }
@@ -112,6 +114,7 @@ class StackSearchItem extends StackItem<SearchItemContent> {
     bool? dock,
     String? permission,
     String? theme,
+    double? borderRadius,
     SearchItemContent? content,
   }) {
     return StackSearchItem(
@@ -126,6 +129,7 @@ class StackSearchItem extends StackItem<SearchItemContent> {
       dock: dock ?? this.dock,
       permission: permission ?? this.permission,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }

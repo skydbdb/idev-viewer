@@ -198,6 +198,7 @@ class StackChartItem extends StackItem<ChartItemContent> {
     super.padding,
     super.status = null,
     super.theme,
+    super.borderRadius,
   });
 
   factory StackChartItem.fromJson(Map<String, dynamic> data) {
@@ -229,6 +230,7 @@ class StackChartItem extends StackItem<ChartItemContent> {
       dock: asNullT<bool>(data['dock']) ?? false,
       permission: data['permission'] as String,
       theme: data['theme'] as String?,
+      borderRadius: data['borderRadius'] as double? ?? 8.0,
       content: ChartItemContent.fromJson(asMap(data['content'])),
     );
   }
@@ -246,6 +248,7 @@ class StackChartItem extends StackItem<ChartItemContent> {
     EdgeInsets? padding,
     StackItemStatus? status,
     String? theme,
+    double? borderRadius,
     ChartItemContent? content,
   }) {
     return StackChartItem(
@@ -260,6 +263,7 @@ class StackChartItem extends StackItem<ChartItemContent> {
       padding: padding ?? this.padding,
       status: status ?? this.status,
       theme: theme ?? this.theme,
+      borderRadius: borderRadius ?? this.borderRadius,
       content: content ?? this.content,
     );
   }
