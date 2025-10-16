@@ -8,8 +8,15 @@
 build/
 *.lock
 
-# idev-viewer-js specific
+# IdevViewer 패키지 빌드 결과물
+IdevViewer/build/
+IdevViewer/.dart_tool/
+IdevViewer/.flutter-plugins
+IdevViewer/.flutter-plugins-dependencies
+
+# idev-viewer-js 관련 (별도 리포지토리에서 관리)
 idev-viewer-js/
+docs/
 
 # Dart compiler cache
 *.dill
@@ -17,59 +24,46 @@ idev-viewer-js/
 *.cache.dill
 *.cache.dill.track.dill
 
-# Android
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
+# Android (IdevViewer 패키지용)
+IdevViewer/android/.gradle
+IdevViewer/android/local.properties
+IdevViewer/android/**/GeneratedPluginRegistrant.java
 
-# iOS
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
+# iOS (IdevViewer 패키지용)
+IdevViewer/ios/**/*.mode1v3
+IdevViewer/ios/**/*.mode2v3
+IdevViewer/ios/**/*.moved-aside
+IdevViewer/ios/**/*.pbxuser
+IdevViewer/ios/**/*.perspectivev3
+IdevViewer/ios/**/*sync/
+IdevViewer/ios/**/.sconsign.dblite
+IdevViewer/ios/**/.tags*
+IdevViewer/ios/**/.vagrant/
+IdevViewer/ios/**/DerivedData/
+IdevViewer/ios/**/Icon?
+IdevViewer/ios/**/Pods/
+IdevViewer/ios/**/.symlinks/
+IdevViewer/ios/**/profile
+IdevViewer/ios/**/xcuserdata
+IdevViewer/ios/.generated/
+IdevViewer/ios/Flutter/App.framework
+IdevViewer/ios/Flutter/Flutter.framework
+IdevViewer/ios/Flutter/Flutter.podspec
+IdevViewer/ios/Flutter/Generated.xcconfig
+IdevViewer/ios/Flutter/app.flx
+IdevViewer/ios/Flutter/app.zip
+IdevViewer/ios/Flutter/flutter_assets/
+IdevViewer/ios/Flutter/flutter_export_environment.sh
+IdevViewer/ios/ServiceDefinitions.json
+IdevViewer/ios/Runner/GeneratedPluginRegistrant.*
 
-# macOS
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-**/macos/Flutter/ephemeral
+# Windows (IdevViewer 패키지용)
+IdevViewer/windows/flutter/generated_plugin_registrant.cc
+IdevViewer/windows/flutter/generated_plugin_registrant.h
+IdevViewer/windows/flutter/generated_plugins.cmake
 
-# Windows
-**/windows/flutter/generated_plugin_registrant.cc
-**/windows/flutter/generated_plugin_registrant.h
-**/windows/flutter/generated_plugins.cmake
-
-# Linux
-**/linux/flutter/generated_plugin_registrant.cc
-**/linux/flutter/generated_plugin_registrant.h
-**/linux/flutter/generated_plugins.cmake
-
-# Web
-**/web/favicon.png
+# Web (IdevViewer 패키지용)
+IdevViewer/web/favicon.png
 
 # IDE
 .vscode/
@@ -99,19 +93,31 @@ Thumbs.db
 # Chrome DevTools
 ~/ChromeDevSession/
 
-# Deployment
-deploy-idev.sh
-cloudfront-config.json
+# Project specific (유지할 파일들)
+# - scripts/ (자동화 스크립트)
+# - docs/ (문서)
+# - assets/ (데모 앱 에셋)
+# - lib/ (데모 앱 소스)
+# - IdevViewer/ (Flutter 패키지)
 
-# Project specific
-Dockerfile
-docker-compose.yml
-nginx.conf
-text_to_json_node.py
-uml/
-web/
+# 백업 및 임시 파일
+backup/
+*.backup
+*.bak
+*.old
+*.orig
+*.rej
+*.swp
+*.swo
+*~
 
-# Large files
+# 로그 파일
+*.log
+*.tmp
+*.temp
+*.cache
+
+# 대용량 파일
 *.zip
 *.tar.gz
 *.7z
@@ -150,22 +156,6 @@ web/
 *.lproj
 *.bundle
 *.framework
-*.dylib
-*.a
-*.o
-*.so
-*.dll
-*.exe
-*.dmg
-*.pkg
-*.deb
-*.rpm
-*.msi
-*.zip
-*.tar.gz
-*.7z
-*.rar
-*.iso
 *.bin
 *.dat
 *.db
@@ -174,16 +164,3 @@ web/
 *.db-journal
 *.db-wal
 *.db-shm
-*.log
-*.tmp
-*.temp
-*.cache
-*.bak
-*.backup
-*.old
-*.orig
-*.rej
-*.swp
-*.swo
-*~
-EOF

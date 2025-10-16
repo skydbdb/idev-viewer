@@ -1,0 +1,58 @@
+name: idev_viewer
+description: IDev-based template viewer plugin for Flutter with 100% identical rendering across all platforms (Android, iOS, Web, Windows)
+version: 1.0.0
+homepage: https://idev.biz
+repository: https://github.com/skydbdb/idev-viewer-flutter
+issue_tracker: https://github.com/skydbdb/idev-viewer-flutter/issues
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  universal_html: ^2.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.idev.viewer
+        pluginClass: IdevViewerPlugin
+      ios:
+        pluginClass: IdevViewerPlugin
+      web:
+        pluginClass: IdevViewerWebPlugin
+        fileName: idev_viewer_web.dart
+      windows:
+        pluginClass: IdevViewerPlugin
+
+topics:
+  - flutter
+  - plugin
+  - viewer
+  - template
+  - idev
+  - cross-platform
+  - webview
+  - iframe
+
+keywords:
+  - flutter
+  - plugin
+  - viewer
+  - template
+  - idev
+  - cross-platform
+  - webview
+  - iframe
+  - android
+  - ios
+  - web
+  - windows

@@ -1,99 +1,277 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:idev_v1/src/core/auth/viewer_auth_service.dart';
-import 'package:pluto_layout/pluto_layout.dart';
-import 'src/core/config/env.dart';
-import '/src/layout/home/home_board.dart';
-import '/src/di/service_locator.dart';
-import '/src/repo/home_repo.dart';
-import '/src/layout/tabs/tabs.dart';
-import '/src/auth/auth_page.dart';
+import 'package:idev_viewer/idev_viewer.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // AppConfig를 먼저 초기화
-  AppConfig.initialize();
-  // AppConfig 초기화 완료 후 다른 서비스 초기화
-  await Future.delayed(const Duration(milliseconds: 100)); // 초기화 완료 대기
-  initServiceLocator();
-
-  runApp(
-    RepositoryProvider(
-      create: (context) => HomeRepo(),
-      child: const IDevViewerApp(),
-    ),
-  );
+/// IDev Viewer 패키지 전용 데모 앱
+///
+/// 이 앱은 IdevViewer 패키지의 기능을 보여주는 데모용 앱입니다.
+/// 실제 패키지 사용법을 확인할 수 있습니다.
+void main() {
+  runApp(const IdevViewerDemoApp());
 }
 
-class IDevViewerApp extends StatelessWidget {
-  const IDevViewerApp({super.key});
+class IdevViewerDemoApp extends StatelessWidget {
+  const IdevViewerDemoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'IDev Viewer Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const IdevViewerDemoHomePage(),
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
-      theme: ThemeData(fontFamily: 'SpoqaHanSansNeo', useMaterial3: false),
-      darkTheme: ThemeData.dark(),
-      initialRoute: _getInitialRoute(), // 동적으로 초기 라우트 결정
-      routes: {
-        '/auth': (context) => const AuthPage(),
-        '/': (context) => const HomePage(), // HomePage로 변경
-      },
-
-      builder: EasyLoading.init(),
     );
-  }
-
-  // 초기 라우트 결정 - 항상 인증 페이지로 이동
-  String _getInitialRoute() {
-    // test start
-    ViewerAuthService.viewerApiKey =
-        '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50';
-    HomeRepo.isInitialized = true;
-    // test end
-
-    // 항상 인증 페이지로 이동
-    print('main.dart: 인증 페이지로 이동');
-    return '/auth';
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class IdevViewerDemoHomePage extends StatefulWidget {
+  const IdevViewerDemoHomePage({super.key});
+
+  @override
+  State<IdevViewerDemoHomePage> createState() => _IdevViewerDemoHomePageState();
+}
+
+class _IdevViewerDemoHomePageState extends State<IdevViewerDemoHomePage> {
+  Template? _currentTemplate;
+  Config _currentConfig = const Config(
+    theme: 'dark',
+    locale: 'ko',
+    platform: 'auto',
+  );
+  bool _isViewerReady = false;
+  String? _lastError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialTemplate();
+  }
+
+  void _loadInitialTemplate() {
+    setState(() {
+      _currentTemplate = Template(
+        script: '''
+        {
+          "widgets": [
+            {
+              "type": "text",
+              "content": "IDev Viewer Demo",
+              "style": {
+                "fontSize": 24,
+                "fontWeight": "bold",
+                "color": "#ffffff"
+              }
+            },
+            {
+              "type": "button",
+              "content": "Click Me!",
+              "action": "demo_action"
+            }
+          ],
+          "layout": {
+            "type": "column",
+            "spacing": 16,
+            "padding": 20
+          },
+          "config": {
+            "theme": "dark",
+            "locale": "ko"
+          }
+        }
+        ''',
+        templateId: 'demo_template',
+        templateNm: 'Demo Template',
+        commitInfo: 'v1.0.0',
+      );
+    });
+  }
+
+  void _updateTemplate() {
+    setState(() {
+      _currentTemplate = Template(
+        script: '''
+        {
+          "widgets": [
+            {
+              "type": "text",
+              "content": "Updated Template!",
+              "style": {
+                "fontSize": 20,
+                "fontWeight": "normal",
+                "color": "#00ff00"
+              }
+            },
+            {
+              "type": "image",
+              "src": "assets/images/idev.jpeg",
+              "width": 200,
+              "height": 150
+            }
+          ],
+          "layout": {
+            "type": "row",
+            "spacing": 12,
+            "padding": 16
+          },
+          "config": {
+            "theme": "light",
+            "locale": "en"
+          }
+        }
+        ''',
+        templateId: 'updated_demo_template',
+        templateNm: 'Updated Demo Template',
+        commitInfo: 'v1.1.0',
+      );
+    });
+  }
+
+  void _toggleTheme() {
+    setState(() {
+      _currentConfig = Config(
+        theme: _currentConfig.theme == 'dark' ? 'light' : 'dark',
+        locale: _currentConfig.locale,
+        platform: _currentConfig.platform,
+      );
+    });
+  }
+
+  void _toggleLocale() {
+    setState(() {
+      _currentConfig = Config(
+        theme: _currentConfig.theme,
+        locale: _currentConfig.locale == 'ko' ? 'en' : 'ko',
+        platform: _currentConfig.platform,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ScrollConfiguration(
-          behavior: const ScrollBehavior().copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },
-            scrollbars: true,
+      appBar: AppBar(
+        title: const Text('IDev Viewer Demo'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _updateTemplate,
+            tooltip: 'Update Template',
           ),
-          child: // const HomeBoard()
-              const PlutoLayout(
-            body: PlutoLayoutContainer(
-              child: HomeBoard(),
+          IconButton(
+            icon: Icon(_currentConfig.theme == 'dark'
+                ? Icons.light_mode
+                : Icons.dark_mode),
+            onPressed: _toggleTheme,
+            tooltip: 'Toggle Theme',
+          ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: _toggleLocale,
+            tooltip: 'Toggle Locale',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // 상태 정보 표시
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            color: Colors.blue.shade50,
+            child: Column(
+              children: [
+                Text(
+                  'Platform: ${_getCurrentPlatform()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Theme: ${_currentConfig.theme} | Locale: ${_currentConfig.locale}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+                if (_isViewerReady)
+                  const Text(
+                    '✅ Viewer Ready',
+                    style: TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.bold),
+                  ),
+                if (_lastError != null)
+                  Text(
+                    '❌ Error: $_lastError',
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+              ],
             ),
-            top: PlutoLayoutContainer(
-              child: TopTab(),
-            ),
-            left: PlutoLayoutContainer(
-              child: LeftTab(),
-            ),
-            right: PlutoLayoutContainer(
-              child: RightTab(),
-            ),
-            bottom: PlutoLayoutContainer(
-              child: BottomTab(),
-            ),
-          )),
+          ),
+          // 뷰어
+          Expanded(
+            child: _currentTemplate != null
+                ? IdevViewer(
+                    template: _currentTemplate!,
+                    config: _currentConfig,
+                    width: double.infinity,
+                    height: 600,
+                    onReady: (data) {
+                      setState(() {
+                        _isViewerReady = true;
+                        _lastError = null;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${_getCurrentPlatform()} 뷰어 준비 완료!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                    onError: (error) {
+                      setState(() {
+                        _isViewerReady = false;
+                        _lastError = error;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('에러: $error'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    },
+                    onTemplateUpdate: (template) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('템플릿 업데이트: ${template['templateId']}'),
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                    },
+                    onItemTap: (item) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('아이템 탭: ${item['type']}'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    },
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          ),
+        ],
+      ),
     );
+  }
+
+  String _getCurrentPlatform() {
+    if (Theme.of(context).platform == TargetPlatform.android) {
+      return 'Android';
+    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
+      return 'iOS';
+    } else if (Theme.of(context).platform == TargetPlatform.fuchsia) {
+      return 'Fuchsia';
+    } else {
+      return 'Web/Windows';
+    }
   }
 }
