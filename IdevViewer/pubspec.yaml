@@ -2,8 +2,8 @@ name: idev_viewer
 description: IDev-based template viewer plugin for Flutter with 100% identical rendering across all platforms (Android, iOS, Web, Windows)
 version: 1.0.0
 homepage: https://idev.biz
-repository: https://github.com/skydbdb/idev-viewer-flutter
-issue_tracker: https://github.com/skydbdb/idev-viewer-flutter/issues
+repository: https://github.com/skydbdb/idev-viewer
+issue_tracker: https://github.com/skydbdb/idev-viewer/issues
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

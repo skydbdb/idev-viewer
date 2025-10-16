@@ -225,15 +225,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - [Pub Package](https://pub.dev/packages/idev_viewer)
-- [GitHub Repository](https://github.com/skydbdb/idev-viewer-flutter)
+- [GitHub Repository](https://github.com/skydbdb/idev-viewer)
 - [Documentation](https://pub.dev/documentation/idev_viewer/latest/)
-- [Issues](https://github.com/skydbdb/idev-viewer-flutter/issues)
+- [Issues](https://github.com/skydbdb/idev-viewer/issues)
 
 ## 📞 Support
 
 - **Email**: support@idev.biz
 - **Website**: https://idev.biz
-- **Issues**: [GitHub Issues](https://github.com/skydbdb/idev-viewer-flutter/issues)
+- **Issues**: [GitHub Issues](https://github.com/skydbdb/idev-viewer/issues)
 
 ---
 
