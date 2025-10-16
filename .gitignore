@@ -9,22 +9,7 @@ build/
 *.lock
 
 # idev-viewer-js specific
-idev-viewer-js/node_modules/
-idev-viewer-js/dist/
-idev-viewer-js/.npmignore
-idev-viewer-js/package-lock.json
-idev-viewer-js/examples/*/node_modules/
-idev-viewer-js/examples/*/dist/
-idev-viewer-js/examples/*/build/
-idev-viewer-js/examples/*/.next/
-idev-viewer-js/examples/*/.nuxt/
-idev-viewer-js/examples/*/.output/
-idev-viewer-js/examples/*/.cache/
-idev-viewer-js/examples/*/coverage/
-idev-viewer-js/examples/*/reports/
-idev-viewer-js/examples/*/logs/
-idev-viewer-js/examples/*/temp/
-idev-viewer-js/examples/*/tmp/
+idev-viewer-js/
 
 # Dart compiler cache
 *.dill
