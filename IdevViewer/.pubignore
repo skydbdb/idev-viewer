@@ -17,3 +17,14 @@ example/.dart_tool/
 example/.flutter-plugins
 example/.flutter-plugins-dependencies
 
+# Exclude large assets (viewer-app is for local development only)
+assets/viewer-app/
+
+# Exclude platform-specific directories (not needed for pub.dev)
+android/
+ios/
+linux/
+macos/
+windows/
+web/assets/idev-app/
+

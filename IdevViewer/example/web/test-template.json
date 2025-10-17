@@ -1,0 +1,260 @@
+[
+    {
+        "boardId": "#TEMPLATE#",
+        "id": "Frame_4g0e9n",
+        "type": "StackFrameItem",
+        "angle": 0,
+        "size": {
+            "width": 449,
+            "height": 679
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "borderRadius": 0,
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "tabsVisible": false,
+            "dividerThickness": 6,
+            "tabsTitle": "[{\"tabIndex\":1,\"title\":\"Tab 1\",\"boardId\":\"Frame_4g0e9n_1\"},{\"tabIndex\":2,\"title\":\"Tab 2\",\"boardId\":\"Frame_4g0e9n_2\"}]",
+            "lastStringify": "V1:3:1(C;0;;0.5;2,3),2(I;1;1;0.11152871183398401;F),3(I;1;2;0.8884712881660161;F)"
+        }
+    },
+    {
+        "boardId": "#TEMPLATE#",
+        "id": "Chart_11k00dm",
+        "type": "StackChartItem",
+        "angle": 0,
+        "size": {
+            "width": 459,
+            "height": 675
+        },
+        "offset": {
+            "dx": 511,
+            "dy": 4
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "borderRadius": 0,
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "Spring",
+        "content": {
+            "chartType": "column",
+            "dataSource": [
+                {
+                    "pay_id": 11,
+                    "emp_id": 1002,
+                    "pay_date": "2023-01-01T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 146483,
+                    "deduction": 110474,
+                    "real_salary": 2740325
+                },
+                {
+                    "pay_id": 12,
+                    "emp_id": 1002,
+                    "pay_date": "2023-01-31T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 135479,
+                    "deduction": 119902,
+                    "real_salary": 2719893
+                },
+                {
+                    "pay_id": 13,
+                    "emp_id": 1002,
+                    "pay_date": "2023-03-02T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 133225,
+                    "deduction": 112706,
+                    "real_salary": 2724835
+                },
+                {
+                    "pay_id": 14,
+                    "emp_id": 1002,
+                    "pay_date": "2023-04-01T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 260741,
+                    "deduction": 138478,
+                    "real_salary": 2826579
+                },
+                {
+                    "pay_id": 15,
+                    "emp_id": 1002,
+                    "pay_date": "2023-05-01T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 199326,
+                    "deduction": 102590,
+                    "real_salary": 2801052
+                },
+                {
+                    "pay_id": 16,
+                    "emp_id": 1002,
+                    "pay_date": "2023-05-31T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 198798,
+                    "deduction": 100315,
+                    "real_salary": 2802799
+                },
+                {
+                    "pay_id": 17,
+                    "emp_id": 1002,
+                    "pay_date": "2023-06-30T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 283239,
+                    "deduction": 142878,
+                    "real_salary": 2844677
+                },
+                {
+                    "pay_id": 18,
+                    "emp_id": 1002,
+                    "pay_date": "2023-07-30T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 120897,
+                    "deduction": 93945,
+                    "real_salary": 2731268
+                },
+                {
+                    "pay_id": 19,
+                    "emp_id": 1002,
+                    "pay_date": "2023-08-29T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 122450,
+                    "deduction": 146928,
+                    "real_salary": 2679838
+                },
+                {
+                    "pay_id": 20,
+                    "emp_id": 1002,
+                    "pay_date": "2023-09-28T00:00:00.000Z",
+                    "base_salary": 2704316,
+                    "bonus": 270749,
+                    "deduction": 81172,
+                    "real_salary": 2893893
+                }
+            ],
+            "apiId": "IDEV-EMP_PAY_R",
+            "reqApis": "[]",
+            "xValueMapper": "pay_date",
+            "yValueMapper": [
+                {
+                    "base_salary": "base_salary"
+                },
+                {
+                    "bonus": "bonus"
+                },
+                {
+                    "deduction": "deduction"
+                },
+                {
+                    "real_salary": "real_salary"
+                }
+            ],
+            "title": "",
+            "showLegend": true,
+            "showTooltip": true,
+            "enableZoom": true,
+            "enablePan": true,
+            "showDataLabels": false,
+            "primaryXAxisType": "datetime",
+            "xAxisLabelFormat": "MM/dd",
+            "primaryYAxisType": "numeric",
+            "yAxisLabelFormat": "currency_kr",
+            "selectionType": "cluster",
+            "autoScrollingMode": "start",
+            "autoScrollingDelta": 3
+        }
+    },
+    {
+        "boardId": "Frame_4g0e9n_1",
+        "id": "Search_vty2c0",
+        "type": "StackSearchItem",
+        "angle": 0,
+        "size": {
+            "width": 377,
+            "height": 54
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 10,
+            "top": 10,
+            "right": 10,
+            "bottom": 10
+        },
+        "borderRadius": 0,
+        "status": 6,
+        "lockZOrder": false,
+        "dock": true,
+        "permission": "all",
+        "theme": "White",
+        "content": {
+            "buttonName": "조회",
+            "reqApis": "[{\"apiId\":\"IDEV-EMP_R\\n인사정보 조회\",\"field\":\"id\",\"type\":\"text\",\"fieldNm\":\"사번\",\"width\":\"120\",\"format\":\"default\",\"enabled\":true},{\"apiId\":\"IDEV-EMP_R\\n인사정보 조회\",\"field\":\"name\",\"type\":\"text\",\"fieldNm\":\"이름\",\"width\":\"120\",\"format\":\"default\",\"enabled\":true}]"
+        }
+    },
+    {
+        "boardId": "Frame_4g0e9n_2",
+        "id": "Grid_yxj3hu",
+        "type": "StackGridItem",
+        "angle": 0,
+        "size": {
+            "width": 400,
+            "height": 500
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "borderRadius": 0,
+        "status": 6,
+        "lockZOrder": false,
+        "dock": true,
+        "permission": "read",
+        "theme": "Spring",
+        "content": {
+            "headerTitle": "인사정보 조회",
+            "apiId": "IDEV-EMP_R",
+            "postApiId": "",
+            "putApiId": "",
+            "deleteApiId": "",
+            "reqApis": "[{\"apiId\":\"IDEV-EMP_PAY_R\\n사원 급여 조회\",\"field\":\"emp_id\",\"type\":\"text\",\"fieldNm\":\"id\",\"width\":\"120\",\"format\":\"default\",\"enabled\":true}]",
+            "resApis": "[{\"apiId\":\"IDEV-EMP_R\",\"field\":\"id\",\"type\":\"text\",\"fieldNm\":\"사번\",\"width\":\"100\",\"format\":\"default\",\"enabled\":true},{\"apiId\":\"IDEV-EMP_R\",\"field\":\"name\",\"type\":\"text\",\"fieldNm\":\"이름\",\"width\":\"100\",\"format\":\"default\",\"enabled\":true},{\"apiId\":\"IDEV-EMP_R\",\"field\":\"department\",\"type\":\"text\",\"fieldNm\":\"부서\",\"width\":\"100\",\"format\":\"default\",\"enabled\":true},{\"apiId\":\"IDEV-EMP_R\",\"field\":\"position\",\"type\":\"text\",\"fieldNm\":\"직급\",\"width\":\"100\",\"format\":\"default\",\"enabled\":true},{\"apiId\":\"IDEV-EMP_R\",\"field\":\"photo_url\",\"type\":\"imageUrl\",\"fieldNm\":\"사진\",\"width\":\"100\",\"format\":\"fitSize\",\"enabled\":true}]",
+            "colGroups": "",
+            "columnAggregate": {},
+            "groupByColumns": [],
+            "mode": "select",
+            "showRowNum": false,
+            "enableRowChecked": false,
+            "showColumn": true,
+            "enableColumnFilter": false,
+            "enableColumnAggregate": false,
+            "showFooter": true
+        }
+    }
+]
