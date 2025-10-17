@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       // test-template.json 로드
       final String jsonString = await rootBundle.loadString(
-        'test-template.json',
+        'assets/test-template.json',
       );
       final List<dynamic> templateList = jsonDecode(jsonString);
 
@@ -90,54 +90,37 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          // Info Panel
+          // Status bar (통합)
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.blue[50],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '📋 테스트 정보',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text('• 템플릿: test-template.json'),
-                Text('• API 키: ${_apiKey.substring(0, 20)}...'),
-                Text(
-                  '• 상태: ${_isLoading
-                      ? '로딩 중...'
-                      : _isReady
-                      ? '준비 완료 ✅'
-                      : '대기 중'}',
-                ),
-              ],
-            ),
-          ),
-
-          // Status bar
-          Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: _isReady ? Colors.green[100] : Colors.orange[100],
             child: Row(
               children: [
                 Icon(
                   _isReady ? Icons.check_circle : Icons.hourglass_empty,
                   color: _isReady ? Colors.green : Colors.orange,
+                  size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  _isReady ? '뷰어 준비 완료' : '로딩 중...',
-                  style: TextStyle(
-                    color: _isReady ? Colors.green[900] : Colors.orange[900],
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    _isReady
+                        ? '✅ 준비 완료 | test-template.json (${_templateData != null ? (_templateData!['items'] as List).length : 0} items)'
+                        : '⏳ 로딩 중...',
+                    style: TextStyle(
+                      color: _isReady ? Colors.green[900] : Colors.orange[900],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Text(
                   '${_events.length} 이벤트',
                   style: TextStyle(
                     color: _isReady ? Colors.green[700] : Colors.orange[700],
+                    fontSize: 12,
                   ),
                 ),
               ],

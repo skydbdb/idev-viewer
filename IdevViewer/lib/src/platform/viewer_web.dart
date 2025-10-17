@@ -5,6 +5,16 @@ import 'package:flutter/material.dart';
 import '../models/viewer_config.dart';
 import '../models/viewer_event.dart';
 
+/// iframe 안에 있는지 확인
+bool _isInsideIframe() {
+  try {
+    return html.window.self != html.window.top;
+  } catch (e) {
+    // 크로스 오리진인 경우 에러 발생
+    return true;
+  }
+}
+
 /// Web 플랫폼 구현 (iframe 사용)
 class IDevViewerPlatform extends StatefulWidget {
   final IDevConfig config;
@@ -40,47 +50,79 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
   }
 
   void _setupIframe() {
-    // viewer URL 결정
-    final viewerUrl = widget.config.viewerUrl ?? 
-        'assets/packages/idev_viewer/viewer-app/index.html';
+    // viewer URL 결정 (절대 경로 사용)
+    final viewerUrl =
+        widget.config.viewerUrl ??
+        '/assets/packages/idev_viewer/viewer-app/index.html';
 
-    _iframe = html.IFrameElement()
-      ..src = viewerUrl
-      ..style.border = 'none'
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..allow = 'accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone';
+    debugPrint('[IDevViewer] Setting up iframe with URL: $viewerUrl');
+
+    _iframe =
+        html.IFrameElement()
+          ..src = viewerUrl
+          ..style.border = 'none'
+          ..style.width = '100%'
+          ..style.height = '100%'
+          ..allow =
+              'accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone';
+
+    // iframe 로드 이벤트 리스너
+    _iframe.onLoad.listen((event) {
+      debugPrint('[IDevViewer] iframe loaded successfully');
+    });
+
+    _iframe.onError.listen((event) {
+      debugPrint('[IDevViewer] iframe load error: $event');
+      setState(() {
+        _error = 'Failed to load viewer application';
+      });
+    });
 
     // iframe을 Flutter Web에 등록
-    ui_web.platformViewRegistry.registerViewFactory(
-      _viewId,
-      (int viewId) => _iframe,
-    );
+    ui_web.platformViewRegistry.registerViewFactory(_viewId, (int viewId) {
+      debugPrint('[IDevViewer] Registering iframe view: $_viewId');
+      return _iframe;
+    });
   }
 
   void _setupMessageListener() {
     html.window.onMessage.listen((event) {
       try {
         final data = event.data;
-        if (data is! Map) return;
+        debugPrint('[IDevViewer] Received message: $data');
 
-        final Map<String, dynamic> messageData = Map<String, dynamic>.from(data);
+        if (data is! Map) {
+          debugPrint('[IDevViewer] Message is not a Map, ignoring');
+          return;
+        }
+
+        final Map<String, dynamic> messageData = Map<String, dynamic>.from(
+          data,
+        );
         final type = messageData['type'] as String?;
 
-        if (type == null) return;
+        if (type == null) {
+          debugPrint('[IDevViewer] Message type is null, ignoring');
+          return;
+        }
+
+        debugPrint('[IDevViewer] Processing message type: $type');
 
         if (type == 'ready') {
+          debugPrint('[IDevViewer] Viewer is ready!');
           _handleReady();
         } else {
           _handleEvent(messageData);
         }
       } catch (e) {
-        debugPrint('Failed to process message from iframe: $e');
+        debugPrint('[IDevViewer] Failed to process message from iframe: $e');
       }
     });
   }
 
   void _handleReady() {
+    debugPrint('[IDevViewer] Handling ready event...');
+
     setState(() {
       _isReady = true;
       _error = null;
@@ -88,22 +130,20 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // 템플릿 데이터 전송
     if (widget.config.template != null) {
-      _sendMessage({
-        'type': 'init_template',
-        'data': widget.config.template,
-      });
+      debugPrint('[IDevViewer] Sending init_template message');
+      _sendMessage({'type': 'init_template', 'data': widget.config.template});
     }
 
     // API 키 설정
     if (widget.config.apiKey != null) {
+      debugPrint('[IDevViewer] Sending update_config message');
       _sendMessage({
         'type': 'update_config',
-        'config': {
-          'apiKey': widget.config.apiKey,
-        },
+        'config': {'apiKey': widget.config.apiKey},
       });
     }
 
+    debugPrint('[IDevViewer] Calling onReady callback');
     widget.onReady?.call();
   }
 
@@ -130,8 +170,7 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
     return Stack(
       children: [
         HtmlElementView(viewType: _viewId),
-        if (!_isReady && widget.loadingWidget != null)
-          widget.loadingWidget!,
+        if (!_isReady && widget.loadingWidget != null) widget.loadingWidget!,
       ],
     );
   }
@@ -141,4 +180,3 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.dispose();
   }
 }
-

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/assets/packages/idev_viewer/viewer-app/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="demo">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>iDev 1.0</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* 로딩 화면 스타일 */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #333;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .loading-text {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .loading-subtext {
+      color: #888888;
+      font-size: 14px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Flutter 앱이 로드되면 로딩 화면 숨기기 */
+    .flutter-app-loaded #loading-screen {
+      display: none;
+    }
+  </style>
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = "807331409";
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+</head>
+
+<body>
+  <!-- 로딩 화면 -->
+  <div id="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">iDev 로딩 중...</div>
+    <div class="loading-subtext">잠시만 기다려주세요</div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function (ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      }).then(function (engineInitializer) {
+        return engineInitializer.initializeEngine();
+      }).then(function (appRunner) {
+        return appRunner.runApp();
+      }).then(function () {
+        // Flutter 앱이 완전히 로드되면 로딩 화면 숨기기
+        setTimeout(function () {
+          document.body.classList.add('flutter-app-loaded');
+        }, 1000); // 1초 후 로딩 화면 숨김
+      }).catch(function (error) {
+        console.error('Flutter 앱 로드 실패:', error);
+        // 에러 발생 시에도 로딩 화면 숨기기
+        document.body.classList.add('flutter-app-loaded');
+      });
+    });
+  </script>
+</body>
+
+</html>

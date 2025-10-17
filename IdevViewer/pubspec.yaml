@@ -82,6 +82,8 @@ flutter:
   # Note: assets/viewer-app/ will be created during build process
   # The actual viewer app files should be provided by the user or
   # built using the build-all.sh script
+  assets:
+    - assets/viewer-app/
 
 topics:
   - flutter

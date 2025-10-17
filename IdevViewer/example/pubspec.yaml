@@ -25,4 +25,4 @@ flutter:
   uses-material-design: true
   
   assets:
-    - test-template.json
+    - assets/test-template.json

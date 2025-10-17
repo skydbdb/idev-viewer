@@ -27,6 +27,7 @@ flutter build web \
   --release \
   --no-source-maps \
   --tree-shake-icons \
+  --base-href=/assets/packages/idev_viewer/viewer-app/ \
   --output=build/web-viewer
 print_success "Flutter Web 뷰어 빌드 완료"
 
