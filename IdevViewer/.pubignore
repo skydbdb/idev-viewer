@@ -1,0 +1,19 @@
+# Exclude build artifacts
+build/
+.dart_tool/
+
+# Exclude git files
+.git/
+.gitignore
+
+# Exclude IDE files
+.idea/
+.vscode/
+*.iml
+
+# Exclude example build artifacts
+example/build/
+example/.dart_tool/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+

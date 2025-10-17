@@ -6,220 +6,215 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'IDev Viewer Package Example',
+      title: 'IDev Viewer Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'IDev Viewer Package Example'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Template? _template;
-  Config _config = const Config(theme: 'dark', locale: 'ko');
+  bool _isReady = false;
+  final List<String> _events = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadTemplate();
+  // 샘플 템플릿 데이터
+  final Map<String, dynamic> _sampleTemplate = {
+    'type': 'container',
+    'properties': {
+      'padding': 20,
+      'backgroundColor': '#f0f0f0',
+    },
+    'children': [
+      {
+        'type': 'text',
+        'properties': {
+          'text': 'Hello from IDev Viewer!',
+          'fontSize': 24,
+          'fontWeight': 'bold',
+        },
+      },
+      {
+        'type': 'button',
+        'properties': {
+          'text': 'Click Me',
+          'backgroundColor': '#007bff',
+          'textColor': '#ffffff',
+        },
+      },
+    ],
+  };
+
+  void _onReady() {
+    setState(() {
+      _isReady = true;
+      _events.add('Viewer ready');
+    });
+    debugPrint('🎉 IDev Viewer is ready!');
   }
 
-  void _loadTemplate() {
+  void _onEvent(IDevEvent event) {
     setState(() {
-      _template = Template(
-        script: '''
-        {
-          "widgets": [
-            {
-              "type": "text",
-              "content": "IDev Viewer Package Example",
-              "style": {
-                "fontSize": 24,
-                "fontWeight": "bold",
-                "color": "#ffffff"
-              }
-            },
-            {
-              "type": "button",
-              "content": "Click Me!",
-              "action": "demo_action"
-            }
-          ],
-          "layout": {
-            "type": "column",
-            "spacing": 16,
-            "padding": 20
-          },
-          "config": {
-            "theme": "dark",
-            "locale": "ko"
-          }
-        }
-        ''',
-        templateId: 'example_template',
-        templateNm: 'Example Template',
-        commitInfo: 'v1.0.0',
-      );
+      _events.add('${event.type}: ${event.data}');
     });
-  }
-
-  void _updateTemplate() {
-    setState(() {
-      _template = Template(
-        script: '''
-        {
-          "widgets": [
-            {
-              "type": "text",
-              "content": "Updated Template!",
-              "style": {
-                "fontSize": 20,
-                "fontWeight": "normal",
-                "color": "#00ff00"
-              }
-            },
-            {
-              "type": "image",
-              "src": "assets/images/idev.jpeg",
-              "width": 200,
-              "height": 150
-            }
-          ],
-          "layout": {
-            "type": "row",
-            "spacing": 12,
-            "padding": 16
-          },
-          "config": {
-            "theme": "light",
-            "locale": "en"
-          }
-        }
-        ''',
-        templateId: 'updated_example_template',
-        templateNm: 'Updated Example Template',
-        commitInfo: 'v1.1.0',
-      );
-    });
-  }
-
-  void _toggleTheme() {
-    setState(() {
-      _config = Config(
-        theme: _config.theme == 'dark' ? 'light' : 'dark',
-        locale: _config.locale,
-      );
-    });
+    debugPrint('📨 Event received: ${event.type}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('IDev Viewer Example'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _updateTemplate,
-            tooltip: 'Update Template',
-          ),
-          IconButton(
-            icon: Icon(
-                _config.theme == 'dark' ? Icons.light_mode : Icons.dark_mode),
-            onPressed: _toggleTheme,
-            tooltip: 'Toggle Theme',
-          ),
-        ],
       ),
       body: Column(
         children: [
-          // 플랫폼 정보 표시
+          // Status bar
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: Colors.blue.shade50,
-            child: Text(
-              'Platform: ${_getCurrentPlatform()}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(12),
+            color: _isReady ? Colors.green[100] : Colors.orange[100],
+            child: Row(
+              children: [
+                Icon(
+                  _isReady ? Icons.check_circle : Icons.hourglass_empty,
+                  color: _isReady ? Colors.green : Colors.orange,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _isReady ? 'Viewer Ready' : 'Loading...',
+                  style: TextStyle(
+                    color: _isReady ? Colors.green[900] : Colors.orange[900],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${_events.length} events',
+                  style: TextStyle(
+                    color: _isReady ? Colors.green[700] : Colors.orange[700],
+                  ),
+                ),
+              ],
             ),
           ),
-          // 뷰어
+
+          // Viewer
           Expanded(
-            child: _template != null
-                ? IdevViewer(
-                    template: _template!,
-                    config: _config,
-                    width: double.infinity,
-                    height: 600,
-                    onReady: (data) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${_getCurrentPlatform()} 뷰어 준비 완료!'),
-                          backgroundColor: Colors.green,
+            flex: 3,
+            child: IDevViewer(
+              config: IDevConfig(
+                apiKey: 'demo-api-key',
+                template: _sampleTemplate,
+                templateName: 'example-template',
+              ),
+              onReady: _onReady,
+              onEvent: _onEvent,
+              loadingWidget: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading IDev Viewer...'),
+                  ],
+                ),
+              ),
+              errorBuilder: (error) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text('Error: $error'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Events log
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: Colors.grey[200],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Events Log',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      );
-                    },
-                    onError: (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('에러: $error'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    },
-                    onTemplateUpdate: (template) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('템플릿 업데이트: ${template['templateId']}'),
-                          backgroundColor: Colors.blue,
-                        ),
-                      );
-                    },
-                    onItemTap: (item) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('아이템 탭: ${item['type']}'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
-                    },
-                  )
-                : const Center(
-                    child: CircularProgressIndicator(),
+                        const Spacer(),
+                        if (_events.isNotEmpty)
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _events.clear();
+                              });
+                            },
+                            child: const Text('Clear'),
+                          ),
+                      ],
+                    ),
                   ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: _events.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No events yet',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: _events.length,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              final eventIndex = _events.length - 1 - index;
+                              return ListTile(
+                                dense: true,
+                                leading: Text(
+                                  '${eventIndex + 1}',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                title: Text(
+                                  _events[eventIndex],
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
-  }
-
-  String _getCurrentPlatform() {
-    if (Theme.of(context).platform == TargetPlatform.android) {
-      return 'Android';
-    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-      return 'iOS';
-    } else if (Theme.of(context).platform == TargetPlatform.fuchsia) {
-      return 'Fuchsia';
-    } else {
-      return 'Web/Windows';
-    }
   }
 }

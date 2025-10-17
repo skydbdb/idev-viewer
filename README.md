@@ -200,6 +200,10 @@ cd IdevViewer
 flutter test
 ```
 
+### 📖 Running Guide
+
+For detailed execution instructions, see the [Running Guide](docs/running-guide.md).
+
 ## 📦 Assets
 
 The plugin includes the following assets:
