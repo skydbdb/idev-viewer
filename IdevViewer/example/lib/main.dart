@@ -63,16 +63,14 @@ class _MyHomePageState extends State<MyHomePage> {
           templateName: 'test-template-from-flutter',
           theme: 'dark',
           locale: 'ko',
-          debugMode: true,
+          debugMode: false,
         );
       });
-      debugPrint('✅ 템플릿 로드 성공: ${templateList.length} items');
     } catch (e) {
       setState(() {
         _isLoading = false;
         _events.add('템플릿 로드 실패: $e');
       });
-      debugPrint('❌ 템플릿 로드 실패: $e');
     }
   }
 
@@ -84,7 +82,6 @@ class _MyHomePageState extends State<MyHomePage> {
         _isUpdating = true;
         _events.add('템플릿 업데이트 시작');
       });
-      debugPrint('🔄 템플릿 업데이트 시작');
 
       // test-template.json 다시 로드
       final String jsonString = await rootBundle.loadString(
@@ -103,18 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
               'test-template-updated-${DateTime.now().millisecondsSinceEpoch}',
           theme: 'dark',
           locale: 'ko',
-          debugMode: true,
+          debugMode: false,
         );
         _isUpdating = false;
         _events.add('템플릿 업데이트 완료');
       });
-      debugPrint('✅ 템플릿 업데이트 성공');
     } catch (e) {
       setState(() {
         _isUpdating = false;
         _events.add('템플릿 업데이트 실패: $e');
       });
-      debugPrint('❌ 템플릿 업데이트 실패: $e');
     }
   }
 
@@ -123,14 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _isReady = true;
       _events.add('뷰어 준비 완료');
     });
-    debugPrint('🎉 IDev Viewer is ready!');
   }
 
   void _onEvent(IDevEvent event) {
     setState(() {
       _events.add('${event.type}: ${event.data}');
     });
-    debugPrint('📨 Event received: ${event.type}');
   }
 
   @override

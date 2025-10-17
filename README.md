@@ -118,6 +118,58 @@ IDevViewer(
 )
 ```
 
+#### 4. 템플릿 동적 업데이트
+
+`IDevConfig`를 변경하면 자동으로 템플릿이 업데이트됩니다:
+
+```dart
+class MyViewerPage extends StatefulWidget {
+  @override
+  State<MyViewerPage> createState() => _MyViewerPageState();
+}
+
+class _MyViewerPageState extends State<MyViewerPage> {
+  IDevConfig _currentConfig = IDevConfig(
+    apiKey: 'my-api-key',
+    template: initialTemplate,
+    templateName: 'initial-template',
+  );
+
+  void _updateTemplate() {
+    setState(() {
+      // config를 변경하면 IDevViewer가 자동으로 didUpdateWidget을 통해 업데이트됩니다
+      _currentConfig = IDevConfig(
+        apiKey: 'my-api-key',
+        template: updatedTemplate,
+        templateName: 'updated-template-${DateTime.now().millisecondsSinceEpoch}',
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('IDev Viewer'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _updateTemplate,
+          ),
+        ],
+      ),
+      body: IDevViewer(
+        config: _currentConfig,
+        onReady: () => print('Viewer is ready!'),
+        onEvent: (event) => print('Event: ${event.type}'),
+      ),
+    );
+  }
+}
+```
+
+**중요**: `IDevConfig` 객체를 새로 생성해야 업데이트가 감지됩니다. `templateName`을 변경하여 고유한 객체를 만드세요.
+
 ### 📋 API 레퍼런스
 
 #### IDevConfig
@@ -467,4 +519,4 @@ npm publish            # 실제 배포
 
 **Made with ❤️ by [IDev](https://idev.biz)**
 
-*최종 업데이트: 2024-10-17*
+*최종 업데이트: 2025-10-17*
