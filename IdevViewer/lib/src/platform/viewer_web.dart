@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
+import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
@@ -33,10 +34,10 @@ class IDevViewerPlatform extends StatefulWidget {
   });
 
   @override
-  State<IDevViewerPlatform> createState() => _IDevViewerPlatformState();
+  State<IDevViewerPlatform> createState() => IDevViewerPlatformState();
 }
 
-class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
+class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   final String _viewId = 'idev-viewer-${DateTime.now().millisecondsSinceEpoch}';
   late html.IFrameElement _iframe;
   bool _isReady = false;
@@ -47,6 +48,33 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.initState();
     _setupIframe();
     _setupMessageListener();
+  }
+
+  @override
+  void didUpdateWidget(IDevViewerPlatform oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // config의 template이 변경되었는지 확인
+    if (widget.config.template != oldWidget.config.template &&
+        widget.config.template != null) {
+      debugPrint('[IDevViewer] Config changed, updating template');
+
+      // React 예제와 동일한 구조로 전송
+      final templateData = widget.config.template!;
+      final script = templateData['items'] ?? templateData;
+
+      _sendMessage({
+        'type': 'update_template',
+        'template': {
+          'script': script is String ? script : jsonEncode(script),
+          'templateId':
+              widget.config.templateName ?? 'flutter_template_updated',
+          'templateNm':
+              widget.config.templateName ?? 'Flutter Template Updated',
+          'commitInfo': 'v1.0.1',
+        },
+      });
+    }
   }
 
   void _setupIframe() {
@@ -128,10 +156,23 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
       _error = null;
     });
 
-    // 템플릿 데이터 전송
+    // 템플릿 데이터 전송 (React 예제와 동일한 구조)
     if (widget.config.template != null) {
       debugPrint('[IDevViewer] Sending init_template message');
-      _sendMessage({'type': 'init_template', 'data': widget.config.template});
+
+      // template이 이미 items를 포함한 Map인 경우
+      final templateData = widget.config.template!;
+      final script = templateData['items'] ?? templateData;
+
+      _sendMessage({
+        'type': 'init_template',
+        'template': {
+          'script': script is String ? script : jsonEncode(script),
+          'templateId': widget.config.templateName ?? 'flutter_template',
+          'templateNm': widget.config.templateName ?? 'Flutter Template',
+          'commitInfo': 'v1.0.0',
+        },
+      });
     }
 
     // API 키 설정
@@ -159,6 +200,24 @@ class _IDevViewerPlatformState extends State<IDevViewerPlatform> {
     } catch (e) {
       debugPrint('Failed to send message to iframe: $e');
     }
+  }
+
+  /// 템플릿 업데이트 (외부에서 호출 가능)
+  void updateTemplate(Map<String, dynamic> template) {
+    debugPrint('[IDevViewer] Updating template externally');
+
+    // React 예제와 동일한 구조로 전송
+    final script = template['items'] ?? template;
+
+    _sendMessage({
+      'type': 'update_template',
+      'template': {
+        'script': script is String ? script : jsonEncode(script),
+        'templateId': 'flutter_template_external',
+        'templateNm': 'Flutter Template External Update',
+        'commitInfo': 'v1.0.2',
+      },
+    });
   }
 
   @override

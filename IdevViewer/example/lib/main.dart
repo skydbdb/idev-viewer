@@ -30,8 +30,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _isReady = false;
   bool _isLoading = true;
+  bool _isUpdating = false;
   final List<String> _events = [];
   Map<String, dynamic>? _templateData;
+  IDevConfig? _currentConfig;
 
   // React 예제와 동일한 API 키
   final String _apiKey =
@@ -55,6 +57,14 @@ class _MyHomePageState extends State<MyHomePage> {
         _templateData = {'items': templateList};
         _isLoading = false;
         _events.add('템플릿 로드 완료');
+        _currentConfig = IDevConfig(
+          apiKey: _apiKey,
+          template: _templateData,
+          templateName: 'test-template-from-flutter',
+          theme: 'dark',
+          locale: 'ko',
+          debugMode: true,
+        );
       });
       debugPrint('✅ 템플릿 로드 성공: ${templateList.length} items');
     } catch (e) {
@@ -63,6 +73,48 @@ class _MyHomePageState extends State<MyHomePage> {
         _events.add('템플릿 로드 실패: $e');
       });
       debugPrint('❌ 템플릿 로드 실패: $e');
+    }
+  }
+
+  Future<void> _updateTemplate() async {
+    if (_isUpdating || !_isReady) return;
+
+    try {
+      setState(() {
+        _isUpdating = true;
+        _events.add('템플릿 업데이트 시작');
+      });
+      debugPrint('🔄 템플릿 업데이트 시작');
+
+      // test-template.json 다시 로드
+      final String jsonString = await rootBundle.loadString(
+        'assets/test-template.json',
+      );
+      final List<dynamic> templateList = jsonDecode(jsonString);
+
+      final newTemplateData = {'items': templateList};
+
+      setState(() {
+        _templateData = newTemplateData;
+        _currentConfig = IDevConfig(
+          apiKey: _apiKey,
+          template: newTemplateData,
+          templateName:
+              'test-template-updated-${DateTime.now().millisecondsSinceEpoch}',
+          theme: 'dark',
+          locale: 'ko',
+          debugMode: true,
+        );
+        _isUpdating = false;
+        _events.add('템플릿 업데이트 완료');
+      });
+      debugPrint('✅ 템플릿 업데이트 성공');
+    } catch (e) {
+      setState(() {
+        _isUpdating = false;
+        _events.add('템플릿 업데이트 실패: $e');
+      });
+      debugPrint('❌ 템플릿 업데이트 실패: $e');
     }
   }
 
@@ -127,11 +179,43 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
+          // 버튼 영역
+          if (_isReady)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Colors.blue[50],
+              child: Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _isUpdating ? null : _updateTemplate,
+                    icon:
+                        _isUpdating
+                            ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Icon(Icons.refresh),
+                    label: Text(_isUpdating ? '업데이트 중...' : '템플릿 업데이트'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'test-template.json 다시 로드',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+
           // Viewer
           Expanded(
             flex: 3,
             child:
-                _isLoading || _templateData == null
+                _isLoading || _currentConfig == null
                     ? const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -143,14 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     )
                     : IDevViewer(
-                      config: IDevConfig(
-                        apiKey: _apiKey,
-                        template: _templateData,
-                        templateName: 'test-template-from-flutter',
-                        theme: 'dark',
-                        locale: 'ko',
-                        debugMode: true,
-                      ),
+                      config: _currentConfig!,
                       onReady: _onReady,
                       onEvent: _onEvent,
                       loadingWidget: const Center(
