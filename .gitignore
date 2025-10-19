@@ -17,6 +17,7 @@ IdevViewer/.flutter-plugins-dependencies
 # idev-viewer-js 관련 (별도 리포지토리에서 관리)
 idev-viewer-js/
 docs/
+scripts/
 
 # Dart compiler cache
 *.dill
@@ -94,8 +95,6 @@ Thumbs.db
 ~/ChromeDevSession/
 
 # Project specific (유지할 파일들)
-# - scripts/ (자동화 스크립트)
-# - docs/ (문서)
 # - assets/ (데모 앱 에셋)
 # - lib/ (데모 앱 소스)
 # - IdevViewer/ (Flutter 패키지)
