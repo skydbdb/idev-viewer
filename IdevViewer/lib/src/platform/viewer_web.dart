@@ -6,11 +6,7 @@ import '../internal/board/board/stack_board.dart';
 import '../internal/board/core/stack_board_controller.dart';
 import '../internal/board/core/case_style.dart';
 import '../internal/board/stack_board_item.dart';
-import '../internal/board/stack_board_items/items/stack_text_item.dart';
-import '../internal/board/stack_board_items/items/stack_frame_item.dart';
-import '../internal/board/stack_board_items/items/stack_chart_item.dart';
-import '../internal/board/stack_board_items/items/stack_search_item.dart';
-import '../internal/board/stack_board_items/items/stack_grid_item.dart';
+import '../internal/board/stack_items.dart';
 import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
 
@@ -225,32 +221,43 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.widgets,
-              size: 32,
-              color: Colors.blue[400],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '위젯 (${content.runtimeType})',
-              style: TextStyle(
-                color: Colors.blue[600],
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+        child: Flexible(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.widgets,
+                size: 24,
+                color: Colors.blue[400],
               ),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              '${item.size.width.toInt()}x${item.size.height.toInt()}',
-              style: TextStyle(
-                color: Colors.blue[500],
-                fontSize: 10,
+              const SizedBox(height: 4),
+              Flexible(
+                child: Text(
+                  '위젯 (${content.runtimeType})',
+                  style: TextStyle(
+                    color: Colors.blue[600],
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-            ),
-          ],
+              Flexible(
+                child: Text(
+                  '${item.size.width.toInt()}x${item.size.height.toInt()}',
+                  style: TextStyle(
+                    color: Colors.blue[500],
+                    fontSize: 8,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
