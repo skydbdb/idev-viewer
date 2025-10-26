@@ -39,7 +39,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void initState() {
     super.initState();
-    
+
     if (_isCreating) {
       print('⚠️ 이미 생성 중, skip');
       return;
@@ -80,6 +80,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _createAndMountIframe() {
     try {
       // Hot reload 시 이전 iframe 제거
+      if (_viewer != null) {
+        print('🗑️ 기존 IdevViewer 인스턴스 제거');
+        _viewer = null;
+      }
+      
       final existingIframes = html.document.querySelectorAll('iframe');
       for (final iframe in existingIframes) {
         if (iframe.id.contains('idev-viewer-')) {
