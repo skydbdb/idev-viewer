@@ -191,8 +191,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       if (_viewer != null) {
         try {
           print('🔍 _viewer.callMethod 시도...');
-          _viewer!.callMethod('updateTemplate', [template]);
-          print('✅ updateTemplate 호출 완료');
+      _viewer!.callMethod('updateTemplate', [template]);
+      print('✅ updateTemplate 호출 완료');
+      
+      // 디버깅: 생성된 template 객체 확인
+      print('🔍 template 내용: $template');
         } catch (e) {
           print('❌ callMethod 실패: $e');
           print('❌ 상세: ${StackTrace.current}');
