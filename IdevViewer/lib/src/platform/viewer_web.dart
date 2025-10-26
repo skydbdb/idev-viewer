@@ -40,12 +40,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // JavaScript 전역 변수로 초기화 여부 확인 (Hot Restart에도 유지)
     final hasInitialized = js.context['_idevViewerHasInitialized'] == true;
-    
+
     print('🎬 initState 호출됨 (count: ${hasInitialized ? '2nd+' : '1st'})');
 
     // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
     final existingViewer = js.context['_idevViewerInstance'];
-    
+
     // 모든 iframe 확인 (더 광범위한 검색)
     final allIframes = html.document.querySelectorAll('iframe');
     final hasIframe = allIframes.isNotEmpty;
@@ -130,7 +130,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       final IdevViewerClass = js.context['IdevViewer'];
       if (IdevViewerClass == null) {
         print('❌ IdevViewer 클래스가 없습니다.');
-        throw Exception('IdevViewer JavaScript 라이브러리가 로드되지 않았습니다');
+        print('⚠️ 이는 Hot Restart로 인한 두 번째 초기화 시도일 수 있습니다.');
+        print('⚠️ 첫 번째 뷰어가 이미 작동 중이므로 이 에러는 무시됩니다.');
+        
+        // 에러를 throw하지 않고, ready 상태로 설정
+        if (mounted) {
+          setState(() {
+            _isReady = true;
+          });
+          widget.onReady?.call();
+        }
+        return;
       }
 
       print('✅ IdevViewer 라이브러리 로드 확인');
