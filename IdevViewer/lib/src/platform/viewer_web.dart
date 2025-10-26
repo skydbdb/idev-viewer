@@ -84,7 +84,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         print('🗑️ 기존 IdevViewer 인스턴스 제거');
         _viewer = null;
       }
-      
+
       final existingIframes = html.document.querySelectorAll('iframe');
       for (final iframe in existingIframes) {
         if (iframe.id.contains('idev-viewer-')) {
@@ -184,12 +184,20 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
 
     try {
+      // vanilla-example 패턴을 따름
+      // script를 문자열로 변환 (JSON.stringify와 동일)
+      final scriptData = widget.config.template!['items'] ?? [];
       final template = js.JsObject.jsify({
-        'script': jsonEncode(widget.config.template!['items'] ?? []),
-        'templateId': 0,
+        'script': jsonEncode(scriptData), // 이미 JSON 문자열
+        'templateId': 'test_template_update_${DateTime.now().millisecondsSinceEpoch}',
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
+      
+      print('🔍 template 객체 생성 완료');
+      print('  - script length: ${template['script'].toString().length}');
+      print('  - templateId: ${template['templateId']}');
+      print('  - templateNm: ${template['templateNm']}');
 
       print(
           '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
