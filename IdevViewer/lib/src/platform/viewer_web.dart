@@ -147,7 +147,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// 템플릿 업데이트
   void _updateTemplate() {
     if (_viewer == null || widget.config.template == null) {
-      print('⚠️ _updateTemplate: _viewer=${_viewer != null}, template=${widget.config.template != null}');
+      print(
+          '⚠️ _updateTemplate: _viewer=${_viewer != null}, template=${widget.config.template != null}');
       return;
     }
 
@@ -158,8 +159,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
-      
-      print('📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
+
+      print(
+          '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
       _viewer?.callMethod('updateTemplate', [template]);
       print('✅ updateTemplate 호출 완료');
     } catch (e) {
@@ -220,20 +222,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           );
     }
 
-    // viewer container를 HTML로 렌더링
-    return HtmlElementView(
-      viewType: _containerId,
-      onPlatformViewCreated: (int viewId) {
-        // 컨테이너 생성 (IdevViewer가 mount할 곳)
-        final container = html.DivElement()
-          ..id = _containerId
-          ..style.width = '100%'
-          ..style.height = '100%';
-
-        if (container.parent == null) {
-          html.document.body?.append(container);
-        }
-      },
+    // HTML body에 직접 추가된 div를 사용 (vanilla-example 방식)
+    // Flutter는 단순히 placeholder로 SizedBox 반환
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity,
+      child: IgnorePointer(
+        // JavaScript가 직접 제어하므로 Flutter 이벤트 무시
+        child: Container(),
+      ),
     );
   }
 
