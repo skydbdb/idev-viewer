@@ -9,6 +9,7 @@ import '../internal/board/stack_board_item.dart';
 import '../internal/board/stack_board_items/items/stack_text_item.dart';
 import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
+import '../internal/config/build_mode.dart';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
 ///
@@ -63,7 +64,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// 뷰어 초기화
   void _initializeViewer() {
     try {
-      // Service Locator 초기화 (뷰어 모드)
+      // 뷰어 모드로 강제 설정 (BuildMode는 컴파일 타임 상수이므로 런타임에 변경 불가)
+      // 대신 Service Locator만 뷰어 모드로 초기화
       initViewerServiceLocator();
       
       // StackBoardController 초기화
