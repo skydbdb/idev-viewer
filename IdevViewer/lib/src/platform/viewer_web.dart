@@ -7,6 +7,7 @@ import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
 import '../internal/core/api/api_endpoint_ide.dart';
 import '../internal/core/auth/auth_service.dart';
+import '../internal/core/config/env.dart';
 import 'dart:convert';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
@@ -56,6 +57,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
 
     try {
+      // AppConfig 초기화
+      AppConfig.initialize();
+      print('🎭 [IDevViewerPlatform] AppConfig 초기화 완료');
+      
       // Service Locator 초기화
       initViewerServiceLocator();
 

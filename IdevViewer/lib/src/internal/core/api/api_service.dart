@@ -139,30 +139,42 @@ class ApiService {
     if (BuildMode.isEditor) {
       EasyLoading.show(status: 'loading...');
     }
-    
+
+    print('🚀 ApiService: API 요청 시작');
+    print('🚀 uri: $uri');
+    print('🚀 method: $method');
+    print('🚀 finalPayload: $finalPayload');
+    print('🚀 ifId: $ifId');
+
     try {
       ApiResponse response;
 
+      print('🚀 ApiService: ${method.toString()} 요청 전송 중...');
       switch (method) {
         case Method.get:
           response = await _apiClient.get(uri,
               queryParameters: finalPayload, options: dioOptions, ifId: ifId);
+          print('✅ ApiService: GET 응답 받음 - result: ${response.result}');
           break;
         case Method.post:
           response = await _apiClient.post(uri,
               data: finalPayload, options: dioOptions, ifId: ifId);
+          print('✅ ApiService: POST 응답 받음 - result: ${response.result}');
           break;
         case Method.put:
           response = await _apiClient.put(uri,
               data: finalPayload, options: dioOptions, ifId: ifId);
+          print('✅ ApiService: PUT 응답 받음 - result: ${response.result}');
           break;
         case Method.delete:
           response = await _apiClient.delete(uri,
               data: finalPayload, options: dioOptions, ifId: ifId);
+          print('✅ ApiService: DELETE 응답 받음 - result: ${response.result}');
           break;
         case Method.patch:
           response = await _apiClient.patch(uri,
               data: finalPayload, options: dioOptions, ifId: ifId);
+          print('✅ ApiService: PATCH 응답 받음 - result: ${response.result}');
           break;
       }
 
@@ -195,7 +207,11 @@ class ApiService {
         'original_error': apiError.data,
         'status_code': apiError.statusCode
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ ApiService: API 호출 중 예외 발생');
+      print('❌ 예외 타입: ${e.runtimeType}');
+      print('❌ 예외 메시지: $e');
+      print('❌ 스택 트레이스: $stackTrace');
       return ApiResponse(
           result: -1,
           reason: e.toString(),

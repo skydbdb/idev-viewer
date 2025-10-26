@@ -736,6 +736,7 @@ class HomeRepo {
     final reqParams = successData['reqParams'] as Map<String, dynamic>?;
 
     print('HomeRepo: API 응답 처리 시작 apiId = $apiId');
+    print('HomeRepo: successData 전체 = $successData');
 
     if (apiId == null || apiId.isEmpty) {
       print('HomeRepo: apiId가 null이므로 처리 중단');
