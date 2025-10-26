@@ -37,7 +37,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void initState() {
     super.initState();
-    _containerId = 'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
+    _containerId =
+        'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
 
     // iframe 생성 및 마운트
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -61,8 +62,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       print('🎭 [IDevViewer] iframe 생성 시작');
 
       // iframe 생성 (vanilla-example 방식)
+      // Flutter web에서는 assets를 적절한 경로로 로드해야 함
+      final idevAppPath = html.window.location.href.contains('example') 
+          ? 'assets/idev-app/index.html'
+          : '/assets/idev-app/index.html';
+      
+      print('🎭 [IDevViewer] idev-app 경로: $idevAppPath');
+      
       _iframe = html.IFrameElement()
-        ..src = '/assets/idev-app/index.html'
+        ..src = idevAppPath
         ..style.width = '100%'
         ..style.height = '100%'
         ..style.border = 'none'
@@ -75,12 +83,23 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
-        _postMessageToIframe('init', widget.config.toJson());
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _postMessageToIframe('init', widget.config.toJson());
+        });
+      });
+
+      // iframe 로드 체크 (5초 타임아웃)
+      Future.delayed(const Duration(seconds: 5), () {
+        if (!_isReady && mounted) {
+          print('⏰ iframe 로드 타임아웃');
+          html.window.console.error('Iframe load timeout. Check src:', _iframe?.src);
+        }
       });
 
       // iframe 에러 리스너
       _iframe!.onError.listen((e) {
         print('❌ iframe 에러: $e');
+        html.window.console.error('Iframe error:', e);
         if (mounted) {
           setState(() {
             _error = 'Failed to load viewer iframe';
@@ -250,9 +269,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       viewType: _containerId,
       onPlatformViewCreated: (int viewId) {
         // iframe을 DOM에 추가
-        final container = html.document.getElementById(_containerId) 
-          ?? html.DivElement()..id = _containerId;
-        
+        final container =
+            html.document.getElementById(_containerId) ?? html.DivElement()
+              ..id = _containerId;
+
         if (_iframe != null && container.children.isEmpty) {
           container.append(_iframe!);
           html.document.body?.append(container);
@@ -265,14 +285,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void dispose() {
     print('🎭 [IDevViewer] dispose');
-    
+
     // 메시지 리스너 제거
     html.window.onMessage.drain();
-    
+
     // iframe 제거
     final container = html.document.getElementById(_containerId);
     container?.remove();
-    
+
     super.dispose();
   }
 }
