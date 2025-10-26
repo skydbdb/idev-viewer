@@ -70,9 +70,20 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// JavaScript IdevViewer 라이브러리를 사용하여 뷰어 초기화
   void _createAndMountIframe() {
     try {
+      // Hot reload 시 이전 iframe 제거
+      final existingIframes = html.document.querySelectorAll('iframe');
+      for (final iframe in existingIframes) {
+        if (iframe.id.contains('idev-viewer-')) {
+          print('🗑️ 기존 iframe 제거: ${iframe.id}');
+          iframe.remove();
+        }
+      }
+
       // IdevViewer JavaScript 클래스 확인
+      print('🔍 IdevViewer 클래스 확인 중...');
       final IdevViewerClass = js.context['IdevViewer'];
       if (IdevViewerClass == null) {
+        print('❌ IdevViewer 클래스가 없습니다. context keys: ${js.context.keys}');
         throw Exception('IdevViewer JavaScript 라이브러리가 로드되지 않았습니다');
       }
 
@@ -82,7 +93,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       final options = js.JsObject.jsify({
         'width': '100%',
         'height': '600px',
-        'idevAppPath': '/assets/packages/idev_viewer/assets/idev-app/index.html',
+        'idevAppPath':
+            '/assets/packages/idev_viewer/assets/idev-app/index.html',
         'autoCreateIframe': true,
         'template': {
           'script': null,
