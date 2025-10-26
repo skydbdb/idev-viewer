@@ -508,15 +508,17 @@ npm publish            # 실제 배포
 원본 IDE 소스를 viewer로 동기화하는 방법:
 
 ```bash
-# 1. 소스 동기화
+# 1. 소스 동기화 (internal 코드 복사)
 ./scripts/sync-idev-core-sources.sh
 
-# 2. 뷰어 모드 패치 적용
+# 2. 뷰어 모드 패치 적용 (자동 수정)
 ./scripts/apply-viewer-mode-patches.sh
 
 # 3. 의존성 설치 및 빌드
 cd IdevViewer && flutter pub get && flutter build web --dart-define=BUILD_MODE=viewer
 ```
+
+> **참고**: `sync-idev-viewer-assets.sh`는 더 이상 사용하지 않습니다. 현재는 internal 코드를 직접 사용하므로 에셋 복사가 필요 없습니다.
 
 상세 내용은 [VIEWER-MODE-PATCHES.md](docs/VIEWER-MODE-PATCHES.md) 참조
 
