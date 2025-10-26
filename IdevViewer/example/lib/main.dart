@@ -239,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   )
                 : IDevViewer(
+                    key: const ValueKey('idev-viewer-singleton'),
                     config: _currentConfig!,
                     onReady: _onReady,
                     onEvent: _onEvent,
