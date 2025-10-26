@@ -132,7 +132,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         print('❌ IdevViewer 클래스가 없습니다.');
         print('⚠️ 이는 Hot Restart로 인한 두 번째 초기화 시도일 수 있습니다.');
         print('⚠️ 첫 번째 뷰어가 이미 작동 중이므로 이 에러는 무시됩니다.');
-        
+
         // 에러를 throw하지 않고, ready 상태로 설정
         if (mounted) {
           setState(() {
@@ -244,36 +244,33 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     try {
       // vanilla-example 패턴을 따름
-      // script를 문자열로 변환 (JSON.stringify와 동일)
-      final scriptData = widget.config.template!['items'] ?? [];
+      // widget.config.template이 {items: [...]} 형태라면 items만 추출
+      // 이미 배열이라면 그대로 사용
+      final scriptData = widget.config.template is List
+          ? widget.config.template
+          : widget.config.template!['items'] ?? [];
+
+      // vanilla-example처럼 배열을 JSON 문자열로 변환
+      final scriptString = jsonEncode(scriptData);
+
+      print('🔍 scriptData 타입: ${scriptData.runtimeType}');
+      print('🔍 scriptData 길이: ${scriptData is List ? scriptData.length : 'N/A'}');
+      print('🔍 scriptString 길이: ${scriptString.length}');
+
       final template = js.JsObject.jsify({
-        'script': jsonEncode(scriptData), // 이미 JSON 문자열
+        'script': scriptString,
         'templateId':
             'test_template_update_${DateTime.now().millisecondsSinceEpoch}',
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
 
-      print('🔍 template 객체 생성 완료');
-      print('  - script length: ${template['script'].toString().length}');
+      print('📝 updateTemplate 호출');
       print('  - templateId: ${template['templateId']}');
       print('  - templateNm: ${template['templateNm']}');
 
-      print(
-          '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
-      print('🔍 viewer 정보: ${viewer != null ? 'exist' : 'null'}');
-
-      try {
-        print('🔍 viewer.callMethod 시도...');
-        viewer.callMethod('updateTemplate', [template]);
-        print('✅ updateTemplate 호출 완료');
-
-        // 디버깅: 생성된 template 객체 확인
-        print('🔍 template 내용: $template');
-      } catch (e) {
-        print('❌ callMethod 실패: $e');
-        print('❌ 상세: ${StackTrace.current}');
-      }
+      viewer.callMethod('updateTemplate', [template]);
+      print('✅ updateTemplate 호출 완료');
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
       print('❌ 스택 추적: ${StackTrace.current}');
