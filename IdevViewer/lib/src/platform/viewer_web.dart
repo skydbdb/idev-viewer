@@ -31,17 +31,17 @@ class IDevViewerPlatform extends StatefulWidget {
 
 class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
-  static bool _isInitialized = false; // 초기화 플래그 (static으로 변경)
   String? _error;
   late String _containerId;
   js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
+  bool _isCreating = false; // 이미 생성 중인지 확인
 
   @override
   void initState() {
     super.initState();
-
-    if (_isInitialized) {
-      print('⚠️ 이미 초기화됨, skip');
+    
+    if (_isCreating) {
+      print('⚠️ 이미 생성 중, skip');
       return;
     }
 
@@ -56,11 +56,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     html.document.body?.append(container);
 
+    _isCreating = true;
+
     // iframe 생성 및 마운트
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         _createAndMountIframe();
-        _isInitialized = true;
       });
     });
   }
