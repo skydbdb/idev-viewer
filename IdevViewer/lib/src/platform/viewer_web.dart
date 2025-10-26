@@ -124,7 +124,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         },
         'onReady': js.JsFunction.withThis((that, data) {
           print('✅ 뷰어 준비 완료');
-          if (mounted) {
+          if (mounted && _viewer != null) {
+            // IdevViewer의 isReady도 강제로 true로 설정
+            try {
+              _viewer?.setProperty('isReady', true);
+              print('✅ IdevViewer.isReady를 true로 설정');
+            } catch (e) {
+              print('⚠️ isReady 설정 실패: $e');
+            }
+
             setState(() {
               _isReady = true;
               _error = null;
@@ -189,11 +197,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       final scriptData = widget.config.template!['items'] ?? [];
       final template = js.JsObject.jsify({
         'script': jsonEncode(scriptData), // 이미 JSON 문자열
-        'templateId': 'test_template_update_${DateTime.now().millisecondsSinceEpoch}',
+        'templateId':
+            'test_template_update_${DateTime.now().millisecondsSinceEpoch}',
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
-      
+
       print('🔍 template 객체 생성 완료');
       print('  - script length: ${template['script'].toString().length}');
       print('  - templateId: ${template['templateId']}');
