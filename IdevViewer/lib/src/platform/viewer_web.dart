@@ -34,14 +34,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   String? _error;
   late String _containerId;
   js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
-  bool _isCreating = false; // 이미 생성 중인지 확인
+  bool _isInitialized = false; // 초기화 완료 여부
 
   @override
   void initState() {
     super.initState();
-
-    if (_isCreating) {
-      print('⚠️ 이미 생성 중, skip');
+    
+    if (_isInitialized) {
+      print('⚠️ 이미 초기화됨, skip');
       return;
     }
 
@@ -56,13 +56,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     html.document.body?.append(container);
 
-    _isCreating = true;
-
-    // iframe 생성 및 마운트
+    // iframe 생성 및 마운트 (한 번만 실행)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _createAndMountIframe();
-      });
+      if (!_isInitialized) {
+        _isInitialized = true;
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _createAndMountIframe();
+        });
+      }
     });
   }
 
@@ -95,6 +96,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       // IdevViewer JavaScript 클래스 확인
       print('🔍 IdevViewer 클래스 확인 중...');
+
       final IdevViewerClass = js.context['IdevViewer'];
       if (IdevViewerClass == null) {
         print('❌ IdevViewer 클래스가 없습니다.');
@@ -133,7 +135,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             } catch (e) {
               print('⚠️ isReady 설정 실패: $e');
             }
-            
+
             setState(() {
               _isReady = true;
               _error = null;
