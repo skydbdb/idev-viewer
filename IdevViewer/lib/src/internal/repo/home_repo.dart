@@ -181,7 +181,7 @@ class HomeRepo {
 
     Map<String, dynamic> reqParams = Map.from(params);
     reqParams['if_id'] = apiId;
-    
+
     // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 사용
     if (api != null) {
       reqParams['method'] = api['method'];
@@ -192,13 +192,14 @@ class HomeRepo {
       reqParams['uri'] = apiId; // API ID를 URI로 사용
       print('HomeRepo: 뷰어 모드 - API 메타데이터 없음, 기본값 사용: $apiId');
     }
-    
+
     reqParams['domainId'] = domainId;
 
-    // reqParams에서 값이 비어있는 항목을 제거
+    // reqParams에서 값이 비어있는 항목을 제거 (단, domainId, method, uri는 유지)
     debugPrint('addApiRequest before reqParams: $reqParams');
-    reqParams.removeWhere(
-        (key, value) => value == null || (value is String && value.isEmpty));
+    reqParams.removeWhere((key, value) =>
+        !['domainId', 'method', 'uri'].contains(key) &&
+        (value == null || (value is String && value.isEmpty)));
     debugPrint('addApiRequest after reqParams: $reqParams');
 
     // 중복 요청 방지 - 정리된 파라미터를 사용하여 requestKey 생성
