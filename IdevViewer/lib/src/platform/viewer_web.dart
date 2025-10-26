@@ -35,19 +35,22 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   late String _containerId;
   
   // static으로 변경하여 Hot Reload 시에도 유지
-  static bool _isGloballyInitialized = false;
   static js.JsObject? _globalViewer; // 전역 IdevViewer 인스턴스
 
   @override
   void initState() {
     super.initState();
     
-    if (_isGloballyInitialized) {
+    // JavaScript 전역 변수로 초기화 여부 확인 (Hot Restart에도 유지)
+    final isAlreadyInitialized = js.context['_idevViewerInitialized'] == true;
+    
+    if (isAlreadyInitialized && _globalViewer != null) {
       print('⚠️ 이미 전역적으로 초기화됨, skip');
       // 이미 초기화된 경우 ready 상태로 설정
       setState(() {
         _isReady = true;
       });
+      widget.onReady?.call();
       return;
     }
 
@@ -64,9 +67,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // iframe 생성 및 마운트 (전역적으로 한 번만 실행)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_isGloballyInitialized) {
-        _isGloballyInitialized = true;
-        print('🔧 전역 초기화 플래그 설정');
+      final isStillNotInitialized = js.context['_idevViewerInitialized'] != true;
+      
+      if (isStillNotInitialized) {
+        js.context['_idevViewerInitialized'] = true;
+        print('🔧 전역 초기화 플래그 설정 (JavaScript)');
         Future.delayed(const Duration(milliseconds: 500), () {
           _createAndMountIframe();
         });
@@ -92,7 +97,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         print('🗑️ 기존 IdevViewer 인스턴스 제거');
         _globalViewer = null;
       }
-      
+
       final existingIframes = html.document.querySelectorAll('iframe');
       for (final iframe in existingIframes) {
         if (iframe.id.contains('idev-viewer-')) {
@@ -142,7 +147,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             } catch (e) {
               print('⚠️ isReady 설정 실패: $e');
             }
-            
+
             setState(() {
               _isReady = true;
               _error = null;
