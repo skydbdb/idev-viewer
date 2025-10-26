@@ -41,6 +41,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void initState() {
     super.initState();
 
+    print('🎬 initState 호출됨');
+    print('  - _idevViewerInitialized: ${js.context['_idevViewerInitialized']}');
+    print('  - _globalViewer: ${_globalViewer != null ? 'exist' : 'null'}');
+    print('  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
+
     // JavaScript 전역 변수로 초기화 여부 확인 (Hot Restart에도 유지)
     final isAlreadyInitialized = js.context['_idevViewerInitialized'] == true;
 
