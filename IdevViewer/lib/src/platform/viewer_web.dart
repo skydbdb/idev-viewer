@@ -60,11 +60,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _createAndMountIframe() {
     try {
       // 이미 iframe이 생성되어 있으면 중복 생성 방지
-      if (_iframe != null) {
-        print('⏩ iframe 이미 생성됨, 건너뜀');
+      if (_iframe != null && html.document.body?.contains(_iframe!) == true) {
+        print('⏩ iframe 이미 생성됨 (DOM 존재), 건너뜀');
         return;
       }
-      
+
+      // 기존 iframe이 DOM에서 제거되었으면 새로 생성
+      if (_iframe != null && html.document.body?.contains(_iframe!) == false) {
+        print('🔄 기존 iframe이 DOM에서 제거됨, 재생성');
+        _iframe = null;
+      }
+
       print('🎭 [IDevViewer] iframe 생성 시작');
       html.window.console.log('Current URL: ${html.window.location.href}');
 
