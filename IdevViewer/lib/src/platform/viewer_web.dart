@@ -254,7 +254,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       final scriptString = jsonEncode(scriptData);
 
       print('🔍 scriptData 타입: ${scriptData.runtimeType}');
-      print('🔍 scriptData 길이: ${scriptData is List ? scriptData.length : 'N/A'}');
+      print(
+          '🔍 scriptData 길이: ${scriptData is List ? scriptData.length : 'N/A'}');
       print('🔍 scriptString 길이: ${scriptString.length}');
 
       final template = js.JsObject.jsify({

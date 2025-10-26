@@ -105,6 +105,47 @@
   </div>
 
   <script>
+    // 메시지 큐
+    var messageQueue = [];
+
+    // 메시지 처리 함수
+    function handleMessage(message) {
+      console.log('📥 [idev-app] 메시지 처리:', message.type);
+
+      // 메시지를 window 전역 변수로 저장 (Flutter에서 접근 가능)
+      if (message.type === 'init' || message.type === 'update_template') {
+        window._idevTemplate = message.template || message.data;
+        console.log('📦 [idev-app] window._idevTemplate 설정:', window._idevTemplate);
+        // DOM을 강제로 다시 그리기 위해 이벤트 트리거
+        window.dispatchEvent(new CustomEvent('idev-template-update', {
+          detail: message.template || message.data
+        }));
+        console.log('🎯 [idev-app] idev-template-update 이벤트 발생');
+      }
+
+      console.log('✅ [idev-app] 메시지 설정 완료:', message.type);
+    }
+
+    // 부모 창으로부터 postMessage 수신 리스너 추가
+    window.addEventListener('message', function (event) {
+      console.log('📥 [idev-app] postMessage 수신:', event.data);
+
+      try {
+        var message = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        console.log('📥 [idev-app] 파싱된 메시지:', message);
+
+        // Flutter 앱이 로드되었으면 즉시 처리
+        if (window._flutterApp || window._flutterLoaded) {
+          handleMessage(message);
+        } else {
+          console.log('⏳ [idev-app] Flutter 앱이 아직 로드되지 않음, 메시지 큐에 저장');
+          messageQueue.push(message);
+        }
+      } catch (e) {
+        console.error('❌ [idev-app] 메시지 파싱 실패:', e);
+      }
+    });
+
     window.addEventListener('load', function (ev) {
       // CanvasKit 렌더러 강제 사용
       window.flutterConfiguration = {
@@ -124,6 +165,26 @@
         // Flutter 앱이 완전히 로드되면 로딩 화면 숨기기
         setTimeout(function () {
           document.body.classList.add('flutter-app-loaded');
+
+          // Flutter 로드 완료 플래그 설정
+          window._flutterLoaded = true;
+          console.log('✅ [idev-app] Flutter 앱 로드 완료');
+
+          // 큐에 저장된 메시지 처리
+          console.log('📋 [idev-app] 메시지 큐 처리:', messageQueue.length);
+          for (var i = 0; i < messageQueue.length; i++) {
+            handleMessage(messageQueue[i]);
+          }
+          messageQueue = []; // 큐 비우기
+
+          // 부모 창에 ready 신호 전송
+          if (window.parent !== window) {
+            console.log('📤 [idev-app] 부모 창에 ready 신호 전송');
+            window.parent.postMessage(JSON.stringify({
+              type: 'flutter-ready',
+              data: { status: 'ready' }
+            }), '*');
+          }
         }, 1000); // 1초 후 로딩 화면 숨김
       }).catch(function (error) {
         console.error('Flutter 앱 로드 실패:', error);
