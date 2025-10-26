@@ -34,21 +34,21 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   String? _error;
   late String _containerId;
 
-  // static으로 변경하여 Hot Reload 시에도 유지
-  static js.JsObject? _globalViewer; // 전역 IdevViewer 인스턴스
-
   @override
   void initState() {
     super.initState();
 
     print('🎬 initState 호출됨');
-    print('  - _globalViewer: ${_globalViewer != null ? 'exist' : 'null'}');
+    
+    // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
+    final existingViewer = js.context['_idevViewerInstance'];
+    print('  - JS _idevViewerInstance: ${existingViewer != null ? 'exist' : 'null'}');
     print(
         '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
     // React의 useRef 패턴: 이미 뷰어가 존재하면 재사용
-    if (_globalViewer != null) {
-      print('♻️ 기존 뷰어 인스턴스 재사용');
+    if (existingViewer != null) {
+      print('♻️ 기존 뷰어 인스턴스 재사용 (JavaScript 전역)');
       setState(() {
         _isReady = true;
       });
@@ -136,16 +136,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         },
         'onReady': js.JsFunction.withThis((that, data) {
           print('✅ 뷰어 준비 완료');
-          if (mounted && _globalViewer != null) {
-            // IdevViewer의 isReady도 강제로 true로 설정
-            try {
-              // JsObject에서 속성 설정
-              _globalViewer!['isReady'] = true;
-              print('✅ IdevViewer.isReady를 true로 설정');
-            } catch (e) {
-              print('⚠️ isReady 설정 실패: $e');
+          if (mounted) {
+            final viewer = js.context['_idevViewerInstance'];
+            if (viewer != null) {
+              // IdevViewer의 isReady도 강제로 true로 설정
+              try {
+                // JsObject에서 속성 설정
+                viewer['isReady'] = true;
+                print('✅ IdevViewer.isReady를 true로 설정');
+              } catch (e) {
+                print('⚠️ isReady 설정 실패: $e');
+              }
             }
-
+            
             setState(() {
               _isReady = true;
               _error = null;
@@ -164,12 +167,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       });
 
       // IdevViewer 인스턴스 생성
-      _globalViewer = js.JsObject(IdevViewerClass, [options]);
+      final viewer = js.JsObject(IdevViewerClass, [options]);
+      
+      // JavaScript 전역 변수에 저장 (Dart 재시작에도 유지)
+      js.context['_idevViewerInstance'] = viewer;
 
-      print('🔍 _globalViewer 인스턴스 생성 완료, mount 시도...');
+      print('🔍 뷰어 인스턴스 생성 완료, JavaScript 전역에 저장, mount 시도...');
 
       // 뷰어 마운트
-      _globalViewer?.callMethod('mount', ['#$_containerId']);
+      viewer.callMethod('mount', ['#$_containerId']);
 
       print('🔍 mount 호출 완료');
 
@@ -198,9 +204,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 템플릿 업데이트
   void _updateTemplate() {
-    if (_globalViewer == null || widget.config.template == null) {
+    final viewer = js.context['_idevViewerInstance'];
+    
+    if (viewer == null || widget.config.template == null) {
       print(
-          '⚠️ _updateTemplate: _globalViewer=${_globalViewer != null}, template=${widget.config.template != null}');
+          '⚠️ _updateTemplate: viewer=${viewer != null}, template=${widget.config.template != null}');
       return;
     }
 
@@ -223,21 +231,18 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       print(
           '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
-      print('🔍 _globalViewer 정보: ${_globalViewer != null ? 'exist' : 'null'}');
-      if (_globalViewer != null) {
-        try {
-          print('🔍 _globalViewer.callMethod 시도...');
-          _globalViewer!.callMethod('updateTemplate', [template]);
-          print('✅ updateTemplate 호출 완료');
+      print('🔍 viewer 정보: ${viewer != null ? 'exist' : 'null'}');
+      
+      try {
+        print('🔍 viewer.callMethod 시도...');
+        viewer.callMethod('updateTemplate', [template]);
+        print('✅ updateTemplate 호출 완료');
 
-          // 디버깅: 생성된 template 객체 확인
-          print('🔍 template 내용: $template');
-        } catch (e) {
-          print('❌ callMethod 실패: $e');
-          print('❌ 상세: ${StackTrace.current}');
-        }
-      } else {
-        print('⚠️ _globalViewer가 null입니다');
+        // 디버깅: 생성된 template 객체 확인
+        print('🔍 template 내용: $template');
+      } catch (e) {
+        print('❌ callMethod 실패: $e');
+        print('❌ 상세: ${StackTrace.current}');
       }
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
