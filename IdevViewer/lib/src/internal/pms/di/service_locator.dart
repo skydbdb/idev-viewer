@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_service.dart';
 import '../../repo/app_streams.dart';
+import '../../repo/home_repo.dart';
 
 final sl = GetIt.instance;
 
@@ -23,4 +24,7 @@ void initViewerServiceLocator() {
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
   sl.registerLazySingleton<ApiService>(
       () => ApiService(apiClient: sl<ApiClient>()));
+  
+  // 뷰어 모드에서 HomeRepo도 등록
+  sl.registerLazySingleton<HomeRepo>(() => HomeRepo());
 }
