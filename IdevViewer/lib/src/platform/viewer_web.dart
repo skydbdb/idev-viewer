@@ -42,14 +42,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
     final existingViewer = js.context['_idevViewerInstance'];
+    final hasIframe = html.document.querySelectorAll('iframe[id*="idev-viewer"]').isNotEmpty;
+    
     print(
         '  - JS _idevViewerInstance: ${existingViewer != null ? 'exist' : 'null'}');
+    print('  - Existing iframe: ${hasIframe ? 'exist' : 'none'}');
     print(
         '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
-    // React의 useRef 패턴: 이미 뷰어가 존재하면 재사용
-    if (existingViewer != null) {
-      print('♻️ 기존 뷰어 인스턴스 재사용 (JavaScript 전역)');
+    // React의 useRef 패턴: 이미 뷰어가 존재하거나 iframe이 있으면 재사용
+    if (existingViewer != null || hasIframe) {
+      print('♻️ 기존 뷰어/iframe 재사용 (중복 초기화 방지)');
       setState(() {
         _isReady = true;
       });
