@@ -59,6 +59,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// iframe 생성 및 마운트
   void _createAndMountIframe() {
     try {
+      // 이미 iframe이 생성되어 있으면 중복 생성 방지
+      if (_iframe != null) {
+        print('⏩ iframe 이미 생성됨, 건너뜀');
+        return;
+      }
+      
       print('🎭 [IDevViewer] iframe 생성 시작');
       html.window.console.log('Current URL: ${html.window.location.href}');
 
@@ -125,7 +131,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
-        
+
         // 5초 후에도 ready 신호가 오지 않으면 강제로 ready 처리
         Future.delayed(const Duration(seconds: 5), () {
           if (!_isReady && mounted) {
