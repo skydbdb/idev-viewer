@@ -46,9 +46,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       ..id = _containerId
       ..style.width = '100%'
       ..style.height = '100%';
-    
+
     html.document.body?.append(container);
-    
+
     // iframe 생성 및 마운트
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -122,6 +122,18 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       _viewer?.callMethod('mount', ['#$_containerId']);
 
       print('✅ IdevViewer 인스턴스 생성 및 마운트 완료');
+
+      // 2초 후 ready 처리 (IdevViewer가 준비될 때까지 대기)
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && !_isReady) {
+          print('⏰ Ready 타임아웃, 강제 ready 처리');
+          setState(() {
+            _isReady = true;
+            _error = null;
+          });
+          widget.onReady?.call();
+        }
+      });
     } catch (e) {
       print('❌ iframe 생성 실패: $e');
       if (mounted) {
