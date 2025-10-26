@@ -36,6 +36,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
   String? _currentScript;
+  bool _apisInitialized = false;
+  bool _paramsInitialized = false;
 
   @override
   void initState() {
@@ -58,30 +60,34 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       // API 및 파라미터 초기화 (home_board.dart와 동일한 루틴)
       final homeRepo = sl<HomeRepo>();
-      final versionId = 7;
-      final domainId = 10001;
-      
+      const versionId = 7;
+      const domainId = 10001;
+
       homeRepo.versionId = versionId;
       homeRepo.domainId = domainId;
 
       print('🎭 [IDevViewerPlatform] API 초기화 시작');
+
+      // API 초기화 완료 후 템플릿 로드
+      homeRepo.getApiIdResponseStream.listen((response) {
+        if (response != null) {
+          final apiId = response['if_id']?.toString();
+          
+          if (apiId == ApiEndpointIDE.apis && !_apisInitialized) {
+            print('🎭 [IDevViewerPlatform] APIs 초기화 완료');
+            _apisInitialized = true;
+            _checkAndLoadTemplate(homeRepo);
+          } else if (apiId == ApiEndpointIDE.params && !_paramsInitialized) {
+            print('🎭 [IDevViewerPlatform] Params 초기화 완료');
+            _paramsInitialized = true;
+            _checkAndLoadTemplate(homeRepo);
+          }
+        }
+      });
+
       // API 초기화는 한 번만 실행
       homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
       homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-
-      // 템플릿 데이터가 있으면 스크립트로 변환
-      if (widget.config.template != null) {
-        print('🎭 [IDevViewerPlatform] 초기 템플릿 로드');
-        _updateTemplate(widget.config.template!);
-      }
-
-      setState(() {
-        _isReady = true;
-        _error = null;
-      });
-
-      // 준비 완료 콜백 호출
-      widget.onReady?.call();
 
       print('🎭 [IDevViewerPlatform] 뷰어 초기화 완료');
     } catch (e) {
@@ -89,6 +95,22 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       setState(() {
         _error = 'Failed to initialize viewer: $e';
       });
+    }
+  }
+
+  /// APIs와 Params 초기화가 완료되면 템플릿 로드
+  void _checkAndLoadTemplate(HomeRepo homeRepo) {
+    if (_apisInitialized && _paramsInitialized && widget.config.template != null) {
+      print('🎭 [IDevViewerPlatform] 초기 템플릿 로드 시작');
+      _updateTemplate(widget.config.template!);
+      
+      setState(() {
+        _isReady = true;
+        _error = null;
+      });
+
+      // 준비 완료 콜백 호출
+      widget.onReady?.call();
     }
   }
 
