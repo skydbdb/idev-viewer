@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
-import 'dart:convert';
-import 'dart:html' as html;
-import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 import '../models/viewer_config.dart';
 import '../models/viewer_event.dart';
@@ -9,10 +5,6 @@ import '../internal/board/board/stack_board.dart';
 import '../internal/board/core/stack_board_controller.dart';
 import '../internal/board/core/case_style.dart';
 import '../internal/board/stack_board_item.dart';
-import '../internal/board/stack_item_case/stack_item_case.dart';
-import '../internal/repo/home_repo.dart';
-import '../internal/pms/di/service_locator.dart';
-import '../internal/config/build_mode.dart';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
 ///
@@ -105,7 +97,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             (itemData['width'] ?? 200).toDouble(),
             (itemData['height'] ?? 100).toDouble(),
           ),
-          content: StackItemContent.fromJson(itemData),
+          content: _createDefaultContent(itemData),
           status: StackItemStatus.idle,
         );
       }).toList();
@@ -122,6 +114,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         _error = 'Failed to update template: $e';
       });
     }
+  }
+
+  /// 기본 콘텐츠 생성
+  StackItemContent _createDefaultContent(Map<String, dynamic> itemData) {
+    return _DefaultItemContent(
+      type: itemData['type'] ?? 'unknown',
+      data: itemData,
+    );
   }
 
   @override
@@ -144,7 +144,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       caseStyle: const CaseStyle(
         frameBorderWidth: 1.0,
         frameBorderColor: Colors.grey,
-        frameBorderRadius: 8.0,
       ),
       onTap: (item) {
         // 아이템 탭 이벤트 처리
@@ -207,5 +206,24 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void dispose() {
     _stackBoardController.dispose();
     super.dispose();
+  }
+}
+
+/// 기본 아이템 콘텐츠 구현체
+class _DefaultItemContent implements StackItemContent {
+  final String type;
+  final Map<String, dynamic> data;
+
+  const _DefaultItemContent({
+    required this.type,
+    required this.data,
+  });
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      ...data,
+    };
   }
 }
