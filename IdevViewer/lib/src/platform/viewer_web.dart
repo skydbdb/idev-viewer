@@ -106,20 +106,20 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _updateTemplate(Map<String, dynamic> template) {
     print('🔄 _updateTemplate 호출됨');
     print('🔄 템플릿 데이터: $template');
-    
+
     try {
       final items = template['items'] as List<dynamic>? ?? [];
       print('🔄 아이템 개수: ${items.length}');
-      
+
       // 기존 아이템들 모두 제거
       print('🔄 기존 아이템 제거 중...');
       _stackBoardController.clear();
-      
+
       // 새로운 아이템들 생성 - 실제 템플릿 타입에 맞게 변환
-      _items = items.map((itemData) {
+      _items = items.map<StackItem<StackItemContent>>((itemData) {
         final itemType = itemData['type'] as String? ?? 'Unknown';
         print('🔄 아이템 타입: $itemType');
-        
+
         // 템플릿 데이터를 적절한 StackItem으로 변환
         switch (itemType) {
           case 'StackFrameItem':
@@ -136,17 +136,20 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             // 알 수 없는 타입은 StackTextItem으로 변환
             return StackTextItem(
               boardId: itemData['boardId'] ?? 'idev-viewer-board',
-              id: itemData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+              id: itemData['id'] ??
+                  DateTime.now().millisecondsSinceEpoch.toString(),
               offset: Offset(
                 (itemData['offset']?['dx'] ?? itemData['x'] ?? 0).toDouble(),
                 (itemData['offset']?['dy'] ?? itemData['y'] ?? 0).toDouble(),
               ),
               size: Size(
-                (itemData['size']?['width'] ?? itemData['width'] ?? 200).toDouble(),
-                (itemData['size']?['height'] ?? itemData['height'] ?? 100).toDouble(),
+                (itemData['size']?['width'] ?? itemData['width'] ?? 200)
+                    .toDouble(),
+                (itemData['size']?['height'] ?? itemData['height'] ?? 100)
+                    .toDouble(),
               ),
               content: TextItemContent(
-                data: '${itemType} (${itemData['id'] ?? 'Unknown'})',
+                data: '$itemType (${itemData['id'] ?? 'Unknown'})',
               ),
               status: StackItemStatus.idle,
             );
