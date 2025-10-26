@@ -220,38 +220,40 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         border: Border.all(color: Colors.grey[300]!, width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.widgets,
-              size: 20,
-              color: Colors.blue[400],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '위젯 (${content.runtimeType})',
-              style: TextStyle(
-                color: Colors.blue[600],
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
+      child: ClipRect(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.widgets,
+                size: 16,
+                color: Colors.blue[400],
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-            Text(
-              '${item.size.width.toInt()}x${item.size.height.toInt()}',
-              style: TextStyle(
-                color: Colors.blue[500],
-                fontSize: 6,
+              const SizedBox(height: 1),
+              Text(
+                '위젯',
+                style: TextStyle(
+                  color: Colors.blue[600],
+                  fontSize: 6,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ],
+              Text(
+                '${item.size.width.toInt()}x${item.size.height.toInt()}',
+                style: TextStyle(
+                  color: Colors.blue[500],
+                  fontSize: 4,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          ),
         ),
       ),
     );
