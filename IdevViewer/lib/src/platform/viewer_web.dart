@@ -42,11 +42,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
     final existingViewer = js.context['_idevViewerInstance'];
-    final hasIframe = html.document.querySelectorAll('iframe[id*="idev-viewer"]').isNotEmpty;
     
+    // 모든 iframe 확인 (더 광범위한 검색)
+    final allIframes = html.document.querySelectorAll('iframe');
+    final hasIframe = allIframes.isNotEmpty;
+
     print(
         '  - JS _idevViewerInstance: ${existingViewer != null ? 'exist' : 'null'}');
-    print('  - Existing iframe: ${hasIframe ? 'exist' : 'none'}');
+    print('  - Total iframes: ${allIframes.length}');
+    if (allIframes.isNotEmpty) {
+      for (var iframe in allIframes) {
+        print('    - iframe id: ${iframe.id}, src: ${iframe.getAttribute('src')}');
+      }
+    }
     print(
         '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
