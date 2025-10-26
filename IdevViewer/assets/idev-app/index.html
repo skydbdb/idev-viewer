@@ -105,6 +105,27 @@
   </div>
 
   <script>
+    // 부모 창으로부터 postMessage 수신 리스너 추가
+    window.addEventListener('message', function (event) {
+      console.log('📥 postMessage 수신:', event.data);
+
+      try {
+        var message = JSON.parse(event.data);
+        console.log('📥 파싱된 메시지:', message);
+
+        // Flutter 앱이 로드되었으면 메시지 전달
+        if (window._flutterApp) {
+          console.log('✅ Flutter 앱에 메시지 전달:', message.type);
+          // Flutter로 메시지 전달은 나중에 구현
+        } else {
+          console.log('⏳ Flutter 앱이 아직 로드되지 않음, 메시지 대기 중...');
+          // 메시지 큐에 저장 (구현 필요)
+        }
+      } catch (e) {
+        console.error('❌ 메시지 파싱 실패:', e);
+      }
+    });
+
     window.addEventListener('load', function (ev) {
       // CanvasKit 렌더러 강제 사용
       window.flutterConfiguration = {
@@ -124,6 +145,15 @@
         // Flutter 앱이 완전히 로드되면 로딩 화면 숨기기
         setTimeout(function () {
           document.body.classList.add('flutter-app-loaded');
+
+          // 부모 창에 ready 신호 전송
+          if (window.parent !== window) {
+            console.log('📤 부모 창에 ready 신호 전송');
+            window.parent.postMessage(JSON.stringify({
+              type: 'flutter-ready',
+              data: { status: 'ready' }
+            }), '*');
+          }
         }, 1000); // 1초 후 로딩 화면 숨김
       }).catch(function (error) {
         console.error('Flutter 앱 로드 실패:', error);

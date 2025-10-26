@@ -90,35 +90,41 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 요소 확인
       print('🎭 iframe 요소 확인: ${_iframe?.src}, ${_iframe?.baseUri}');
 
-      // iframe 로드 리스너
-      _iframe!.onLoad.listen((_) {
-        print('✅ iframe 로드 완료');
-
-        // idev-viewer-js 패턴: postMessage로 초기화 메시지 전송
-        Future.delayed(const Duration(milliseconds: 1000), () {
+      // 부모 창에서 메시지 수신 리스너 추가
+      html.window.onMessage.listen((event) {
+        if (event.source == _iframe?.contentWindow) {
           try {
-            final message = jsonEncode({
-              'type': 'init',
-              'data': widget.config.toJson(),
-            });
-            _iframe?.contentWindow?.postMessage(message, '*');
-            print('📤 초기화 메시지 전송: init');
+            final data = jsonDecode(event.data);
+            final type = data['type'];
+            print('📥 iframe 메시지 수신: $type');
 
-            // ready 처리 (Flutter 앱이 ready 신호를 보내지 않으므로 강제 처리)
-            Future.delayed(const Duration(seconds: 1), () {
-              print('✅ iframe 초기화 완료');
+            if (type == 'flutter-ready') {
+              print('✅ flutter-ready 수신');
               if (mounted) {
                 setState(() {
                   _isReady = true;
                   _error = null;
                 });
                 widget.onReady?.call();
+
+                // 초기화 메시지 전송
+                final initMessage = jsonEncode({
+                  'type': 'init',
+                  'data': widget.config.toJson(),
+                });
+                _iframe?.contentWindow?.postMessage(initMessage, '*');
+                print('📤 초기화 메시지 전송: init');
               }
-            });
+            }
           } catch (e) {
-            print('❌ 메시지 전송 실패: $e');
+            print('❌ 메시지 처리 실패: $e');
           }
-        });
+        }
+      });
+
+      // iframe 로드 리스너
+      _iframe!.onLoad.listen((_) {
+        print('✅ iframe 로드 완료');
       });
 
       // iframe 에러 리스너
@@ -220,7 +226,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // iframe을 직접 DOM에 렌더링하므로 빈 Container 반환
     // iframe은 이미 body에 append되어 있음
-    return Container(
+    return const SizedBox(
       width: double.infinity,
       height: double.infinity,
     );
