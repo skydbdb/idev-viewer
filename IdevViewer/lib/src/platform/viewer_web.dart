@@ -6,6 +6,7 @@ import '../internal/board/board/viewer/template_viewer_page.dart';
 import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
 import '../internal/core/api/api_endpoint_ide.dart';
+import '../internal/core/auth/auth_service.dart';
 import 'dart:convert';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
@@ -52,11 +53,20 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 뷰어 초기화
   Future<void> _initializeViewer() async {
-    print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
+      print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
 
     try {
       // Service Locator 초기화
       initViewerServiceLocator();
+
+      // 뷰어 API 키 설정
+      const apiKey = '5b08a46031ecd3e644cfced3a9bd43138b39873fd6f84e125c86ebfe1401668721c8efe37f8e5fe884cab898daad4b90627e375d89071a7d8015b3c4ab6d01a3';
+      AuthService.setViewerApiKey(apiKey);
+      print('🔑 [IDevViewerPlatform] 뷰어 API 키 설정 완료');
+      
+      // 뷰어 인증 초기화
+      await AuthService.initializeViewerAuth();
+      print('🔑 [IDevViewerPlatform] 뷰어 인증 초기화 완료');
 
       // API 및 파라미터 초기화 (home_board.dart와 동일한 루틴)
       final homeRepo = sl<HomeRepo>();
@@ -77,9 +87,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         if (response != null) {
           final apiId = response['if_id']?.toString();
           final status = response['status'];
-          
+
           print('🎭 [IDevViewerPlatform] API 응답: $apiId, status: $status');
-          
+
           // 실패 응답도 초기화 완료로 간주 (토큰 없어도 뷰어 모드는 동작 가능)
           if (apiId == ApiEndpointIDE.apis && !_apisInitialized) {
             print('🎭 [IDevViewerPlatform] APIs 초기화 완료');
@@ -106,7 +116,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _checkAndLoadTemplate(HomeRepo homeRepo) {
     if (_apisInitialized && _paramsInitialized) {
       print('🎭 [IDevViewerPlatform] APIs와 Params 초기화 완료');
-      
+
       setState(() {
         _isReady = true;
         _error = null;
