@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:html' as html;
 import 'dart:convert';
 import '../models/viewer_config.dart';
@@ -8,7 +7,7 @@ import '../models/viewer_event.dart';
 /// Web 플랫폼 구현 (iframe 기반)
 ///
 /// idev-app을 iframe으로 로드하여 렌더링합니다.
-/// Internal 코드는 assets/idev-app에 컴파일된 형태로만 포함됩니다.
+/// vanilla-example의 접근 방식을 따라 구성합니다.
 class IDevViewerPlatform extends StatefulWidget {
   final IDevConfig config;
   final VoidCallback? onReady;
@@ -33,16 +32,16 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
   html.IFrameElement? _iframe;
-  String _iframeId = '';
+  late String _containerId;
 
   @override
   void initState() {
     super.initState();
-    _iframeId = 'idev-viewer-${DateTime.now().millisecondsSinceEpoch}';
+    _containerId = 'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
 
-    // iframe 생성
+    // iframe 생성 및 마운트
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeIframe();
+      _createAndMountIframe();
     });
   }
 
@@ -51,53 +50,32 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.didUpdateWidget(oldWidget);
 
     // config 변경 시 iframe 업데이트
-    if (widget.config.template != oldWidget.config.template && _iframe != null) {
-      _sendConfigToIframe();
+    if (widget.config.template != oldWidget.config.template && _isReady) {
+      _updateTemplate();
     }
   }
 
-  /// iframe 초기화
-  void _initializeIframe() {
+  /// iframe 생성 및 마운트
+  void _createAndMountIframe() {
     try {
-      print('🎭 [IDevViewerPlatform] iframe 초기화 시작');
+      print('🎭 [IDevViewer] iframe 생성 시작');
 
-      // config를 JSON으로 변환
-      final configJson = jsonEncode(widget.config.toJson());
-      final encodedConfig = Uri.encodeComponent(configJson);
-      final src = '/assets/idev-app/index.html?config=$encodedConfig';
-
-      print('🎭 [IDevViewerPlatform] iframe src: $src');
-
-      // HTML element 먼저 생성
-      final container = html.DivElement()
-        ..id = _iframeId
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.margin = '0'
-        ..style.padding = '0';
-
-      // iframe 생성
+      // iframe 생성 (vanilla-example 방식)
       _iframe = html.IFrameElement()
-        ..src = src
+        ..src = '/assets/idev-app/index.html'
         ..style.width = '100%'
         ..style.height = '100%'
         ..style.border = 'none'
         ..style.margin = '0'
-        ..style.padding = '0';
-
-      // iframe을 container에 추가
-      container.append(_iframe!);
+        ..style.padding = '0'
+        ..allow = 'clipboard-write'
+        ..title = 'IDev Viewer'
+        ..setAttribute('scrolling', 'no');
 
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
-        if (mounted) {
-          setState(() {
-            _isReady = true;
-            _error = null;
-          });
-          widget.onReady?.call();
-        }
+        _postMessageToIframe('init', widget.config.toJson());
       });
 
       // iframe 에러 리스너
@@ -110,34 +88,108 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         }
       });
 
-      // container를 body에 추가 (임시)
-      html.document.body?.append(container);
-      
-      print('✅ iframe 초기화 완료 (container ID: $_iframeId)');
+      // 메시지 리스너 등록
+      html.window.onMessage.listen(_handleMessage);
+
+      print('✅ iframe 생성 완료');
     } catch (e) {
-      print('❌ iframe 초기화 실패: $e');
+      print('❌ iframe 생성 실패: $e');
       if (mounted) {
         setState(() {
-          _error = 'Failed to initialize viewer: $e';
+          _error = 'Failed to create iframe: $e';
         });
       }
     }
   }
 
-  /// iframe에 config 전송
-  void _sendConfigToIframe() {
-    if (_iframe == null || !_isReady) return;
+  /// iframe에 메시지 전송
+  void _postMessageToIframe(String type, [Map<String, dynamic>? data]) {
+    if (_iframe == null) return;
 
     try {
-      final configJson = jsonEncode(widget.config.toJson());
-      final encodedConfig = Uri.encodeComponent(configJson);
-      final newSrc = '/assets/idev-app/index.html?config=$encodedConfig';
-
-      // src를 변경하여 iframe 리로드
-      _iframe!.src = newSrc;
-      print('🔄 iframe src 업데이트: $newSrc');
+      final message = {
+        'type': type,
+        'data': data,
+      };
+      _iframe!.contentWindow?.postMessage(jsonEncode(message), '*');
+      print('📤 iframe에 메시지 전송: $type');
     } catch (e) {
-      print('❌ iframe config 전송 실패: $e');
+      print('❌ 메시지 전송 실패: $e');
+    }
+  }
+
+  /// 메시지 수신 처리
+  void _handleMessage(html.MessageEvent event) {
+    try {
+      if (event.source != _iframe?.contentWindow) return;
+
+      final data = jsonDecode(event.data as String);
+      final type = data['type'] as String?;
+
+      print('📥 iframe 메시지 수신: $type');
+
+      switch (type) {
+        case 'ready':
+          _handleReady(data['data']);
+          break;
+        case 'error':
+          _handleError(data['data']);
+          break;
+        default:
+          print('⚠️ 알 수 없는 메시지 타입: $type');
+      }
+    } catch (e) {
+      print('❌ 메시지 처리 실패: $e');
+    }
+  }
+
+  /// ready 메시지 처리
+  void _handleReady(dynamic data) {
+    print('✅ iframe ready 수신');
+    if (mounted) {
+      setState(() {
+        _isReady = true;
+        _error = null;
+      });
+      widget.onReady?.call();
+
+      // 초기 템플릿 설정
+      if (widget.config.template != null) {
+        _updateTemplate();
+      }
+    }
+  }
+
+  /// error 메시지 처리
+  void _handleError(dynamic data) {
+    print('❌ iframe error 수신: $data');
+    if (mounted) {
+      setState(() {
+        _error = data?.toString() ?? 'Viewer error';
+      });
+    }
+    widget.onEvent?.call(IDevEvent(
+      type: 'error',
+      data: data,
+    ));
+  }
+
+  /// 템플릿 업데이트
+  void _updateTemplate() {
+    if (_iframe == null || widget.config.template == null) return;
+
+    try {
+      final template = {
+        'script': jsonEncode(widget.config.template!['items'] ?? []),
+        'templateId': 0,
+        'templateNm': widget.config.templateName ?? 'viewer',
+        'commitInfo': 'viewer-mode',
+      };
+
+      _postMessageToIframe('updateTemplate', template);
+      print('📝 템플릿 업데이트 전송');
+    } catch (e) {
+      print('❌ 템플릿 업데이트 실패: $e');
     }
   }
 
@@ -193,18 +245,34 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           );
     }
 
-    // HtmlElementView를 사용하여 iframe을 표시
+    // iframe을 표시할 HTML element view
     return HtmlElementView(
-      viewType: _iframeId,
+      viewType: _containerId,
+      onPlatformViewCreated: (int viewId) {
+        // iframe을 DOM에 추가
+        final container = html.document.getElementById(_containerId) 
+          ?? html.DivElement()..id = _containerId;
+        
+        if (_iframe != null && container.children.isEmpty) {
+          container.append(_iframe!);
+          html.document.body?.append(container);
+          print('✅ iframe DOM에 추가됨');
+        }
+      },
     );
   }
 
   @override
   void dispose() {
-    print('🎭 [IDevViewerPlatform] dispose');
-    // iframe 정리
-    final container = html.document.getElementById(_iframeId);
+    print('🎭 [IDevViewer] dispose');
+    
+    // 메시지 리스너 제거
+    html.window.onMessage.drain();
+    
+    // iframe 제거
+    final container = html.document.getElementById(_containerId);
     container?.remove();
+    
     super.dispose();
   }
 }
