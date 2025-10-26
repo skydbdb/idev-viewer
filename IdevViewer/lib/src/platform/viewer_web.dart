@@ -5,6 +5,7 @@ import '../models/viewer_event.dart';
 import '../internal/board/board/viewer/template_viewer_page.dart';
 import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
+import '../internal/core/api/api_endpoint_ide.dart';
 import 'dart:convert';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
@@ -54,6 +55,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     try {
       // Service Locator 초기화
       initViewerServiceLocator();
+
+      // API 및 파라미터 초기화 (home_board.dart와 동일한 루틴)
+      final homeRepo = sl<HomeRepo>();
+      final versionId = 7;
+      final domainId = 10001;
+      
+      homeRepo.versionId = versionId;
+      homeRepo.domainId = domainId;
+
+      print('🎭 [IDevViewerPlatform] API 초기화 시작');
+      // API 초기화는 한 번만 실행
+      homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
+      homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
 
       // 템플릿 데이터가 있으면 스크립트로 변환
       if (widget.config.template != null) {
