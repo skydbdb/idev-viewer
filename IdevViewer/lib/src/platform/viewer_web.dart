@@ -66,7 +66,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // 뷰어 모드로 강제 설정 (BuildMode는 컴파일 타임 상수이므로 런타임에 변경 불가)
       // 대신 Service Locator만 뷰어 모드로 초기화
       initViewerServiceLocator();
-      
+
       // StackBoardController 초기화
       _stackBoardController =
           StackBoardController(boardId: 'idev-viewer-board');
@@ -95,6 +95,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _updateTemplate(Map<String, dynamic> template) {
     try {
       final items = template['items'] as List<dynamic>? ?? [];
+      
+      // 기존 아이템들 모두 제거
+      _stackBoardController.clear();
+      
+      // 새로운 아이템들 생성
       _items = items.map((itemData) {
         // 템플릿 데이터를 StackTextItem으로 변환
         return StackTextItem(
@@ -116,7 +121,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         );
       }).toList();
 
-      // StackBoardController에 아이템 추가
+      // StackBoardController에 새로운 아이템들 추가
       for (final item in _items) {
         _stackBoardController.addItem(item);
       }

@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _updateTemplate() async {
-    if (_isUpdating || !_isReady) return;
+    if (_isUpdating) return;
 
     try {
       setState(() {
