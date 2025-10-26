@@ -46,7 +46,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void initState() {
     super.initState();
-    print('🎭 [IDevViewerPlatform] initState 시작');
 
     // 위젯 트리 빌드 완료 후 초기화
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -56,12 +55,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 뷰어 초기화
   Future<void> _initializeViewer() async {
-    print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
-
     try {
       // AppConfig 초기화
       AppConfig.initialize();
-      print('🎭 [IDevViewerPlatform] AppConfig 초기화 완료');
 
       // Service Locator 초기화
       initViewerServiceLocator();
@@ -70,21 +66,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       const apiKey =
           '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50';
       AuthService.setViewerApiKey(apiKey);
-      print('🔑 [IDevViewerPlatform] 뷰어 API 키 설정 완료');
 
       // 뷰어 인증 초기화
       await AuthService.initializeViewerAuth();
-      print('🔑 [IDevViewerPlatform] 뷰어 인증 초기화 완료');
 
-      // API 및 파라미터 초기화 (home_board.dart와 동일한 루틴)
+      // API 및 파라미터 초기화
       final homeRepo = sl<HomeRepo>();
 
       homeRepo.versionId = versionId;
       homeRepo.domainId = domainId;
 
-      print('🎭 [IDevViewerPlatform] API 초기화 시작');
-
-      // API 초기화는 한 번만 실행
+      // API 초기화
       homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
       homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
 
@@ -92,26 +84,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       homeRepo.getApiIdResponseStream.listen((response) {
         if (response != null) {
           final apiId = response['if_id']?.toString();
-          final status = response['status'];
 
-          print('🎭 [IDevViewerPlatform] API 응답: $apiId, status: $status');
-
-          // 실패 응답도 초기화 완료로 간주 (토큰 없어도 뷰어 모드는 동작 가능)
           if (apiId == ApiEndpointIDE.apis && !_apisInitialized) {
-            print('🎭 [IDevViewerPlatform] APIs 초기화 완료');
             _apisInitialized = true;
-            _checkAndLoadTemplate(homeRepo);
+            _checkAndLoadTemplate();
           } else if (apiId == ApiEndpointIDE.params && !_paramsInitialized) {
-            print('🎭 [IDevViewerPlatform] Params 초기화 완료');
             _paramsInitialized = true;
-            _checkAndLoadTemplate(homeRepo);
+            _checkAndLoadTemplate();
           }
         }
       });
-
-      print('🎭 [IDevViewerPlatform] 뷰어 초기화 완료');
     } catch (e) {
-      print('❌ [IDevViewerPlatform] 뷰어 초기화 실패: $e');
       setState(() {
         _error = 'Failed to initialize viewer: $e';
       });
@@ -119,10 +102,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   }
 
   /// APIs와 Params 초기화가 완료되면 템플릿 로드
-  void _checkAndLoadTemplate(HomeRepo homeRepo) {
+  void _checkAndLoadTemplate() {
     if (_apisInitialized && _paramsInitialized) {
-      print('🎭 [IDevViewerPlatform] APIs와 Params 초기화 완료');
-
       setState(() {
         _isReady = true;
         _error = null;
@@ -137,60 +118,34 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void didUpdateWidget(IDevViewerPlatform oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    print('🔄 didUpdateWidget 호출됨');
-    print('🔄 _isReady: $_isReady');
-    print('🔄 이전 템플릿: ${oldWidget.config.template}');
-    print('🔄 새 템플릿: ${widget.config.template}');
-
     // 초기화가 완료된 후에만 템플릿 업데이트 처리
-    if (!_isReady) {
-      print('🔄 초기화 미완료, 템플릿 업데이트 건너뛰기');
-      return;
-    }
+    if (!_isReady) return;
 
     // 템플릿이 null이고 _currentScript가 null이면 업데이트 건너뛰기
-    // (버튼 클릭 시에만 템플릿 로드)
-    if (widget.config.template == null && _currentScript == null) {
-      print('🔄 템플릿 null, 업데이트 건너뛰기');
-      return;
-    }
+    if (widget.config.template == null && _currentScript == null) return;
 
     // config의 template이 실제로 변경되었는지 확인
-    // templateName이 달라도 template 데이터가 같으면 업데이트하지 않음
     final templateChanged = widget.config.template != oldWidget.config.template;
-    print('🔄 템플릿 데이터 변경: $templateChanged');
 
     if (templateChanged && widget.config.template != null) {
-      print('🔄 템플릿 업데이트 시작');
       _updateTemplate(widget.config.template!);
-    } else {
-      print('🔄 템플릿 변경 없음, 업데이트 건너뛰기');
     }
   }
 
   /// 템플릿 업데이트 - 템플릿 데이터를 JSON 스크립트로 변환
   void _updateTemplate(Map<String, dynamic> template) {
-    print('🔄 _updateTemplate 호출됨');
-    print('🔄 템플릿 데이터: $template');
-
     try {
       // 템플릿 데이터에서 items 배열 추출
       final items = template['items'] as List<dynamic>? ?? [];
-      print('🔄 아이템 개수: ${items.length}');
 
       // items 배열만 JSON으로 변환
       final script = jsonEncode(items);
-      print('🔄 스크립트 변환 완료: ${script.length} 문자');
-      print('🔄 스크립트 미리보기: ${script.substring(0, 100)}...');
 
       setState(() {
         _currentScript = script;
-        _error = null; // 에러 초기화
+        _error = null;
       });
-
-      print('🔄 setState 호출 완료, _currentScript 설정됨');
     } catch (e) {
-      print('❌ 템플릿 업데이트 실패: $e');
       setState(() {
         _error = 'Failed to update template: $e';
       });
@@ -199,7 +154,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   @override
   Widget build(BuildContext context) {
-    print('🎭 [IDevViewerPlatform] build 호출 - _isReady: $_isReady');
 
     if (_error != null && widget.errorBuilder != null) {
       return widget.errorBuilder!(_error!);
@@ -254,12 +208,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     // TemplateViewerPage를 사용하여 100% 동일한 렌더링 보장
     // GetIt에서 등록된 싱글톤 HomeRepo를 사용 (apis 맵 공유)
     return Provider<HomeRepo>(
-      create: (_) {
-        // GetIt에 등록된 싱글톤 HomeRepo 가져오기
-        final homeRepo = sl<HomeRepo>();
-        print('📋 GetIt에서 HomeRepo 싱글톤 가져옴: apis 개수 = ${homeRepo.apis.length}');
-        return homeRepo;
-      },
+      create: (_) => sl<HomeRepo>(),
       child: TemplateViewerPage(
         templateId: 0,
         templateNm: widget.config.templateName ?? 'viewer',

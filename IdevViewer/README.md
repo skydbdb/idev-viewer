@@ -18,7 +18,7 @@ Cross-platform UI template viewer for Flutter applications with **100% identical
 
 | Platform | Status | Implementation |
 |----------|--------|----------------|
-| Web | ✅ Fully Supported | iframe-based viewer |
+| Web | ✅ Fully Supported | Internal Flutter viewer with TemplateViewerPage |
 | Android | 🚧 Coming Soon | WebView-based viewer |
 | iOS | 🚧 Coming Soon | WebView-based viewer |
 | Windows | 🚧 Coming Soon | WebView-based viewer |
@@ -160,6 +160,34 @@ IDevViewer(
   ),
 )
 ```
+
+## Architecture
+
+### Web Implementation
+
+The web platform uses **TemplateViewerPage** from the internal codebase, providing 100% identical rendering with the original IDE.
+
+**Key Components:**
+- **TemplateViewerPage**: Main viewer widget for rendering templates
+- **HomeRepo**: Centralized repository for API management and data handling
+- **Service Locator (GetIt)**: Dependency injection for singleton services
+- **StackBoard**: Layout system for arranging widgets
+- **StackItems**: Various widget types (Frame, Chart, Grid, Search, Text, etc.)
+
+**Architecture Flow:**
+1. Viewer initialization loads API metadata (`apis` and `params`)
+2. Template data is converted to JSON script format
+3. TemplateViewerPage renders using internal Flutter widgets
+4. All components share a single HomeRepo instance via GetIt
+5. API calls from template widgets are routed through HomeRepo
+
+### Benefits of Internal Implementation
+
+- ✅ **No iframe overhead**: Direct Flutter rendering
+- ✅ **Full control**: All source code in Flutter/Dart
+- ✅ **Type safety**: Compile-time error checking
+- ✅ **State management**: Direct integration with Provider pattern
+- ✅ **API handling**: Shared HomeRepo instance across all components
 
 ## For JavaScript Frameworks
 

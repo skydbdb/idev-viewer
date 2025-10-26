@@ -179,25 +179,17 @@ class HomeRepo {
   void addApiRequest(String apiId, Map<String, dynamic> params) {
     final api = apis[apiId];
 
-    print('🔍 addApiRequest 호출됨');
-    print('🔍 요청하는 API ID: $apiId');
-    print('🔍 apis 맵에 등록된 API 개수: ${apis.length}');
-    print('🔍 apis 맵의 키들: ${apis.keys.toList()}');
-    print('🔍 apis[$apiId] 존재 여부: ${api != null}');
-
     Map<String, dynamic> reqParams = Map.from(params);
     reqParams['if_id'] = apiId;
-    
+
     // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 사용
     if (api != null) {
       reqParams['method'] = api['method'];
       reqParams['uri'] = api['uri'];
-      print('✅ API 메타데이터 사용: $apiId');
     } else {
       // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 설정
       reqParams['method'] = 'get'; // 기본값
       reqParams['uri'] = apiId; // API ID를 URI로 사용
-      print('⚠️ HomeRepo: 뷰어 모드 - API 메타데이터 없음, 기본값 사용: $apiId');
     }
 
     reqParams['domainId'] = domainId;
