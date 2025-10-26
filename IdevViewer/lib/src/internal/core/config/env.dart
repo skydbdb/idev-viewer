@@ -87,9 +87,11 @@ class AppConfig {
         };
       case Environment.local:
         return {
-          'aws': 'http://localhost:3000',
-          'legacyBase': 'http://localhost:3000',
-          'legacyHaksa': 'http://localhost:3000',
+          'aws': 'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
+          'legacyBase':
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
+          'legacyHaksa':
+              'https://fuv3je9sl0.execute-api.ap-northeast-2.amazonaws.com',
         };
     }
   }
