@@ -151,7 +151,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   }
 
   /// 아이템 위젯 빌더
-  Widget? _buildItemWidget(StackTextItem item) {
+  Widget? _buildItemWidget(StackItem<StackItemContent> item) {
     // 아이템 타입에 따라 다른 위젯 반환
     final content = item.content;
     if (content == null) return null;
