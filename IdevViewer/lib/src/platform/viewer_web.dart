@@ -7,6 +7,10 @@ import '../internal/board/core/stack_board_controller.dart';
 import '../internal/board/core/case_style.dart';
 import '../internal/board/stack_board_item.dart';
 import '../internal/board/stack_board_items/items/stack_text_item.dart';
+import '../internal/board/stack_board_items/items/stack_frame_item.dart';
+import '../internal/board/stack_board_items/items/stack_chart_item.dart';
+import '../internal/board/stack_board_items/items/stack_search_item.dart';
+import '../internal/board/stack_board_items/items/stack_grid_item.dart';
 import '../internal/pms/di/service_locator.dart';
 import '../internal/repo/home_repo.dart';
 
@@ -38,7 +42,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   late StackBoardController _stackBoardController;
   bool _isReady = false;
   String? _error;
-  List<StackTextItem> _items = [];
+  List<StackItem<StackItemContent>> _items = [];
 
   @override
   void initState() {
@@ -56,7 +60,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('🔄 didUpdateWidget 호출됨');
     print('🔄 이전 템플릿: ${oldWidget.config.template}');
     print('🔄 새 템플릿: ${widget.config.template}');
-    print('🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
+    print(
+        '🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
 
     // config의 template이 변경되었는지 확인
     if (widget.config.template != oldWidget.config.template &&
@@ -110,26 +115,42 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       print('🔄 기존 아이템 제거 중...');
       _stackBoardController.clear();
       
-      // 새로운 아이템들 생성
+      // 새로운 아이템들 생성 - 실제 템플릿 타입에 맞게 변환
       _items = items.map((itemData) {
-        // 템플릿 데이터를 StackTextItem으로 변환
-        return StackTextItem(
-          boardId: 'idev-viewer-board',
-          id: itemData['id'] ??
-              DateTime.now().millisecondsSinceEpoch.toString(),
-          offset: Offset(
-            (itemData['x'] ?? 0).toDouble(),
-            (itemData['y'] ?? 0).toDouble(),
-          ),
-          size: Size(
-            (itemData['width'] ?? 200).toDouble(),
-            (itemData['height'] ?? 100).toDouble(),
-          ),
-          content: TextItemContent(
-            data: itemData['text'] ?? '위젯 ${itemData['id'] ?? 'Unknown'}',
-          ),
-          status: StackItemStatus.idle,
-        );
+        final itemType = itemData['type'] as String? ?? 'Unknown';
+        print('🔄 아이템 타입: $itemType');
+        
+        // 템플릿 데이터를 적절한 StackItem으로 변환
+        switch (itemType) {
+          case 'StackFrameItem':
+            return StackFrameItem.fromJson(itemData);
+          case 'StackChartItem':
+            return StackChartItem.fromJson(itemData);
+          case 'StackSearchItem':
+            return StackSearchItem.fromJson(itemData);
+          case 'StackGridItem':
+            return StackGridItem.fromJson(itemData);
+          case 'StackTextItem':
+            return StackTextItem.fromJson(itemData);
+          default:
+            // 알 수 없는 타입은 StackTextItem으로 변환
+            return StackTextItem(
+              boardId: itemData['boardId'] ?? 'idev-viewer-board',
+              id: itemData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+              offset: Offset(
+                (itemData['offset']?['dx'] ?? itemData['x'] ?? 0).toDouble(),
+                (itemData['offset']?['dy'] ?? itemData['y'] ?? 0).toDouble(),
+              ),
+              size: Size(
+                (itemData['size']?['width'] ?? itemData['width'] ?? 200).toDouble(),
+                (itemData['size']?['height'] ?? itemData['height'] ?? 100).toDouble(),
+              ),
+              content: TextItemContent(
+                data: '${itemType} (${itemData['id'] ?? 'Unknown'})',
+              ),
+              status: StackItemStatus.idle,
+            );
+        }
       }).toList();
 
       print('🔄 새 아이템 생성 완료: ${_items.length}개');
