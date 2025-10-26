@@ -488,6 +488,40 @@ npm publish            # 실제 배포
 
 ---
 
+## 📚 개발자 문서
+
+개발자를 위한 상세 문서:
+
+### Flutter 패키지
+- [뷰어 모드 구현 가이드](docs/VIEWER-MODE-IMPLEMENTATION.md) - 아키텍처 및 구현 상세
+- [뷰어 모드 패치 가이드](docs/VIEWER-MODE-PATCHES.md) - 동기화 후 패치 적용 방법
+- [Scripts](scripts/) - 동기화 및 배포 스크립트
+
+### JavaScript 라이브러리
+- [npm 배포 가이드](docs/npm-deploy-guide.md)
+- [VIEWER API KEY 가이드](docs/VIEWER-API-KEY-GUIDE.md)
+
+---
+
+## 🔄 원본 IDE와 동기화
+
+원본 IDE 소스를 viewer로 동기화하는 방법:
+
+```bash
+# 1. 소스 동기화
+./scripts/sync-idev-core-sources.sh
+
+# 2. 뷰어 모드 패치 적용
+./scripts/apply-viewer-mode-patches.sh
+
+# 3. 의존성 설치 및 빌드
+cd IdevViewer && flutter pub get && flutter build web --dart-define=BUILD_MODE=viewer
+```
+
+상세 내용은 [VIEWER-MODE-PATCHES.md](docs/VIEWER-MODE-PATCHES.md) 참조
+
+---
+
 ## 📞 지원
 
 문제가 있거나 질문이 있으신가요?
