@@ -65,7 +65,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 생성 (vanilla-example 방식)
       // Flutter web 개발 서버에서는 flutter_assets/ 경로 사용
       // 프로덕션 빌드에서는 assets/ 경로 사용
-      final idevAppPath = 'flutter_assets/packages/idev_viewer/assets/idev-app/index.html';
+      const idevAppPath =
+          'flutter_assets/packages/idev_viewer/assets/idev-app/index.html';
 
       print('🎭 [IDevViewer] idev-app 경로: $idevAppPath');
       print('🎭 [IDevViewer] 현재 URL: ${html.window.location.href}');
@@ -80,7 +81,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         ..style.padding = '0'
         ..allow = 'clipboard-write'
         ..title = 'IDev Viewer'
-        ..setAttribute('scrolling', 'no');
+        ..setAttribute('scrolling', 'no')
+        ..setAttribute('allowfullscreen', 'true');
+        
+      // DOM에 추가 (HtmlElementView 사용 안 함)
+      html.document.body?.append(_iframe!);
+      
+      // iframe 요소 확인
+      print('🎭 iframe 요소 확인: ${_iframe?.src}, ${_iframe?.baseUri}');
 
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
