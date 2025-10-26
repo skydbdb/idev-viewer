@@ -26,10 +26,11 @@ All notable changes to the IDevViewer project will be documented in this file.
 
 ### 🔧 Changed
 - `dart:ui`에서 `dart:ui_web`로 마이그레이션 (`platformViewRegistry`)
-- `idevAppPath`를 `viewer-app`으로 변경 (읽기 전용 모드)
+- `idevAppPath`를 `idev-app`으로 사용 (`idev-viewer.js` 포함)
 - Ready 타임아웃을 10초로 증가
 - 컨테이너 ID를 고정값(`idev-viewer-container-singleton`)으로 변경
 - 디버깅 로그 제거 (프로덕션 준비)
+- `viewer-app` 제거하고 `idev-app` 단일 경로로 통합
 
 ### 📚 Documentation
 - 상세한 통합 가이드 작성 (`VIEWER_INTEGRATION_GUIDE.md`)
@@ -46,9 +47,8 @@ All notable changes to the IDevViewer project will be documented in this file.
 - 템플릿 polling 중복 감지 메커니즘
 
 ### 📦 Assets
-- `viewer-app` (읽기 전용 Flutter 앱) 포함
-- `idev-app` (편집 모드, 백업용) 포함
-- `idev-viewer.js` JavaScript 라이브러리 통합
+- `idev-app` (Flutter 앱 + idev-viewer.js) 포함
+- JavaScript 라이브러리 통합 (`idev-viewer.js`)
 
 ---
 

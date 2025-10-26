@@ -40,11 +40,11 @@ IDevViewer는 Flutter Web 애플리케이션에 **읽기 전용(Viewer Mode)** i
 │  │  │ (PlatformView - DOM Container)      │ │ │
 │  │  │                                     │ │ │
 │  │  │  ┌───────────────────────────────┐ │ │ │
-│  │  │  │ <iframe> (viewer-app)         │ │ │ │
+│  │  │  │ <iframe> (idev-app)           │ │ │ │
 │  │  │  │                               │ │ │ │
-│  │  │  │  Flutter Web App (Viewer)     │ │ │ │
-│  │  │  │  - 읽기 전용 모드            │ │ │ │
-│  │  │  │  - 템플릿 렌더링             │ │ │ │
+│  │  │  │  Flutter Web App (iDev)       │ │ │ │
+│  │  │  │  - 템플릿 뷰어               │ │ │ │
+│  │  │  │  - idev-viewer.js            │ │ │ │
 │  │  │  └───────────────────────────────┘ │ │ │
 │  │  └─────────────────────────────────────┘ │ │
 │  └───────────────────────────────────────────┘ │
@@ -62,7 +62,7 @@ IDevViewer는 Flutter Web 애플리케이션에 **읽기 전용(Viewer Mode)** i
 2. 템플릿 업데이트
    Flutter → IdevViewer.updateTemplate() 
          → postMessage 
-         → iframe (viewer-app) 
+         → iframe (idev-app) 
          → Flutter 내부 상태 업데이트
 
 3. Ready 신호
@@ -91,12 +91,12 @@ dependencies:
 ```
 IdevViewer/
 ├── assets/
-│   ├── viewer-app/           # 읽기 전용 Flutter 앱
-│   │   ├── index.html
-│   │   ├── main.dart.js
-│   │   ├── flutter.js
-│   │   └── ...
-│   └── idev-app/             # 편집 모드 (백업용)
+│   └── idev-app/             # iDev Flutter 앱
+│       ├── index.html
+│       ├── main.dart.js
+│       ├── flutter.js
+│       ├── idev-viewer.js    # JavaScript 라이브러리
+│       └── ...
 └── lib/
     └── src/
         └── platform/
@@ -109,11 +109,11 @@ IdevViewer/
 # IdevViewer/pubspec.yaml
 flutter:
   assets:
-    # viewer-app (읽기 전용)
-    - assets/viewer-app/
-    - assets/viewer-app/assets/
-    - assets/viewer-app/canvaskit/
-    - assets/viewer-app/icons/
+    # idev-app (idev-viewer.js 포함)
+    - assets/idev-app/
+    - assets/idev-app/assets/
+    - assets/idev-app/canvaskit/
+    - assets/idev-app/icons/
 ```
 
 ---
@@ -324,7 +324,7 @@ const maxAttempts = 50; // 기본값: 5초
 
 **해결**: 이미 수정됨 - `lastTemplateId` 중복 체크로 방지
 
-### 4. 404 에러 (viewer-app/index.html)
+### 4. 404 에러 (idev-app/index.html)
 
 **원인**: Assets가 pubspec.yaml에 등록되지 않음
 
@@ -332,8 +332,8 @@ const maxAttempts = 50; // 기본값: 5초
 ```yaml
 flutter:
   assets:
-    - assets/viewer-app/
-    - assets/viewer-app/assets/
+    - assets/idev-app/
+    - assets/idev-app/assets/
 ```
 
 ### 5. IdevViewer 클래스를 찾을 수 없음
@@ -342,7 +342,7 @@ flutter:
 
 **해결**:
 ```html
-<!-- viewer-app/index.html -->
+<!-- idev-app/index.html -->
 <script src="idev-viewer.js"></script>
 ```
 
@@ -408,7 +408,7 @@ window.parent.postMessage(JSON.stringify({
 ### 중복 템플릿 방지 로직
 
 ```javascript
-// viewer-app/index.html
+// idev-app/index.html
 var lastTemplateId = null;
 
 function handleMessage(message) {
@@ -450,8 +450,8 @@ Ready 타임아웃을 10초로 설정하여 느린 네트워크에서도 정상 
 
 ### 관련 파일
 - `lib/src/platform/viewer_web.dart` - 메인 구현
-- `assets/viewer-app/index.html` - 뷰어 앱 HTML
-- `idev-viewer-js/src/core/IdevViewer.js` - JavaScript 라이브러리
+- `assets/idev-app/index.html` - iDev 앱 HTML
+- `assets/idev-app/idev-viewer.js` - JavaScript 라이브러리
 
 ### Flutter Web 공식 문서
 - [Platform Views](https://docs.flutter.dev/platform-integration/web/web-specific-code)

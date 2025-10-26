@@ -110,8 +110,7 @@ IdevViewer/
 │       └── platform/              # 플랫폼별 구현
 │           └── viewer_web.dart    # Web 구현
 ├── assets/
-│   ├── viewer-app/                # 읽기 전용 Flutter 앱
-│   └── idev-app/                  # 편집 모드 (백업용)
+│   └── idev-app/                  # iDev Flutter 앱 (idev-viewer.js 포함)
 ├── example/                       # 예제 앱
 ├── VIEWER_INTEGRATION_GUIDE.md    # 상세 가이드
 └── README.md                      # 이 파일

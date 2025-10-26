@@ -201,7 +201,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         'width': '100%',
         'height': '600px',
         'idevAppPath':
-            '/assets/packages/idev_viewer/assets/viewer-app/index.html',
+            '/assets/packages/idev_viewer/assets/idev-app/index.html',
         'autoCreateIframe': true,
         'template': {
           'script': null,
