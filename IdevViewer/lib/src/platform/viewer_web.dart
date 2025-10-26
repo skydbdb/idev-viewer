@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
+import 'dart:js' as js;
 import 'dart:convert';
 import '../models/viewer_config.dart';
 import '../models/viewer_event.dart';
@@ -33,6 +34,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   String? _error;
   html.IFrameElement? _iframe;
   late String _containerId;
+  js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
 
   @override
   void initState() {
@@ -56,117 +58,60 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
   }
 
-  /// iframe 생성 및 마운트
+  /// JavaScript IdevViewer 라이브러리를 사용하여 뷰어 초기화
   void _createAndMountIframe() {
     try {
-      // DOM에 이미 iframe이 존재하면 재사용
-      final existingIframes = html.document.querySelectorAll('iframe');
-      if (existingIframes.isNotEmpty) {
-        _iframe = existingIframes.first as html.IFrameElement;
-        print('♻️ 기존 iframe 재사용: ${_iframe?.src}');
-        return;
+      // IdevViewer JavaScript 클래스 확인
+      final IdevViewerClass = js.context['IdevViewer'];
+      if (IdevViewerClass == null) {
+        throw Exception('IdevViewer JavaScript 라이브러리가 로드되지 않았습니다');
       }
-
-      print('🎭 [IDevViewer] iframe 생성 시작');
-      html.window.console.log('Current URL: ${html.window.location.href}');
-
-      // iframe 생성 (vanilla-example 방식)
-      // Flutter web 개발 서버에서는 flutter_assets/ 경로 사용
-      // 프로덕션 빌드에서는 assets/ 경로 사용
-      const idevAppPath =
-          'flutter_assets/packages/idev_viewer/assets/idev-app/index.html';
-
-      print('🎭 [IDevViewer] idev-app 경로: $idevAppPath');
-      print('🎭 [IDevViewer] 현재 URL: ${html.window.location.href}');
-      html.window.console.log('IDev app path: $idevAppPath');
-
-      _iframe = html.IFrameElement()
-        ..src = idevAppPath
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.border = 'none'
-        ..style.margin = '0'
-        ..style.padding = '0'
-        ..allow = 'clipboard-write'
-        ..title = 'IDev Viewer'
-        ..setAttribute('scrolling', 'no')
-        ..setAttribute('allowfullscreen', 'true');
-
-      // DOM에 추가 (HtmlElementView 사용 안 함)
-      // 이미 DOM에 같은 src의 iframe이 있으면 추가하지 않음
-      final existingSameSrc =
-          html.document.querySelector('iframe[src="$idevAppPath"]');
-      if (existingSameSrc == null) {
-        html.document.body?.append(_iframe!);
-      } else {
-        _iframe = existingSameSrc as html.IFrameElement;
-        print('♻️ 같은 src의 iframe 재사용');
-      }
-
-      // iframe 요소 확인
-      print('🎭 iframe 요소 확인: ${_iframe?.src}, ${_iframe?.baseUri}');
-
-      // 부모 창에서 메시지 수신 리스너 추가
-      html.window.onMessage.listen((event) {
-        if (event.source == _iframe?.contentWindow) {
-          try {
-            final data = jsonDecode(event.data);
-            final type = data['type'];
-            print('📥 iframe 메시지 수신: $type');
-
-            if (type == 'flutter-ready') {
-              print('✅ flutter-ready 수신');
-              if (mounted) {
-                setState(() {
-                  _isReady = true;
-                  _error = null;
-                });
-                widget.onReady?.call();
-
-                // 초기화 메시지 전송
-                final initMessage = jsonEncode({
-                  'type': 'init',
-                  'data': widget.config.toJson(),
-                });
-                _iframe?.contentWindow?.postMessage(initMessage, '*');
-                print('📤 초기화 메시지 전송: init');
-              }
-            }
-          } catch (e) {
-            print('❌ 메시지 처리 실패: $e');
-          }
-        }
-      });
-
-      // iframe 로드 리스너
-      _iframe!.onLoad.listen((_) {
-        print('✅ iframe 로드 완료');
-
-        // 5초 후에도 ready 신호가 오지 않으면 강제로 ready 처리
-        Future.delayed(const Duration(seconds: 5), () {
-          if (!_isReady && mounted) {
-            print('⏰ ready 신호 타임아웃, 강제 ready 처리');
+      
+      print('✅ IdevViewer 라이브러리 로드 확인');
+      
+      // 옵션 객체 생성
+      final options = js.JsObject.jsify({
+        'width': '100%',
+        'height': '600px',
+        'idevAppPath': './idev-app/',
+        'template': {
+          'script': null,
+          'templateId': 0,
+          'templateNm': widget.config.templateName ?? 'viewer',
+          'commitInfo': 'viewer-mode'
+        },
+        'config': {
+          'apiKey': '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50',
+          'theme': 'dark',
+          'locale': 'ko'
+        },
+        'onReady': js.JsFunction.withThis((that, data) {
+          print('✅ 뷰어 준비 완료');
+          if (mounted) {
             setState(() {
               _isReady = true;
               _error = null;
             });
             widget.onReady?.call();
           }
-        });
+        }),
+        'onError': js.JsFunction.withThis((that, error) {
+          print('❌ 뷰어 에러: $error');
+          if (mounted) {
+            setState(() {
+              _error = error.toString();
+            });
+          }
+        }),
       });
-
-      // iframe 에러 리스너
-      _iframe!.onError.listen((e) {
-        print('❌ iframe 에러: $e');
-        html.window.console.error('Iframe error: $e');
-        if (mounted) {
-          setState(() {
-            _error = 'Failed to load viewer iframe';
-          });
-        }
-      });
-
-      print('✅ iframe 생성 완료');
+      
+      // IdevViewer 인스턴스 생성
+      _viewer = js.JsObject(IdevViewerClass, [options]);
+      
+      // 뷰어 마운트
+      _viewer?.callMethod('mount', ['#$_containerId']);
+      
+      print('✅ IdevViewer 인스턴스 생성 및 마운트 완료');
     } catch (e) {
       print('❌ iframe 생성 실패: $e');
       if (mounted) {
@@ -179,21 +124,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 템플릿 업데이트
   void _updateTemplate() {
-    if (_iframe == null || widget.config.template == null) return;
+    if (_viewer == null || widget.config.template == null) return;
 
     try {
-      final template = {
+      final template = js.JsObject.jsify({
         'script': jsonEncode(widget.config.template!['items'] ?? []),
         'templateId': 0,
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
-      };
-
-      final message = jsonEncode({
-        'type': 'updateTemplate',
-        'data': template,
       });
-      _iframe?.contentWindow?.postMessage(message, '*');
+      
+      _viewer?.callMethod('updateTemplate', [template]);
       print('📝 템플릿 업데이트 전송');
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
@@ -252,25 +193,30 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           );
     }
 
-    // iframe을 직접 DOM에 렌더링하므로 빈 Container 반환
-    // iframe은 이미 body에 append되어 있음
-    return const SizedBox(
-      width: double.infinity,
-      height: double.infinity,
+    // viewer container를 HTML로 렌더링
+    return HtmlElementView(
+      viewType: _containerId,
+      onPlatformViewCreated: (int viewId) {
+        // 컨테이너 생성 (IdevViewer가 mount할 곳)
+        final container = html.DivElement()
+          ..id = _containerId
+          ..style.width = '100%'
+          ..style.height = '100%';
+        
+        if (container.parent == null) {
+          html.document.body?.append(container);
+        }
+      },
     );
   }
 
   @override
   void dispose() {
     print('🎭 [IDevViewer] dispose');
-
-    // 메시지 리스너 제거
-    html.window.onMessage.drain();
-
-    // iframe 제거
-    final container = html.document.getElementById(_containerId);
-    container?.remove();
-
+    
+    // IdevViewer 제거
+    _viewer?.callMethod('destroy');
+    
     super.dispose();
   }
 }
