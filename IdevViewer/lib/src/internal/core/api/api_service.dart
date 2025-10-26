@@ -135,7 +135,11 @@ class ApiService {
       finalPayload = cleanData; // token이 제거된 data만 사용
     }
 
-    EasyLoading.show(status: 'loading...');
+    // 뷰어 모드에서는 EasyLoading 사용하지 않음
+    if (BuildMode.isEditor) {
+      EasyLoading.show(status: 'loading...');
+    }
+    
     try {
       ApiResponse response;
 
@@ -197,7 +201,10 @@ class ApiService {
           reason: e.toString(),
           data: {'exception_type': e.runtimeType.toString()});
     } finally {
-      EasyLoading.dismiss();
+      // 뷰어 모드에서는 EasyLoading dismiss하지 않음
+      if (BuildMode.isEditor) {
+        EasyLoading.dismiss();
+      }
     }
   }
 }

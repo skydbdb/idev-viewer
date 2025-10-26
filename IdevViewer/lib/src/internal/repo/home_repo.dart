@@ -181,7 +181,7 @@ class HomeRepo {
 
     Map<String, dynamic> reqParams = Map.from(params);
     reqParams['if_id'] = apiId;
-    
+
     // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 사용
     if (api != null) {
       reqParams['method'] = api['method'];
@@ -192,7 +192,7 @@ class HomeRepo {
       reqParams['uri'] = apiId; // API ID를 URI로 사용
       print('HomeRepo: 뷰어 모드 - API 메타데이터 없음, 기본값 사용: $apiId');
     }
-    
+
     reqParams['domainId'] = domainId;
 
     // reqParams에서 값이 비어있는 항목을 제거 (단, domainId, method, uri는 유지)
@@ -743,9 +743,21 @@ class HomeRepo {
     }
 
     if (apiId == ApiEndpointIDE.apis) {
-      initApis(successData['data']['result']);
+      final data = successData['data'];
+      if (data != null && data['result'] != null) {
+        print('HomeRepo: APIs 데이터 구조 확인 완료');
+        initApis(data['result']);
+      } else {
+        print('HomeRepo: APIs 데이터 구조 오류 - data: $data');
+      }
     } else if (apiId == ApiEndpointIDE.params) {
-      initParams(successData['data']['result']);
+      final data = successData['data'];
+      if (data != null && data['result'] != null) {
+        print('HomeRepo: Params 데이터 구조 확인 완료');
+        initParams(data['result']);
+      } else {
+        print('HomeRepo: Params 데이터 구조 오류 - data: $data');
+      }
     }
 
     printResponseLog(successData['data']);
