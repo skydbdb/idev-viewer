@@ -33,16 +33,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
   late String _containerId;
+  
+  // 전역 플래그로 첫 번째 초기화 추적
+  static bool _hasInitialized = false;
 
   @override
   void initState() {
     super.initState();
 
-    print('🎬 initState 호출됨');
+    print('🎬 initState 호출됨 (count: ${_hasInitialized ? '2nd+' : '1st'})');
 
     // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
     final existingViewer = js.context['_idevViewerInstance'];
-    
+
     // 모든 iframe 확인 (더 광범위한 검색)
     final allIframes = html.document.querySelectorAll('iframe');
     final hasIframe = allIframes.isNotEmpty;
@@ -52,14 +55,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('  - Total iframes: ${allIframes.length}');
     if (allIframes.isNotEmpty) {
       for (var iframe in allIframes) {
-        print('    - iframe id: ${iframe.id}, src: ${iframe.getAttribute('src')}');
+        print(
+            '    - iframe id: ${iframe.id}, src: ${iframe.getAttribute('src')}');
       }
     }
     print(
         '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
-    // React의 useRef 패턴: 이미 뷰어가 존재하거나 iframe이 있으면 재사용
-    if (existingViewer != null || hasIframe) {
+    // 이미 한 번 초기화되었거나, 뷰어 인스턴스가 존재하면 재사용
+    if (_hasInitialized || existingViewer != null || hasIframe) {
       print('♻️ 기존 뷰어/iframe 재사용 (중복 초기화 방지)');
       setState(() {
         _isReady = true;
@@ -68,7 +72,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       return;
     }
 
-    print('🆕 새 뷰어 인스턴스 생성 시작');
+    // 첫 번째 초기화 플래그 설정
+    _hasInitialized = true;
+    print('🆕 새 뷰어 인스턴스 생성 시작 (첫 번째 초기화)');
 
     _containerId =
         'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
