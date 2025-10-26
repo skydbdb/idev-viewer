@@ -82,7 +82,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       final options = js.JsObject.jsify({
         'width': '100%',
         'height': '600px',
-        'idevAppPath': './idev-app/',
+        'idevAppPath': '/assets/packages/idev_viewer/assets/idev-app/index.html',
+        'autoCreateIframe': true,
         'template': {
           'script': null,
           'templateId': 0,
@@ -118,8 +119,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // IdevViewer 인스턴스 생성
       _viewer = js.JsObject(IdevViewerClass, [options]);
 
+      print('🔍 _viewer 인스턴스 생성 완료, mount 시도...');
+
       // 뷰어 마운트
       _viewer?.callMethod('mount', ['#$_containerId']);
+
+      print('🔍 mount 호출 완료');
 
       print('✅ IdevViewer 인스턴스 생성 및 마운트 완료');
 
