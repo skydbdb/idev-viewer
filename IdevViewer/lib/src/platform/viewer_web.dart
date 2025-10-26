@@ -125,6 +125,18 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
+        
+        // 5초 후에도 ready 신호가 오지 않으면 강제로 ready 처리
+        Future.delayed(const Duration(seconds: 5), () {
+          if (!_isReady && mounted) {
+            print('⏰ ready 신호 타임아웃, 강제 ready 처리');
+            setState(() {
+              _isReady = true;
+              _error = null;
+            });
+            widget.onReady?.call();
+          }
+        });
       });
 
       // iframe 에러 리스너
