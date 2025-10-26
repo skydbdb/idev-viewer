@@ -135,8 +135,9 @@
 
     // 부모 창으로부터 postMessage 수신 리스너 추가
     window.addEventListener('message', function (event) {
-      // 부모 창에서 온 메시지만 처리 (무한 루프 방지)
-      if (!event.source || event.source === window) {
+      // 자기 자신이 보낸 메시지도 허용 (폴링에서 보낸 메시지)
+      // 단, CustomEvent는 무시 (무한 루프 방지)
+      if (event.source !== window && event.source !== window.parent && event.source !== null) {
         return;
       }
 
@@ -200,31 +201,26 @@
 
           // 템플릿 폴링 시작 (ExternalMessageHandler가 처리할 수 있도록)
           var lastTemplateId = null;
-          setInterval(function() {
+          setInterval(function () {
             if (window._idevTemplate) {
               var currentTemplateId = window._idevTemplate.templateId;
               if (currentTemplateId && currentTemplateId !== lastTemplateId) {
                 console.log('🔄 [idev-app] 새 템플릿 감지:', currentTemplateId);
                 lastTemplateId = currentTemplateId;
-                
+
                 // ExternalMessageHandler가 처리할 수 있는 형식으로 메시지 생성
                 var templateMessage = {
                   type: 'update_template',
                   template: window._idevTemplate,
                   timestamp: Date.now()
                 };
-                
+
                 console.log('📤 [idev-app] Flutter 앱에 update_template 전송');
-                console.log('📤 [idev-app] 템플릿 데이터:', templateMessage);
-                
-                // MessageEvent로 window.onMessage에 전달
-                var messageEvent = new MessageEvent('message', {
-                  data: templateMessage,
-                  origin: window.location.origin,
-                  source: null  // 외부 소스로 인식되도록
-                });
-                window.dispatchEvent(messageEvent);
-                console.log('✅ [idev-app] MessageEvent 발생 완료');
+                console.log('📤 [idev-app] 템플릿 데이터:', JSON.stringify(templateMessage).substring(0, 200) + '...');
+
+                // 자기 자신에게 postMessage 전송 (html.window.onMessage가 받을 수 있도록)
+                window.postMessage(templateMessage, window.location.origin);
+                console.log('✅ [idev-app] postMessage 전송 완료');
               }
             }
           }, 500); // 0.5초마다 체크
