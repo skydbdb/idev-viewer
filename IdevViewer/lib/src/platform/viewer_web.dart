@@ -33,15 +33,21 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
   late String _containerId;
-  js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
-  bool _isInitialized = false; // 초기화 완료 여부
+  
+  // static으로 변경하여 Hot Reload 시에도 유지
+  static bool _isGloballyInitialized = false;
+  static js.JsObject? _globalViewer; // 전역 IdevViewer 인스턴스
 
   @override
   void initState() {
     super.initState();
     
-    if (_isInitialized) {
-      print('⚠️ 이미 초기화됨, skip');
+    if (_isGloballyInitialized) {
+      print('⚠️ 이미 전역적으로 초기화됨, skip');
+      // 이미 초기화된 경우 ready 상태로 설정
+      setState(() {
+        _isReady = true;
+      });
       return;
     }
 
@@ -56,10 +62,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     html.document.body?.append(container);
 
-    // iframe 생성 및 마운트 (한 번만 실행)
+    // iframe 생성 및 마운트 (전역적으로 한 번만 실행)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_isInitialized) {
-        _isInitialized = true;
+      if (!_isGloballyInitialized) {
+        _isGloballyInitialized = true;
+        print('🔧 전역 초기화 플래그 설정');
         Future.delayed(const Duration(milliseconds: 500), () {
           _createAndMountIframe();
         });
@@ -81,11 +88,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _createAndMountIframe() {
     try {
       // Hot reload 시 이전 iframe 제거
-      if (_viewer != null) {
+      if (_globalViewer != null) {
         print('🗑️ 기존 IdevViewer 인스턴스 제거');
-        _viewer = null;
+        _globalViewer = null;
       }
-
+      
       final existingIframes = html.document.querySelectorAll('iframe');
       for (final iframe in existingIframes) {
         if (iframe.id.contains('idev-viewer-')) {
@@ -126,16 +133,16 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         },
         'onReady': js.JsFunction.withThis((that, data) {
           print('✅ 뷰어 준비 완료');
-          if (mounted && _viewer != null) {
+          if (mounted && _globalViewer != null) {
             // IdevViewer의 isReady도 강제로 true로 설정
             try {
               // JsObject에서 속성 설정
-              _viewer!['isReady'] = true;
+              _globalViewer!['isReady'] = true;
               print('✅ IdevViewer.isReady를 true로 설정');
             } catch (e) {
               print('⚠️ isReady 설정 실패: $e');
             }
-
+            
             setState(() {
               _isReady = true;
               _error = null;
@@ -154,12 +161,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       });
 
       // IdevViewer 인스턴스 생성
-      _viewer = js.JsObject(IdevViewerClass, [options]);
+      _globalViewer = js.JsObject(IdevViewerClass, [options]);
 
-      print('🔍 _viewer 인스턴스 생성 완료, mount 시도...');
+      print('🔍 _globalViewer 인스턴스 생성 완료, mount 시도...');
 
       // 뷰어 마운트
-      _viewer?.callMethod('mount', ['#$_containerId']);
+      _globalViewer?.callMethod('mount', ['#$_containerId']);
 
       print('🔍 mount 호출 완료');
 
@@ -188,9 +195,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 템플릿 업데이트
   void _updateTemplate() {
-    if (_viewer == null || widget.config.template == null) {
+    if (_globalViewer == null || widget.config.template == null) {
       print(
-          '⚠️ _updateTemplate: _viewer=${_viewer != null}, template=${widget.config.template != null}');
+          '⚠️ _updateTemplate: _globalViewer=${_globalViewer != null}, template=${widget.config.template != null}');
       return;
     }
 
@@ -213,11 +220,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       print(
           '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
-      print('🔍 _viewer 정보: ${_viewer != null ? 'exist' : 'null'}');
-      if (_viewer != null) {
+      print('🔍 _globalViewer 정보: ${_globalViewer != null ? 'exist' : 'null'}');
+      if (_globalViewer != null) {
         try {
-          print('🔍 _viewer.callMethod 시도...');
-          _viewer!.callMethod('updateTemplate', [template]);
+          print('🔍 _globalViewer.callMethod 시도...');
+          _globalViewer!.callMethod('updateTemplate', [template]);
           print('✅ updateTemplate 호출 완료');
 
           // 디버깅: 생성된 template 객체 확인
@@ -227,7 +234,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           print('❌ 상세: ${StackTrace.current}');
         }
       } else {
-        print('⚠️ _viewer가 null입니다');
+        print('⚠️ _globalViewer가 null입니다');
       }
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
@@ -303,8 +310,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void dispose() {
     print('🎭 [IDevViewer] dispose');
 
-    // IdevViewer 제거
-    _viewer?.callMethod('destroy');
+    // IdevViewer 제거 (전역 인스턴스는 유지, 개별 위젯만 정리)
+    // _globalViewer?.callMethod('destroy');
 
     super.dispose();
   }
