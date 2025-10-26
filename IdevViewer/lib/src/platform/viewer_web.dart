@@ -31,7 +31,7 @@ class IDevViewerPlatform extends StatefulWidget {
 
 class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
-  bool _isInitialized = false; // 초기화 플래그
+  static bool _isInitialized = false; // 초기화 플래그 (static으로 변경)
   String? _error;
   late String _containerId;
   js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
@@ -191,11 +191,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       if (_viewer != null) {
         try {
           print('🔍 _viewer.callMethod 시도...');
-      _viewer!.callMethod('updateTemplate', [template]);
-      print('✅ updateTemplate 호출 완료');
-      
-      // 디버깅: 생성된 template 객체 확인
-      print('🔍 template 내용: $template');
+          _viewer!.callMethod('updateTemplate', [template]);
+          print('✅ updateTemplate 호출 완료');
+
+          // 디버깅: 생성된 template 객체 확인
+          print('🔍 template 내용: $template');
         } catch (e) {
           print('❌ callMethod 실패: $e');
           print('❌ 상세: ${StackTrace.current}');
