@@ -85,7 +85,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('🔄 didUpdateWidget 호출됨');
     print('🔄 이전 템플릿: ${oldWidget.config.template}');
     print('🔄 새 템플릿: ${widget.config.template}');
-    print('🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
+    print(
+        '🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
 
     // config의 template이 변경되었는지 확인
     if (widget.config.template != oldWidget.config.template &&
@@ -101,8 +102,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('🔄 템플릿 데이터: $template');
 
     try {
-      // 템플릿 데이터를 JSON 문자열로 변환
-      final script = jsonEncode(template);
+      // 템플릿 데이터에서 items 배열 추출
+      final items = template['items'] as List<dynamic>? ?? [];
+      print('🔄 아이템 개수: ${items.length}');
+
+      // items 배열만 JSON으로 변환
+      final script = jsonEncode(items);
       print('🔄 스크립트 변환 완료: ${script.length} 문자');
 
       setState(() {
