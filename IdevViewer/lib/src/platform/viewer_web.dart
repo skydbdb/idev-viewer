@@ -42,16 +42,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.initState();
 
     print('🎬 initState 호출됨');
-    print('  - _idevViewerInitialized: ${js.context['_idevViewerInitialized']}');
     print('  - _globalViewer: ${_globalViewer != null ? 'exist' : 'null'}');
-    print('  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
+    print(
+        '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
-    // JavaScript 전역 변수로 초기화 여부 확인 (Hot Restart에도 유지)
-    final isAlreadyInitialized = js.context['_idevViewerInitialized'] == true;
-
-    if (isAlreadyInitialized && _globalViewer != null) {
-      print('⚠️ 이미 전역적으로 초기화됨, skip');
-      // 이미 초기화된 경우 ready 상태로 설정
+    // React의 useRef 패턴: 이미 뷰어가 존재하면 재사용
+    if (_globalViewer != null) {
+      print('♻️ 기존 뷰어 인스턴스 재사용');
       setState(() {
         _isReady = true;
       });
@@ -59,14 +56,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       return;
     }
 
-    // 즉시 플래그 설정 (비동기 콜백 전에)
-    if (js.context['_idevViewerInitialized'] != true) {
-      js.context['_idevViewerInitialized'] = true;
-      print('🔧 전역 초기화 플래그 설정 (JavaScript, 동기)');
-    } else {
-      print('⚠️ 플래그는 이미 설정되었지만 _globalViewer가 null, skip');
-      return;
-    }
+    print('🆕 새 뷰어 인스턴스 생성 시작');
 
     _containerId =
         'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
