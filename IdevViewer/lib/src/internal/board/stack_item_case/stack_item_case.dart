@@ -781,12 +781,15 @@ class _StackItemCaseState extends State<StackItemCase> {
   Widget _buildDefaultContent(BuildContext context, StackItem<StackItemContent> item) {
     // 뷰어 모드 또는 강제 뷰어 모드에서는 안전한 기본 콘텐츠 제공
     if (BuildMode.isViewer || widget.forceViewerMode) {
+      // 디버깅을 위한 콘텐츠 정보 표시
+      final contentInfo = item.content?.runtimeType.toString() ?? 'Unknown';
+      
       return Container(
         width: item.size.width,
         height: item.size.height,
         decoration: BoxDecoration(
-          color: Colors.grey[50],
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          color: Colors.blue[50],
+          border: Border.all(color: Colors.blue[300]!, width: 2),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
@@ -796,14 +799,23 @@ class _StackItemCaseState extends State<StackItemCase> {
               Icon(
                 Icons.widgets,
                 size: 32,
-                color: Colors.grey[400],
+                color: Colors.blue[400],
               ),
               const SizedBox(height: 8),
               Text(
-                '위젯',
+                '위젯 ($contentInfo)',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Colors.blue[600],
                   fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                '${item.size.width.toInt()}x${item.size.height.toInt()}',
+                style: TextStyle(
+                  color: Colors.blue[500],
+                  fontSize: 10,
                 ),
               ),
             ],
