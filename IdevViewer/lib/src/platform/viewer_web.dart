@@ -218,21 +218,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           );
     }
 
-    // iframe을 표시할 HTML element view
-    return HtmlElementView(
-      viewType: _containerId,
-      onPlatformViewCreated: (int viewId) {
-        // iframe을 DOM에 추가
-        final container =
-            html.document.getElementById(_containerId) ?? html.DivElement()
-              ..id = _containerId;
-
-        if (_iframe != null && container.children.isEmpty) {
-          container.append(_iframe!);
-          html.document.body?.append(container);
-          print('✅ iframe DOM에 추가됨');
-        }
-      },
+    // iframe을 직접 DOM에 렌더링하므로 빈 Container 반환
+    // iframe은 이미 body에 append되어 있음
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
     );
   }
 
