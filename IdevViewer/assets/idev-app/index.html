@@ -90,7 +90,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "1854382354";
+    const serviceWorkerVersion = "717589462";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
@@ -117,7 +117,7 @@
         if (message.type === 'update_template' && message.template) {
           window._idevTemplate = message.template;
           console.log('✅ [idev-app] 템플릿 저장 완료');
-
+          
           // CustomEvent 발생 (Flutter가 리스닝)
           var event = new CustomEvent('idev-template-update', {
             detail: message.template

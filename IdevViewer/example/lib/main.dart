@@ -221,7 +221,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
-                  onPressed: (!_isInitialized && !_isLoading) ? _initViewer : null,
+                  onPressed:
+                      (!_isInitialized && !_isLoading) ? _initViewer : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -231,7 +232,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: (_isReady && !_isUpdating) ? _updateTemplate : null,
+                  onPressed:
+                      (_isReady && !_isUpdating) ? _updateTemplate : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -389,7 +391,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 4),
                             ),
-                            child: const Text('클리어', style: TextStyle(fontSize: 12)),
+                            child: const Text('클리어',
+                                style: TextStyle(fontSize: 12)),
                           ),
                       ],
                     ),
