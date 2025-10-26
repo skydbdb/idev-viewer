@@ -63,18 +63,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       html.window.console.log('Current URL: ${html.window.location.href}');
 
       // iframe 생성 (vanilla-example 방식)
-      // Flutter web에서는 상대 경로를 사용해야 함
-      // 개발 서버에서는 assets/로 시작하거나 절대 경로 /assets/ 사용
-      final currentHost = html.window.location.href;
-      final idevAppPath = 'assets/packages/idev_viewer/assets/idev-app/index.html';
+      // Flutter web 개발 서버에서는 flutter_assets/ 경로 사용
+      // 프로덕션 빌드에서는 assets/ 경로 사용
+      final idevAppPath = 'flutter_assets/packages/idev_viewer/assets/idev-app/index.html';
 
       print('🎭 [IDevViewer] idev-app 경로: $idevAppPath');
-      print('🎭 [IDevViewer] 현재 URL: $currentHost');
+      print('🎭 [IDevViewer] 현재 URL: ${html.window.location.href}');
       html.window.console.log('IDev app path: $idevAppPath');
-      
-      // 파일 존재 여부 확인
-      final fullPath = '${html.window.location.origin}/$idevAppPath';
-      print('🎭 [IDevViewer] 전체 경로: $fullPath');
 
       _iframe = html.IFrameElement()
         ..src = idevAppPath
