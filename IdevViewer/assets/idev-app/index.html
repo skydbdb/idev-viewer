@@ -128,6 +128,11 @@
 
     // 부모 창으로부터 postMessage 수신 리스너 추가
     window.addEventListener('message', function (event) {
+      // 자기 자신이 발생시킨 이벤트는 무시 (무한 루프 방지)
+      if (event.source === window) {
+        return;
+      }
+
       console.log('📥 [idev-app] postMessage 수신:', event.data);
 
       try {
