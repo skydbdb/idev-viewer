@@ -25,6 +25,6 @@ void initViewerServiceLocator() {
   sl.registerLazySingleton<ApiService>(
       () => ApiService(apiClient: sl<ApiClient>()));
   
-  // 뷰어 모드에서 HomeRepo도 등록
+  // 뷰어 모드에서 HomeRepo는 LazySingleton으로 등록 (단일 인스턴스)
   sl.registerLazySingleton<HomeRepo>(() => HomeRepo());
 }

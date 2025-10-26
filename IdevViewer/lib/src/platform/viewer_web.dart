@@ -252,12 +252,12 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
 
     // TemplateViewerPage를 사용하여 100% 동일한 렌더링 보장
+    // GetIt에서 등록된 싱글톤 HomeRepo를 사용 (apis 맵 공유)
     return Provider<HomeRepo>(
       create: (_) {
-        final homeRepo = HomeRepo();
-        // versionId와 domainId 설정
-        homeRepo.versionId = versionId;
-        homeRepo.domainId = domainId;
+        // GetIt에 등록된 싱글톤 HomeRepo 가져오기
+        final homeRepo = sl<HomeRepo>();
+        print('📋 GetIt에서 HomeRepo 싱글톤 가져옴: apis 개수 = ${homeRepo.apis.length}');
         return homeRepo;
       },
       child: TemplateViewerPage(
