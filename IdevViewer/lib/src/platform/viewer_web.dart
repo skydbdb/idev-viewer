@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/viewer_config.dart';
 import '../models/viewer_event.dart';
 import '../internal/board/board/stack_board.dart';
@@ -6,6 +7,8 @@ import '../internal/board/core/stack_board_controller.dart';
 import '../internal/board/core/case_style.dart';
 import '../internal/board/stack_board_item.dart';
 import '../internal/board/stack_board_items/items/stack_text_item.dart';
+import '../internal/pms/di/service_locator.dart';
+import '../internal/repo/home_repo.dart';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
 ///
@@ -60,6 +63,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// 뷰어 초기화
   void _initializeViewer() {
     try {
+      // Service Locator 초기화 (뷰어 모드)
+      initViewerServiceLocator();
+      
       // StackBoardController 초기화
       _stackBoardController =
           StackBoardController(boardId: 'idev-viewer-board');
@@ -136,21 +142,24 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
 
     // internal 코드를 직접 사용하여 StackBoard 렌더링
-    return StackBoard(
-      id: 'idev-viewer-board',
-      controller: _stackBoardController,
-      customBuilder: _buildItemWidget,
-      caseStyle: const CaseStyle(
-        frameBorderWidth: 1.0,
-        frameBorderColor: Colors.grey,
+    return Provider<HomeRepo>(
+      create: (_) => HomeRepo(),
+      child: StackBoard(
+        id: 'idev-viewer-board',
+        controller: _stackBoardController,
+        customBuilder: _buildItemWidget,
+        caseStyle: const CaseStyle(
+          frameBorderWidth: 1.0,
+          frameBorderColor: Colors.grey,
+        ),
+        onTap: (item) {
+          // 아이템 탭 이벤트 처리
+          widget.onEvent?.call(IDevEvent(
+            type: 'item_tap',
+            data: {'itemId': item.id, 'item': item.toJson()},
+          ));
+        },
       ),
-      onTap: (item) {
-        // 아이템 탭 이벤트 처리
-        widget.onEvent?.call(IDevEvent(
-          type: 'item_tap',
-          data: {'itemId': item.id, 'item': item.toJson()},
-        ));
-      },
     );
   }
 
