@@ -145,11 +145,16 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       return;
     }
 
-    // config의 template이 변경되었는지 확인
-    if (widget.config.template != oldWidget.config.template &&
-        widget.config.template != null) {
+    // config의 template이 실제로 변경되었는지 확인
+    // templateName이 달라도 template 데이터가 같으면 업데이트하지 않음
+    final templateChanged = widget.config.template != oldWidget.config.template;
+    print('🔄 템플릿 데이터 변경: $templateChanged');
+    
+    if (templateChanged && widget.config.template != null) {
       print('🔄 템플릿 업데이트 시작');
       _updateTemplate(widget.config.template!);
+    } else {
+      print('🔄 템플릿 변경 없음, 업데이트 건너뛰기');
     }
   }
 
