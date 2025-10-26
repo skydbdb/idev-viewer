@@ -53,17 +53,18 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 뷰어 초기화
   Future<void> _initializeViewer() async {
-      print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
+    print('🎭 [IDevViewerPlatform] 뷰어 초기화 시작');
 
     try {
       // Service Locator 초기화
       initViewerServiceLocator();
 
       // 뷰어 API 키 설정
-      const apiKey = '5b08a46031ecd3e644cfced3a9bd43138b39873fd6f84e125c86ebfe1401668721c8efe37f8e5fe884cab898daad4b90627e375d89071a7d8015b3c4ab6d01a3';
+      const apiKey =
+          '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50';
       AuthService.setViewerApiKey(apiKey);
       print('🔑 [IDevViewerPlatform] 뷰어 API 키 설정 완료');
-      
+
       // 뷰어 인증 초기화
       await AuthService.initializeViewerAuth();
       print('🔑 [IDevViewerPlatform] 뷰어 인증 초기화 완료');
@@ -132,10 +133,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.didUpdateWidget(oldWidget);
 
     print('🔄 didUpdateWidget 호출됨');
+    print('🔄 _isReady: $_isReady');
     print('🔄 이전 템플릿: ${oldWidget.config.template}');
     print('🔄 새 템플릿: ${widget.config.template}');
     print(
         '🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
+
+    // 초기화가 완료된 후에만 템플릿 업데이트 처리
+    if (!_isReady) {
+      print('🔄 초기화 미완료, 템플릿 업데이트 건너뛰기');
+      return;
+    }
 
     // config의 template이 변경되었는지 확인
     if (widget.config.template != oldWidget.config.template &&
