@@ -146,7 +146,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 템플릿 업데이트
   void _updateTemplate() {
-    if (_viewer == null || widget.config.template == null) return;
+    if (_viewer == null || widget.config.template == null) {
+      print('⚠️ _updateTemplate: _viewer=${_viewer != null}, template=${widget.config.template != null}');
+      return;
+    }
 
     try {
       final template = js.JsObject.jsify({
@@ -155,11 +158,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
-
+      
+      print('📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
       _viewer?.callMethod('updateTemplate', [template]);
-      print('📝 템플릿 업데이트 전송');
+      print('✅ updateTemplate 호출 완료');
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
+      print('❌ 스택 추적: ${StackTrace.current}');
     }
   }
 
