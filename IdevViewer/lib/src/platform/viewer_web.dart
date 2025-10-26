@@ -53,9 +53,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void didUpdateWidget(IDevViewerPlatform oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    print('🔄 didUpdateWidget 호출됨');
+    print('🔄 이전 템플릿: ${oldWidget.config.template}');
+    print('🔄 새 템플릿: ${widget.config.template}');
+    print('🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
+
     // config의 template이 변경되었는지 확인
     if (widget.config.template != oldWidget.config.template &&
         widget.config.template != null) {
+      print('🔄 템플릿 업데이트 시작');
       _updateTemplate(widget.config.template!);
     }
   }
@@ -93,10 +99,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// 템플릿 업데이트
   void _updateTemplate(Map<String, dynamic> template) {
+    print('🔄 _updateTemplate 호출됨');
+    print('🔄 템플릿 데이터: $template');
+    
     try {
       final items = template['items'] as List<dynamic>? ?? [];
+      print('🔄 아이템 개수: ${items.length}');
       
       // 기존 아이템들 모두 제거
+      print('🔄 기존 아이템 제거 중...');
       _stackBoardController.clear();
       
       // 새로운 아이템들 생성
@@ -121,13 +132,18 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         );
       }).toList();
 
+      print('🔄 새 아이템 생성 완료: ${_items.length}개');
+
       // StackBoardController에 새로운 아이템들 추가
       for (final item in _items) {
         _stackBoardController.addItem(item);
       }
 
+      print('🔄 StackBoardController에 아이템 추가 완료');
       setState(() {});
+      print('🔄 setState 호출 완료');
     } catch (e) {
+      print('❌ 템플릿 업데이트 실패: $e');
       setState(() {
         _error = 'Failed to update template: $e';
       });

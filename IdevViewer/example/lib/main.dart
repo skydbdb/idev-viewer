@@ -8,7 +8,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -75,6 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _updateTemplate() async {
+    print('🔄 main.dart _updateTemplate 호출됨');
+    print('🔄 _isUpdating: $_isUpdating');
+    
     if (_isUpdating) return;
 
     try {
@@ -83,13 +86,16 @@ class _MyHomePageState extends State<MyHomePage> {
         _events.add('템플릿 업데이트 시작');
       });
 
+      print('🔄 test-template.json 로드 중...');
       // test-template.json 다시 로드
       final String jsonString = await rootBundle.loadString(
         'assets/test-template.json',
       );
       final List<dynamic> templateList = jsonDecode(jsonString);
+      print('🔄 템플릿 로드 완료: ${templateList.length}개 아이템');
 
       final newTemplateData = {'items': templateList};
+      print('🔄 새 템플릿 데이터: $newTemplateData');
 
       setState(() {
         _templateData = newTemplateData;
@@ -105,7 +111,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _isUpdating = false;
         _events.add('템플릿 업데이트 완료');
       });
+      
+      print('🔄 setState 완료, _currentConfig 업데이트됨');
     } catch (e) {
+      print('❌ main.dart 템플릿 업데이트 실패: $e');
       setState(() {
         _isUpdating = false;
         _events.add('템플릿 업데이트 실패: $e');
@@ -181,14 +190,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: _isUpdating ? null : _updateTemplate,
-                    icon:
-                        _isUpdating
-                            ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                            : const Icon(Icons.refresh),
+                    icon: _isUpdating
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.refresh),
                     label: Text(_isUpdating ? '업데이트 중...' : '템플릿 업데이트'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -207,59 +215,57 @@ class _MyHomePageState extends State<MyHomePage> {
           // Viewer
           Expanded(
             flex: 3,
-            child:
-                _isLoading || _currentConfig == null
-                    ? const Center(
+            child: _isLoading || _currentConfig == null
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('템플릿 로딩 중...'),
+                      ],
+                    ),
+                  )
+                : IDevViewer(
+                    config: _currentConfig!,
+                    onReady: _onReady,
+                    onEvent: _onEvent,
+                    loadingWidget: const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircularProgressIndicator(),
                           SizedBox(height: 16),
-                          Text('템플릿 로딩 중...'),
+                          Text('IDev Viewer 시작 중...'),
                         ],
                       ),
-                    )
-                    : IDevViewer(
-                      config: _currentConfig!,
-                      onReady: _onReady,
-                      onEvent: _onEvent,
-                      loadingWidget: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text('IDev Viewer 시작 중...'),
-                          ],
-                        ),
-                      ),
-                      errorBuilder:
-                          (error) => Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                  size: 48,
-                                ),
-                                const SizedBox(height: 16),
-                                Text('오류: $error'),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _isLoading = true;
-                                      _events.clear();
-                                    });
-                                    _loadTemplate();
-                                  },
-                                  child: const Text('다시 시도'),
-                                ),
-                              ],
-                            ),
-                          ),
                     ),
+                    errorBuilder: (error) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error,
+                            color: Colors.red,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 16),
+                          Text('오류: $error'),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _isLoading = true;
+                                _events.clear();
+                              });
+                              _loadTemplate();
+                            },
+                            child: const Text('다시 시도'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
 
           // Events log
@@ -296,35 +302,34 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   const Divider(height: 1),
                   Expanded(
-                    child:
-                        _events.isEmpty
-                            ? const Center(
-                              child: Text(
-                                '아직 이벤트가 없습니다',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            )
-                            : ListView.builder(
-                              itemCount: _events.length,
-                              reverse: true,
-                              itemBuilder: (context, index) {
-                                final eventIndex = _events.length - 1 - index;
-                                return ListTile(
-                                  dense: true,
-                                  leading: Text(
-                                    '${eventIndex + 1}',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    _events[eventIndex],
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                );
-                              },
+                    child: _events.isEmpty
+                        ? const Center(
+                            child: Text(
+                              '아직 이벤트가 없습니다',
+                              style: TextStyle(color: Colors.grey),
                             ),
+                          )
+                        : ListView.builder(
+                            itemCount: _events.length,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              final eventIndex = _events.length - 1 - index;
+                              return ListTile(
+                                dense: true,
+                                leading: Text(
+                                  '${eventIndex + 1}',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                title: Text(
+                                  _events[eventIndex],
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
