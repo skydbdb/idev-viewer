@@ -52,7 +52,6 @@ class StackItemCase extends StatefulWidget {
     this.actionsBuilder,
     this.borderBuilder,
     this.layoutMode = StackItemLayoutMode.positioned,
-    this.forceViewerMode = false,
   });
 
   /// * StackItemData
@@ -97,9 +96,6 @@ class StackItemCase extends StatefulWidget {
 
   /// * Layout mode for different container types
   final StackItemLayoutMode layoutMode;
-
-  /// * Force viewer mode for stable rendering in responsive layouts
-  final bool forceViewerMode;
 
   @override
   State<StatefulWidget> createState() {
@@ -753,7 +749,7 @@ class _StackItemCaseState extends State<StackItemCase> {
   Widget _content(BuildContext context, StackItem<StackItemContent> item) {
     final Widget content = Padding(
         padding: item.padding,
-        child: widget.childBuilder?.call(item) ?? _buildDefaultContent(context, item));
+        child: widget.childBuilder?.call(item) ?? const SizedBox.shrink());
 
     return ConfigBuilder.withItem(
       itemId,
@@ -775,57 +771,6 @@ class _StackItemCaseState extends State<StackItemCase> {
       },
       child: content,
     );
-  }
-
-  /// * Default content when childBuilder is null
-  Widget _buildDefaultContent(BuildContext context, StackItem<StackItemContent> item) {
-    // 뷰어 모드 또는 강제 뷰어 모드에서는 안전한 기본 콘텐츠 제공
-    if (BuildMode.isViewer || widget.forceViewerMode) {
-      // 디버깅을 위한 콘텐츠 정보 표시
-      final contentInfo = item.content?.runtimeType.toString() ?? 'Unknown';
-      
-      return Container(
-        width: item.size.width,
-        height: item.size.height,
-        decoration: BoxDecoration(
-          color: Colors.blue[50],
-          border: Border.all(color: Colors.blue[300]!, width: 2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.widgets,
-                size: 32,
-                color: Colors.blue[400],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '위젯 ($contentInfo)',
-                style: TextStyle(
-                  color: Colors.blue[600],
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                '${item.size.width.toInt()}x${item.size.height.toInt()}',
-                style: TextStyle(
-                  color: Colors.blue[500],
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-    
-    // 편집 모드에서는 빈 위젯 반환
-    return const SizedBox.shrink();
   }
 
   /// * Delete handle
@@ -1106,7 +1051,7 @@ class _StackItemCaseState extends State<StackItemCase> {
             angle: item.angle,
             child: Padding(
               padding: item.padding,
-              child: widget.childBuilder?.call(item) ?? _buildContent(context),
+              child: widget.childBuilder?.call(item) ?? const SizedBox.shrink(),
             ),
           ),
         );
@@ -1135,7 +1080,7 @@ class _StackItemCaseState extends State<StackItemCase> {
             angle: item.angle,
             child: Padding(
               padding: item.padding,
-              child: widget.childBuilder?.call(item) ?? _buildContent(context),
+              child: widget.childBuilder?.call(item) ?? const SizedBox.shrink(),
             ),
           ),
         );
@@ -1150,8 +1095,8 @@ class _StackItemCaseState extends State<StackItemCase> {
       itemId,
       shouldRebuild:
           (StackItem<StackItemContent> p, StackItem<StackItemContent> n) {
-        // 뷰어 모드 또는 강제 뷰어 모드에서는 더 적극적으로 리빌드
-        if (BuildMode.isViewer || widget.forceViewerMode) {
+        // 뷰어 모드에서는 더 적극적으로 리빌드
+        if (BuildMode.isViewer) {
           return p.content != n.content || p.status != n.status;
         }
         return p.content != n.content ||
@@ -1159,8 +1104,8 @@ class _StackItemCaseState extends State<StackItemCase> {
             p.size != n.size;
       },
       childBuilder: (StackItem<StackItemContent> item, Widget c) {
-        // 뷰어 모드 또는 강제 뷰어 모드에서는 편집 기능을 비활성화하고 content만 표시
-        if (BuildMode.isViewer || widget.forceViewerMode) {
+        // 뷰어 모드에서는 편집 기능을 비활성화하고 content만 표시
+        if (BuildMode.isViewer) {
           // 뷰어 모드에서 위젯 상태를 강제로 활성화
           final activeItem = item.copyWith(
             status: StackItemStatus.idle, // 강제로 idle 상태로 설정

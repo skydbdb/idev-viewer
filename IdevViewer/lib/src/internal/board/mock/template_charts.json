@@ -1,0 +1,328 @@
+[
+    {
+        "boardId": "#TEMPLATE#",
+        "id": "Layout_17vt9bv",
+        "type": "StackLayoutItem",
+        "angle": 0,
+        "size": {
+            "width": 900,
+            "height": 600
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "directionLtr": true,
+            "bodyOrientation": "horizontal",
+            "bodyRatio": 0.5,
+            "title": "레이아웃 제목",
+            "profile": "IDEV 시스템",
+            "appBar": "smallAndUp",
+            "actions": "none",
+            "drawer": "smallAndUp",
+            "topNavigation": "none",
+            "leftNavigation": "smallAndUp",
+            "rightNavigation": "none",
+            "bottomNavigation": "none",
+            "subBody": "mediumAndUp",
+            "subBodyOptions": "detail",
+            "reqMenus": "[{\"menuId\":\"home\",\"label\":\"홈\",\"icon\":\"Icons.home\",\"script\":\"\",\"templateId\":\"\",\"subTemplateId\":\"\"},{\"menuId\":\"settings\",\"label\":\"설정\",\"icon\":\"Icons.settings\",\"script\":\"\",\"templateId\":\"\",\"subTemplateId\":\"\"}]"
+        }
+    },
+    {
+        "boardId": "body_1icfzp",
+        "id": "Frame_hf3wjd",
+        "type": "StackFrameItem",
+        "angle": 0,
+        "size": {
+            "width": 800,
+            "height": 500
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 5,
+        "lockZOrder": false,
+        "dock": true,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "tabsVisible": true,
+            "dividerThickness": 6,
+            "tabsTitle": "[{\"boardId\":\"tab_ldgpgj\",\"title\":\"Untitled\",\"tabIndex\":1},{\"boardId\":\"tab_ldgpgk\",\"title\":\"Untitled\",\"tabIndex\":2}]",
+            "lastStringify": "V1:3:1(R;0;;0;2,3),2(I;10;tab_ldgpgj;0.25;F),3(I;10;tab_ldgpgk;0.75;F)"
+        }
+    },
+    {
+        "boardId": "tab_ldgpgj",
+        "id": "Search_yqfqf7",
+        "type": "StackSearchItem",
+        "angle": 0,
+        "size": {
+            "width": 200,
+            "height": 50
+        },
+        "offset": {
+            "dx": 79,
+            "dy": 24
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "all",
+        "theme": "White",
+        "content": {
+            "buttonName": "조회",
+            "reqApis": "[]"
+        }
+    },
+    {
+        "boardId": "tab_ldgpgk",
+        "id": "Grid_19gqs00",
+        "type": "StackGridItem",
+        "angle": 0,
+        "size": {
+            "width": 800,
+            "height": 500
+        },
+        "offset": {
+            "dx": 72,
+            "dy": 63
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "headerTitle": "그리드 제목",
+            "apiId": "",
+            "reqApis": "[]",
+            "resApis": "[]",
+            "colGroups": "",
+            "columnAggregate": {},
+            "groupByColumns": [],
+            "mode": "normal",
+            "showRowNum": true,
+            "enableRowChecked": false,
+            "showColumn": true,
+            "enableColumnFilter": false,
+            "enableColumnAggregate": false,
+            "showFooter": true
+        }
+    },
+    {
+        "boardId": "subBody_1ae2zn1",
+        "id": "Image_y0mfn",
+        "type": "StackImageItem",
+        "angle": 0,
+        "size": {
+            "width": 200,
+            "height": 50
+        },
+        "offset": {
+            "dx": 49,
+            "dy": 168
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "url": "",
+            "assetName": "assets/images/idev.jpeg",
+            "color": "transparent",
+            "colorBlendMode": "color",
+            "fit": "scaleDown",
+            "repeat": "repeat"
+        }
+    },
+    {
+        "boardId": "body_1ld90zd",
+        "id": "Frame_rsxelf",
+        "type": "StackFrameItem",
+        "angle": 0,
+        "size": {
+            "width": 800,
+            "height": 500
+        },
+        "offset": {
+            "dx": 0,
+            "dy": 0
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "tabsVisible": true,
+            "dividerThickness": 6,
+            "tabsTitle": "[{\"boardId\":\"tab_xaevkn\",\"title\":\"Untitled\",\"tabIndex\":1},{\"boardId\":\"tab_xaevko\",\"title\":\"Untitled\",\"tabIndex\":2}]",
+            "lastStringify": "V1:3:1(C;0;;0.25;2,3),2(I;10;tab_xaevkn;0.25;F),3(I;10;tab_xaevko;0.75;F)"
+        }
+    },
+    {
+        "boardId": "tab_xaevkn",
+        "id": "Text_1lhbhe0",
+        "type": "StackTextItem",
+        "angle": 0,
+        "size": {
+            "width": 120,
+            "height": 50
+        },
+        "offset": {
+            "dx": 105,
+            "dy": 27
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "data": "Text"
+        }
+    },
+    {
+        "boardId": "tab_xaevko",
+        "id": "Chart_1ttcehh",
+        "type": "StackChartItem",
+        "angle": 0,
+        "size": {
+            "width": 400,
+            "height": 400
+        },
+        "offset": {
+            "dx": 56,
+            "dy": 62
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "chartType": "column",
+            "dataSource": [
+                {
+                    "name": "이름A",
+                    "age": 30
+                },
+                {
+                    "name": "이름B",
+                    "age": 25
+                },
+                {
+                    "name": "이름C",
+                    "age": 45
+                }
+            ],
+            "reqApis": "[]",
+            "xValueMapper": "name",
+            "yValueMapper": [],
+            "title": "차트 제목",
+            "showLegend": false,
+            "showTooltip": true,
+            "enableZoom": true,
+            "enablePan": true,
+            "showDataLabels": true,
+            "primaryXAxisType": "category",
+            "xAxisLabelFormat": "default",
+            "primaryYAxisType": "category",
+            "yAxisLabelFormat": "default",
+            "selectionType": "cluster",
+            "autoScrollingMode": "start",
+            "autoScrollingDelta": 0
+        }
+    },
+    {
+        "boardId": "subBody_1ou1mpd",
+        "id": "Image_zo0vy",
+        "type": "StackImageItem",
+        "angle": 0,
+        "size": {
+            "width": 200,
+            "height": 50
+        },
+        "offset": {
+            "dx": 54,
+            "dy": 143
+        },
+        "padding": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+        },
+        "status": 6,
+        "lockZOrder": false,
+        "dock": false,
+        "permission": "read",
+        "theme": "White",
+        "content": {
+            "url": "",
+            "assetName": "assets/images/idev.jpeg",
+            "color": "transparent",
+            "colorBlendMode": "color",
+            "fit": "scaleDown",
+            "repeat": "repeat"
+        }
+    }
+]

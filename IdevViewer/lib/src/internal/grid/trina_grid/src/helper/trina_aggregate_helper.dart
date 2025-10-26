@@ -1,0 +1,124 @@
+import 'package:collection/collection.dart'
+    show IterableExtension, IterableNumberExtension;
+import 'package:idev_viewer/src/internal/grid/trina_grid/trina_grid.dart';
+
+class TrinaAggregateHelper {
+  static num? sum({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+    TrinaAggregateFilter? filter,
+  }) {
+    if (column.type is! TrinaColumnTypeWithNumberFormat ||
+        !_hasColumnField(rows: rows, column: column)) {
+      return 0;
+    }
+
+    final numberColumn = column.type as TrinaColumnTypeWithNumberFormat;
+
+    final foundItems = filter != null
+        // ? rows.where((row) => filter(row.cells[column.field]!))
+        ? rows.where((row) =>
+            !(row.type.isGroup ?? false) && filter(row.cells[column.field]!))
+        : rows.where((row) => !(row.type.isGroup ?? false));
+
+    final Iterable<num> numbers =
+        foundItems.map((e) => e.cells[column.field]?.value as num?).nonNulls;
+
+    return numbers.isNotEmpty
+        ? numberColumn.toNumber(numberColumn.applyFormat(numbers.sum))
+        : null;
+  }
+
+  static num? average({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+    TrinaAggregateFilter? filter,
+  }) {
+    if (column.type is! TrinaColumnTypeWithNumberFormat ||
+        !_hasColumnField(rows: rows, column: column)) {
+      return 0;
+    }
+
+    final numberColumn = column.type as TrinaColumnTypeWithNumberFormat;
+
+    final foundItems = filter != null
+        ? rows.where((row) =>
+            !(row.type.isGroup ?? false) && filter(row.cells[column.field]!))
+        : rows.where((row) => !(row.type.isGroup ?? false));
+
+    final Iterable<num> numbers =
+        foundItems.map((e) => e.cells[column.field]?.value as num?).nonNulls;
+
+    return numbers.isNotEmpty
+        ? numberColumn.toNumber(numberColumn.applyFormat(numbers.average))
+        : null;
+  }
+
+  static num? min({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+    TrinaAggregateFilter? filter,
+  }) {
+    if (column.type is! TrinaColumnTypeWithNumberFormat ||
+        !_hasColumnField(rows: rows, column: column)) {
+      return null;
+    }
+
+    final foundItems = filter != null
+        ? rows.where((row) =>
+            !(row.type.isGroup ?? false) && filter(row.cells[column.field]!))
+        : rows.where((row) => !(row.type.isGroup ?? false));
+
+    final Iterable<num> mapValues = foundItems.map(
+      (e) => e.cells[column.field]!.value,
+    );
+
+    return mapValues.minOrNull;
+  }
+
+  static num? max({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+    TrinaAggregateFilter? filter,
+  }) {
+    if (column.type is! TrinaColumnTypeWithNumberFormat ||
+        !_hasColumnField(rows: rows, column: column)) {
+      return null;
+    }
+
+    final foundItems = filter != null
+        ? rows.where((row) =>
+            !(row.type.isGroup ?? false) && filter(row.cells[column.field]!))
+        : rows.where((row) => !(row.type.isGroup ?? false));
+
+    final Iterable<num> mapValues = foundItems.map(
+      (e) => e.cells[column.field]!.value,
+    );
+
+    return mapValues.maxOrNull;
+  }
+
+  static int count({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+    TrinaAggregateFilter? filter,
+  }) {
+    if (!_hasColumnField(rows: rows, column: column)) {
+      return 0;
+    }
+
+    final foundItems = filter != null
+        ? rows.where((row) =>
+            !(row.type.isGroup ?? false) && filter(row.cells[column.field]!))
+        : rows.where((row) => !(row.type.isGroup ?? false));
+
+    return foundItems.length;
+  }
+
+  static bool _hasColumnField({
+    required Iterable<TrinaRow> rows,
+    required TrinaColumn column,
+  }) {
+    return rows.firstOrNull?.cells.containsKey(column.field) == true;
+  }
+}
