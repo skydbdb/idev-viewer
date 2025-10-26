@@ -162,8 +162,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       print(
           '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
-      _viewer?.callMethod('updateTemplate', [template]);
-      print('✅ updateTemplate 호출 완료');
+      print('🔍 _viewer 정보: ${_viewer != null ? 'exist' : 'null'}');
+      if (_viewer != null) {
+        try {
+          print('🔍 _viewer.callMethod 시도...');
+          _viewer!.callMethod('updateTemplate', [template]);
+          print('✅ updateTemplate 호출 완료');
+        } catch (e) {
+          print('❌ callMethod 실패: $e');
+          print('❌ 상세: ${StackTrace.current}');
+        }
+      } else {
+        print('⚠️ _viewer가 null입니다');
+      }
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
       print('❌ 스택 추적: ${StackTrace.current}');
