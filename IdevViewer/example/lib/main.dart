@@ -42,7 +42,19 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadTemplate();
+    // 초기에는 템플릿을 로드하지 않음 (버튼 클릭 시에만 로드)
+    setState(() {
+      _templateData = null;
+      _isLoading = false;
+      _currentConfig = IDevConfig(
+        apiKey: _apiKey,
+        template: null, // 초기 템플릿 없음
+        templateName: 'test-template-from-flutter',
+        theme: 'dark',
+        locale: 'ko',
+        debugMode: false,
+      );
+    });
   }
 
   Future<void> _loadTemplate() async {
@@ -77,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _updateTemplate() async {
     print('🔄 main.dart _updateTemplate 호출됨');
     print('🔄 _isUpdating: $_isUpdating');
-    
+
     if (_isUpdating) return;
 
     try {
@@ -111,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _isUpdating = false;
         _events.add('템플릿 업데이트 완료');
       });
-      
+
       print('🔄 setState 완료, _currentConfig 업데이트됨');
     } catch (e) {
       print('❌ main.dart 템플릿 업데이트 실패: $e');

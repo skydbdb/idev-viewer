@@ -181,8 +181,18 @@ class HomeRepo {
 
     Map<String, dynamic> reqParams = Map.from(params);
     reqParams['if_id'] = apiId;
-    reqParams['method'] = api['method'];
-    reqParams['uri'] = api['uri'];
+    
+    // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 사용
+    if (api != null) {
+      reqParams['method'] = api['method'];
+      reqParams['uri'] = api['uri'];
+    } else {
+      // 뷰어 모드에서 API 메타데이터가 없을 때 기본값 설정
+      reqParams['method'] = 'get'; // 기본값
+      reqParams['uri'] = apiId; // API ID를 URI로 사용
+      print('HomeRepo: 뷰어 모드 - API 메타데이터 없음, 기본값 사용: $apiId');
+    }
+    
     reqParams['domainId'] = domainId;
 
     // reqParams에서 값이 비어있는 항목을 제거
@@ -200,7 +210,7 @@ class HomeRepo {
 
     final paramsJson = jsonEncode(cleanedParams);
     final requestKey =
-        '${api['method']}_${apiId}_${reqParams['versionId']}_${reqParams['templateId']}_${reqParams['commitId']}_$paramsJson';
+        '${reqParams['method']}_${apiId}_${reqParams['versionId']}_${reqParams['templateId']}_${reqParams['commitId']}_$paramsJson';
     if (_processingRequests.contains(requestKey)) {
       print('HomeRepo: 중복 API 요청 방지 (addApiRequest): $requestKey');
       return;
@@ -484,23 +494,9 @@ class HomeRepo {
   HomeRepo() {
     // 뷰어 모드에서는 AppStreams 사용하지 않음
     if (BuildMode.isEditor) {
-      try {
-        _appStreams = sl<AppStreams>();
-      } catch (e) {
-        print('Warning: AppStreams not available in Service Locator: $e');
-        _appStreams = null;
-      }
-    } else {
-      // 뷰어 모드에서는 AppStreams를 null로 설정
-      _appStreams = null;
+      _appStreams = sl<AppStreams>();
     }
-    
-    try {
-      _apiService = sl<ApiService>();
-    } catch (e) {
-      print('Warning: ApiService not available in Service Locator: $e');
-      _apiService = null;
-    }
+    _apiService = sl<ApiService>();
 
     // 전역적으로 리스너는 한 번만 설정
     if (!_globalListenersSetup) {

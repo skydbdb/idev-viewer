@@ -136,12 +136,17 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     print('🔄 _isReady: $_isReady');
     print('🔄 이전 템플릿: ${oldWidget.config.template}');
     print('🔄 새 템플릿: ${widget.config.template}');
-    print(
-        '🔄 템플릿 변경 감지: ${widget.config.template != oldWidget.config.template}');
 
     // 초기화가 완료된 후에만 템플릿 업데이트 처리
     if (!_isReady) {
       print('🔄 초기화 미완료, 템플릿 업데이트 건너뛰기');
+      return;
+    }
+
+    // 템플릿이 null이고 _currentScript가 null이면 업데이트 건너뛰기
+    // (버튼 클릭 시에만 템플릿 로드)
+    if (widget.config.template == null && _currentScript == null) {
+      print('🔄 템플릿 null, 업데이트 건너뛰기');
       return;
     }
 
