@@ -139,7 +139,7 @@ class ApiService {
     if (BuildMode.isEditor) {
       EasyLoading.show(status: 'loading...');
     }
-    
+
     try {
       ApiResponse response;
 

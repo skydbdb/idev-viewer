@@ -149,7 +149,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     // templateName이 달라도 template 데이터가 같으면 업데이트하지 않음
     final templateChanged = widget.config.template != oldWidget.config.template;
     print('🔄 템플릿 데이터 변경: $templateChanged');
-    
+
     if (templateChanged && widget.config.template != null) {
       print('🔄 템플릿 업데이트 시작');
       _updateTemplate(widget.config.template!);
@@ -171,12 +171,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // items 배열만 JSON으로 변환
       final script = jsonEncode(items);
       print('🔄 스크립트 변환 완료: ${script.length} 문자');
+      print('🔄 스크립트 미리보기: ${script.substring(0, 100)}...');
 
       setState(() {
         _currentScript = script;
+        _error = null; // 에러 초기화
       });
 
-      print('🔄 setState 호출 완료');
+      print('🔄 setState 호출 완료, _currentScript 설정됨');
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
       setState(() {
@@ -222,7 +224,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       );
     }
 
-    if (!_isReady) {
+    if (!_isReady || _currentScript == null) {
       return widget.loadingWidget ??
           Container(
             color: Colors.grey[100],
@@ -245,7 +247,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       child: TemplateViewerPage(
         templateId: 0,
         templateNm: widget.config.templateName ?? 'viewer',
-        script: _currentScript,
+        script: _currentScript!,
         commitInfo: 'viewer-mode',
       ),
     );
