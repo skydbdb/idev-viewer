@@ -40,6 +40,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   String? _currentScript;
   bool _apisInitialized = false;
   bool _paramsInitialized = false;
+  static const int versionId = 7;
+  static const int domainId = 10001;
 
   @override
   void initState() {
@@ -60,7 +62,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // AppConfig 초기화
       AppConfig.initialize();
       print('🎭 [IDevViewerPlatform] AppConfig 초기화 완료');
-      
+
       // Service Locator 초기화
       initViewerServiceLocator();
 
@@ -76,8 +78,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       // API 및 파라미터 초기화 (home_board.dart와 동일한 루틴)
       final homeRepo = sl<HomeRepo>();
-      const versionId = 7;
-      const domainId = 10001;
 
       homeRepo.versionId = versionId;
       homeRepo.domainId = domainId;
@@ -253,7 +253,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
     // TemplateViewerPage를 사용하여 100% 동일한 렌더링 보장
     return Provider<HomeRepo>(
-      create: (_) => HomeRepo(),
+      create: (_) {
+        final homeRepo = HomeRepo();
+        // versionId와 domainId 설정
+        homeRepo.versionId = versionId;
+        homeRepo.domainId = domainId;
+        return homeRepo;
+      },
       child: TemplateViewerPage(
         templateId: 0,
         templateNm: widget.config.templateName ?? 'viewer',
