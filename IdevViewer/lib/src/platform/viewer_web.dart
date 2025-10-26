@@ -127,12 +127,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           if (mounted && _viewer != null) {
             // IdevViewer의 isReady도 강제로 true로 설정
             try {
-              _viewer?.setProperty('isReady', true);
+              // JsObject에서 속성 설정
+              _viewer!['isReady'] = true;
               print('✅ IdevViewer.isReady를 true로 설정');
             } catch (e) {
               print('⚠️ isReady 설정 실패: $e');
             }
-
+            
             setState(() {
               _isReady = true;
               _error = null;
