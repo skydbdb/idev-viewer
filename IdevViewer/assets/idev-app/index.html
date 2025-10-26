@@ -113,8 +113,14 @@
       console.log('📥 메시지 처리:', message.type);
 
       // 메시지를 window 전역 변수로 저장 (Flutter에서 접근 가능)
-      if (message.type === 'init') {
-        window._idevTemplate = message.data;
+      if (message.type === 'init' || message.type === 'update_template') {
+        window._idevTemplate = message.data || message.template;
+        console.log('📦 window._idevTemplate 설정:', window._idevTemplate);
+        // DOM을 강제로 다시 그리기 위해 이벤트 트리거
+        window.dispatchEvent(new CustomEvent('idev-template-update', { 
+          detail: message.data || message.template 
+        }));
+        console.log('🎯 idev-template-update 이벤트 발생');
       } else if (message.type === 'updateTemplate') {
         window._idevTemplate = message.data;
         // DOM을 강제로 다시 그리기 위해 이벤트 트리거

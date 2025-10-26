@@ -39,7 +39,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void initState() {
     super.initState();
-    
+
     if (_isInitialized) {
       print('⚠️ 이미 초기화됨, skip');
       return;
