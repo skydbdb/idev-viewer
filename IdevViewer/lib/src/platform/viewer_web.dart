@@ -83,7 +83,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       print('🔍 IdevViewer 클래스 확인 중...');
       final IdevViewerClass = js.context['IdevViewer'];
       if (IdevViewerClass == null) {
-        print('❌ IdevViewer 클래스가 없습니다. context keys: ${js.context.keys}');
+        print('❌ IdevViewer 클래스가 없습니다.');
         throw Exception('IdevViewer JavaScript 라이브러리가 로드되지 않았습니다');
       }
 
