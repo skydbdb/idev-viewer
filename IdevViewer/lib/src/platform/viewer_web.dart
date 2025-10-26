@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:html' as html;
+import 'dart:convert';
 import '../models/viewer_config.dart';
 import '../models/viewer_event.dart';
-import '../internal/board/board/viewer/template_viewer_page.dart';
-import '../internal/pms/di/service_locator.dart';
-import '../internal/repo/home_repo.dart';
-import '../internal/core/api/api_endpoint_ide.dart';
-import '../internal/core/auth/auth_service.dart';
-import '../internal/core/config/env.dart';
-import 'dart:convert';
 
-/// Web 플랫폼 구현 (internal 코드 직접 사용)
+/// Web 플랫폼 구현 (iframe 기반)
 ///
-/// Flutter Web에서 internal 코드를 직접 사용하여 IDev Viewer를 렌더링합니다.
-/// TemplateViewerPage를 사용하여 100% 동일한 렌더링을 보장합니다.
+/// idev-app을 iframe으로 로드하여 렌더링합니다.
+/// Internal 코드는 assets/idev-app에 컴파일된 형태로만 포함됩니다.
 class IDevViewerPlatform extends StatefulWidget {
   final IDevConfig config;
   final VoidCallback? onReady;
@@ -37,80 +31,58 @@ class IDevViewerPlatform extends StatefulWidget {
 class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
-  String? _currentScript;
-  bool _apisInitialized = false;
-  bool _paramsInitialized = false;
-  static const int versionId = 7;
-  static const int domainId = 10001;
+  html.IFrameElement? _iframe;
 
   @override
   void initState() {
     super.initState();
 
-    // 위젯 트리 빌드 완료 후 초기화
+    // iframe 생성
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeViewer();
+      _initializeIframe();
     });
   }
 
-  /// 뷰어 초기화
-  Future<void> _initializeViewer() async {
+  /// iframe 초기화
+  void _initializeIframe() {
     try {
-      // AppConfig 초기화
-      AppConfig.initialize();
+      // config를 JSON으로 변환
+      final configJson = jsonEncode(widget.config.toJson());
+      final encodedConfig = Uri.encodeComponent(configJson);
 
-      // Service Locator 초기화
-      initViewerServiceLocator();
+      // iframe 생성
+      _iframe = html.IFrameElement()
+        ..src = '/assets/idev-app/index.html?config=$encodedConfig'
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..style.border = 'none'
+        ..id = 'idev-viewer-iframe';
 
-      // 뷰어 API 키 설정
-      const apiKey =
-          '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50';
-      AuthService.setViewerApiKey(apiKey);
-
-      // 뷰어 인증 초기화
-      await AuthService.initializeViewerAuth();
-
-      // API 및 파라미터 초기화
-      final homeRepo = sl<HomeRepo>();
-
-      homeRepo.versionId = versionId;
-      homeRepo.domainId = domainId;
-
-      // API 초기화
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-
-      // API 응답 스트림 구독
-      homeRepo.getApiIdResponseStream.listen((response) {
-        if (response != null) {
-          final apiId = response['if_id']?.toString();
-
-          if (apiId == ApiEndpointIDE.apis && !_apisInitialized) {
-            _apisInitialized = true;
-            _checkAndLoadTemplate();
-          } else if (apiId == ApiEndpointIDE.params && !_paramsInitialized) {
-            _paramsInitialized = true;
-            _checkAndLoadTemplate();
-          }
+      // iframe 로드 리스너
+      _iframe!.onLoad.listen((_) {
+        if (mounted) {
+          setState(() {
+            _isReady = true;
+          });
+          widget.onReady?.call();
         }
       });
+
+      // iframe 에러 리스너
+      _iframe!.onError.listen((e) {
+        if (mounted) {
+          setState(() {
+            _error = 'Failed to load viewer: $e';
+          });
+        }
+      });
+
+      print('✅ iframe 초기화 완료');
     } catch (e) {
+      print('❌ iframe 초기화 실패: $e');
       setState(() {
         _error = 'Failed to initialize viewer: $e';
       });
-    }
-  }
-
-  /// APIs와 Params 초기화가 완료되면 템플릿 로드
-  void _checkAndLoadTemplate() {
-    if (_apisInitialized && _paramsInitialized) {
-      setState(() {
-        _isReady = true;
-        _error = null;
-      });
-
-      // 준비 완료 콜백 호출
-      widget.onReady?.call();
     }
   }
 
@@ -118,43 +90,24 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void didUpdateWidget(IDevViewerPlatform oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // 초기화가 완료된 후에만 템플릿 업데이트 처리
-    if (!_isReady) return;
-
-    // 템플릿이 null이고 _currentScript가 null이면 업데이트 건너뛰기
-    if (widget.config.template == null && _currentScript == null) return;
-
-    // config의 template이 실제로 변경되었는지 확인
-    final templateChanged = widget.config.template != oldWidget.config.template;
-
-    if (templateChanged && widget.config.template != null) {
-      _updateTemplate(widget.config.template!);
+    // config가 변경되면 iframe 재로드
+    if (widget.config.template != oldWidget.config.template) {
+      _updateIframeConfig();
     }
   }
 
-  /// 템플릿 업데이트 - 템플릿 데이터를 JSON 스크립트로 변환
-  void _updateTemplate(Map<String, dynamic> template) {
-    try {
-      // 템플릿 데이터에서 items 배열 추출
-      final items = template['items'] as List<dynamic>? ?? [];
+  /// iframe 설정 업데이트
+  void _updateIframeConfig() {
+    if (_iframe == null) return;
 
-      // items 배열만 JSON으로 변환
-      final script = jsonEncode(items);
+    final configJson = jsonEncode(widget.config.toJson());
+    final encodedConfig = Uri.encodeComponent(configJson);
 
-      setState(() {
-        _currentScript = script;
-        _error = null;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to update template: $e';
-      });
-    }
+    _iframe!.src = '/assets/idev-app/index.html?config=$encodedConfig';
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (_error != null && widget.errorBuilder != null) {
       return widget.errorBuilder!(_error!);
     }
@@ -188,7 +141,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       );
     }
 
-    if (!_isReady || _currentScript == null) {
+    if (!_isReady) {
       return widget.loadingWidget ??
           Container(
             color: Colors.grey[100],
@@ -205,21 +158,22 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           );
     }
 
-    // TemplateViewerPage를 사용하여 100% 동일한 렌더링 보장
-    // GetIt에서 등록된 싱글톤 HomeRepo를 사용 (apis 맵 공유)
-    return Provider<HomeRepo>(
-      create: (_) => sl<HomeRepo>(),
-      child: TemplateViewerPage(
-        templateId: 0,
-        templateNm: widget.config.templateName ?? 'viewer',
-        script: _currentScript!,
-        commitInfo: 'viewer-mode',
-      ),
+    // iframe 뷰
+    return HtmlElementView(
+      viewType: 'idev-viewer',
+      onPlatformViewCreated: (int viewId) {
+        // iframe을 DOM에 추가
+        if (_iframe != null) {
+          html.document.getElementById('idev-viewer')?.append(_iframe!);
+        }
+      },
     );
   }
 
   @override
   void dispose() {
+    // iframe 정리
+    _iframe?.remove();
     super.dispose();
   }
 }
