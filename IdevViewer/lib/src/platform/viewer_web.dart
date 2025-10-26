@@ -64,10 +64,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       // iframe 생성 (vanilla-example 방식)
       // Flutter web에서는 assets를 적절한 경로로 로드해야 함
-      final idevAppPath = html.window.location.href.contains('example') 
+      final idevAppPath = html.window.location.href.contains('example')
           ? 'assets/idev-app/index.html'
           : '/assets/idev-app/index.html';
-      
+
       print('🎭 [IDevViewer] idev-app 경로: $idevAppPath');
       html.window.console.log('IDev app path: $idevAppPath');
 
@@ -94,7 +94,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       Future.delayed(const Duration(seconds: 5), () {
         if (!_isReady && mounted) {
           print('⏰ iframe 로드 타임아웃');
-          html.window.console.error('Iframe load timeout. Check src: ${_iframe?.src}');
+          html.window.console
+              .error('Iframe load timeout. Check src: ${_iframe?.src}');
         }
       });
 

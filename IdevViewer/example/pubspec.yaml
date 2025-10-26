@@ -26,3 +26,6 @@ flutter:
   
   assets:
     - assets/test-template.json
+    
+  # idev_viewer 패키지의 idev-app assets도 포함
+  # (package dependency로 자동 포함됨)
