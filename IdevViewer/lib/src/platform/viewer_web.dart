@@ -5,6 +5,7 @@ import '../internal/board/board/stack_board.dart';
 import '../internal/board/core/stack_board_controller.dart';
 import '../internal/board/core/case_style.dart';
 import '../internal/board/stack_board_item.dart';
+import '../internal/board/stack_board_items/items/stack_text_item.dart';
 
 /// Web 플랫폼 구현 (internal 코드 직접 사용)
 ///
@@ -34,7 +35,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   late StackBoardController _stackBoardController;
   bool _isReady = false;
   String? _error;
-  List<StackItem<StackItemContent>> _items = [];
+  List<StackTextItem> _items = [];
 
   @override
   void initState() {
@@ -85,8 +86,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     try {
       final items = template['items'] as List<dynamic>? ?? [];
       _items = items.map((itemData) {
-        // 템플릿 데이터를 StackItem으로 변환
-        return StackItem<StackItemContent>(
+        // 템플릿 데이터를 StackTextItem으로 변환
+        return StackTextItem(
           boardId: 'idev-viewer-board',
           id: itemData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
           offset: Offset(
@@ -97,7 +98,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             (itemData['width'] ?? 200).toDouble(),
             (itemData['height'] ?? 100).toDouble(),
           ),
-          content: _createDefaultContent(itemData),
+          content: TextItemContent(
+            data: itemData['text'] ?? '위젯 ${itemData['id'] ?? 'Unknown'}',
+          ),
           status: StackItemStatus.idle,
         );
       }).toList();
@@ -114,14 +117,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         _error = 'Failed to update template: $e';
       });
     }
-  }
-
-  /// 기본 콘텐츠 생성
-  StackItemContent _createDefaultContent(Map<String, dynamic> itemData) {
-    return _DefaultItemContent(
-      type: itemData['type'] ?? 'unknown',
-      data: itemData,
-    );
   }
 
   @override
@@ -156,7 +151,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   }
 
   /// 아이템 위젯 빌더
-  Widget? _buildItemWidget(StackItem<StackItemContent> item) {
+  Widget? _buildItemWidget(StackTextItem item) {
     // 아이템 타입에 따라 다른 위젯 반환
     final content = item.content;
     if (content == null) return null;
@@ -206,24 +201,5 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void dispose() {
     _stackBoardController.dispose();
     super.dispose();
-  }
-}
-
-/// 기본 아이템 콘텐츠 구현체
-class _DefaultItemContent implements StackItemContent {
-  final String type;
-  final Map<String, dynamic> data;
-
-  const _DefaultItemContent({
-    required this.type,
-    required this.data,
-  });
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      ...data,
-    };
   }
 }
