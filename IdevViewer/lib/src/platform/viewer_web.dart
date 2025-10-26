@@ -59,18 +59,14 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// iframe 생성 및 마운트
   void _createAndMountIframe() {
     try {
-      // 이미 iframe이 생성되어 있으면 중복 생성 방지
-      if (_iframe != null && html.document.body?.contains(_iframe!) == true) {
-        print('⏩ iframe 이미 생성됨 (DOM 존재), 건너뜀');
+      // DOM에 이미 iframe이 존재하면 재사용
+      final existingIframes = html.document.querySelectorAll('iframe');
+      if (existingIframes.isNotEmpty) {
+        _iframe = existingIframes.first as html.IFrameElement;
+        print('♻️ 기존 iframe 재사용: ${_iframe?.src}');
         return;
       }
-
-      // 기존 iframe이 DOM에서 제거되었으면 새로 생성
-      if (_iframe != null && html.document.body?.contains(_iframe!) == false) {
-        print('🔄 기존 iframe이 DOM에서 제거됨, 재생성');
-        _iframe = null;
-      }
-
+      
       print('🎭 [IDevViewer] iframe 생성 시작');
       html.window.console.log('Current URL: ${html.window.location.href}');
 
