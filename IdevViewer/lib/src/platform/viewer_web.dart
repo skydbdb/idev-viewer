@@ -39,10 +39,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     super.initState();
 
     print('🎬 initState 호출됨');
-    
+
     // JavaScript 전역 변수에서 뷰어 인스턴스 확인 (Dart 재시작에도 유지)
     final existingViewer = js.context['_idevViewerInstance'];
-    print('  - JS _idevViewerInstance: ${existingViewer != null ? 'exist' : 'null'}');
+    print(
+        '  - JS _idevViewerInstance: ${existingViewer != null ? 'exist' : 'null'}');
     print(
         '  - IdevViewer class: ${js.context['IdevViewer'] != null ? 'exist' : 'null'}');
 
@@ -91,9 +92,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _createAndMountIframe() {
     try {
       // Hot reload 시 이전 iframe 제거
-      if (_globalViewer != null) {
+      final existingViewer = js.context['_idevViewerInstance'];
+      if (existingViewer != null) {
         print('🗑️ 기존 IdevViewer 인스턴스 제거');
-        _globalViewer = null;
+        js.context['_idevViewerInstance'] = null;
       }
 
       final existingIframes = html.document.querySelectorAll('iframe');
@@ -148,7 +150,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
                 print('⚠️ isReady 설정 실패: $e');
               }
             }
-            
+
             setState(() {
               _isReady = true;
               _error = null;
@@ -168,7 +170,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       // IdevViewer 인스턴스 생성
       final viewer = js.JsObject(IdevViewerClass, [options]);
-      
+
       // JavaScript 전역 변수에 저장 (Dart 재시작에도 유지)
       js.context['_idevViewerInstance'] = viewer;
 
@@ -205,7 +207,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   /// 템플릿 업데이트
   void _updateTemplate() {
     final viewer = js.context['_idevViewerInstance'];
-    
+
     if (viewer == null || widget.config.template == null) {
       print(
           '⚠️ _updateTemplate: viewer=${viewer != null}, template=${widget.config.template != null}');
@@ -232,7 +234,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       print(
           '📝 updateTemplate 호출, script length: ${template['script'].toString().length}');
       print('🔍 viewer 정보: ${viewer != null ? 'exist' : 'null'}');
-      
+
       try {
         print('🔍 viewer.callMethod 시도...');
         viewer.callMethod('updateTemplate', [template]);
