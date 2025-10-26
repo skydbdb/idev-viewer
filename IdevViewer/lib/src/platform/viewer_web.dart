@@ -40,7 +40,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void initState() {
     super.initState();
-    _initializeViewer();
+    // 다음 프레임에서 초기화 실행
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeViewer();
+    });
   }
 
   @override
@@ -58,22 +61,22 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   void _initializeViewer() {
     try {
       // StackBoardController 초기화
-      _stackBoardController = StackBoardController(boardId: 'idev-viewer-board');
-      
+      _stackBoardController =
+          StackBoardController(boardId: 'idev-viewer-board');
+
       // 템플릿 데이터 로드
       if (widget.config.template != null) {
         _updateTemplate(widget.config.template!);
       }
-      
+
       // 준비 완료 상태로 설정
       setState(() {
         _isReady = true;
         _error = null;
       });
-      
+
       // 준비 완료 콜백 호출
       widget.onReady?.call();
-      
     } catch (e) {
       setState(() {
         _error = 'Failed to initialize viewer: $e';
@@ -89,7 +92,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         // 템플릿 데이터를 StackTextItem으로 변환
         return StackTextItem(
           boardId: 'idev-viewer-board',
-          id: itemData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+          id: itemData['id'] ??
+              DateTime.now().millisecondsSinceEpoch.toString(),
           offset: Offset(
             (itemData['x'] ?? 0).toDouble(),
             (itemData['y'] ?? 0).toDouble(),
@@ -104,14 +108,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           status: StackItemStatus.idle,
         );
       }).toList();
-      
+
       // StackBoardController에 아이템 추가
       for (final item in _items) {
         _stackBoardController.addItem(item);
       }
-      
+
       setState(() {});
-      
     } catch (e) {
       setState(() {
         _error = 'Failed to update template: $e';
@@ -126,9 +129,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
 
     if (!_isReady) {
-      return widget.loadingWidget ?? const Center(
-        child: CircularProgressIndicator(),
-      );
+      return widget.loadingWidget ??
+          const Center(
+            child: CircularProgressIndicator(),
+          );
     }
 
     // internal 코드를 직접 사용하여 StackBoard 렌더링
