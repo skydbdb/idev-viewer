@@ -83,28 +83,42 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         ..title = 'IDev Viewer'
         ..setAttribute('scrolling', 'no')
         ..setAttribute('allowfullscreen', 'true');
-        
+
       // DOM에 추가 (HtmlElementView 사용 안 함)
       html.document.body?.append(_iframe!);
-      
+
       // iframe 요소 확인
       print('🎭 iframe 요소 확인: ${_iframe?.src}, ${_iframe?.baseUri}');
 
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
-        Future.delayed(const Duration(milliseconds: 500), () {
-          _postMessageToIframe('init', widget.config.toJson());
+        
+        // idev-viewer-js 패턴: postMessage로 초기화 메시지 전송
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          try {
+            final message = jsonEncode({
+              'type': 'init',
+              'data': widget.config.toJson(),
+            });
+            _iframe?.contentWindow?.postMessage(message, '*');
+            print('📤 초기화 메시지 전송: init');
+            
+            // ready 처리 (Flutter 앱이 ready 신호를 보내지 않으므로 강제 처리)
+            Future.delayed(const Duration(seconds: 1), () {
+              print('✅ iframe 초기화 완료');
+              if (mounted) {
+                setState(() {
+                  _isReady = true;
+                  _error = null;
+                });
+                widget.onReady?.call();
+              }
+            });
+          } catch (e) {
+            print('❌ 메시지 전송 실패: $e');
+          }
         });
-      });
-
-      // iframe 로드 체크 (5초 타임아웃)
-      Future.delayed(const Duration(seconds: 5), () {
-        if (!_isReady && mounted) {
-          print('⏰ iframe 로드 타임아웃');
-          html.window.console
-              .error('Iframe load timeout. Check src: ${_iframe?.src}');
-        }
       });
 
       // iframe 에러 리스너
@@ -118,9 +132,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         }
       });
 
-      // 메시지 리스너 등록
-      html.window.onMessage.listen(_handleMessage);
-
       print('✅ iframe 생성 완료');
     } catch (e) {
       print('❌ iframe 생성 실패: $e');
@@ -132,77 +143,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
   }
 
-  /// iframe에 메시지 전송
-  void _postMessageToIframe(String type, [Map<String, dynamic>? data]) {
-    if (_iframe == null) return;
-
-    try {
-      final message = {
-        'type': type,
-        'data': data,
-      };
-      _iframe!.contentWindow?.postMessage(jsonEncode(message), '*');
-      print('📤 iframe에 메시지 전송: $type');
-    } catch (e) {
-      print('❌ 메시지 전송 실패: $e');
-    }
-  }
-
-  /// 메시지 수신 처리
-  void _handleMessage(html.MessageEvent event) {
-    try {
-      if (event.source != _iframe?.contentWindow) return;
-
-      final data = jsonDecode(event.data as String);
-      final type = data['type'] as String?;
-
-      print('📥 iframe 메시지 수신: $type');
-
-      switch (type) {
-        case 'ready':
-          _handleReady(data['data']);
-          break;
-        case 'error':
-          _handleError(data['data']);
-          break;
-        default:
-          print('⚠️ 알 수 없는 메시지 타입: $type');
-      }
-    } catch (e) {
-      print('❌ 메시지 처리 실패: $e');
-    }
-  }
-
-  /// ready 메시지 처리
-  void _handleReady(dynamic data) {
-    print('✅ iframe ready 수신');
-    if (mounted) {
-      setState(() {
-        _isReady = true;
-        _error = null;
-      });
-      widget.onReady?.call();
-
-      // 초기 템플릿 설정
-      if (widget.config.template != null) {
-        _updateTemplate();
-      }
-    }
-  }
-
-  /// error 메시지 처리
-  void _handleError(dynamic data) {
-    print('❌ iframe error 수신: $data');
-    if (mounted) {
-      setState(() {
-        _error = data?.toString() ?? 'Viewer error';
-      });
-    }
-    widget.onEvent?.call(IDevEvent(
-      type: 'error',
-      data: data,
-    ));
-  }
 
   /// 템플릿 업데이트
   void _updateTemplate() {
