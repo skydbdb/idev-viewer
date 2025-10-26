@@ -68,11 +68,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
       print('🎭 [IDevViewerPlatform] API 초기화 시작');
 
-      // API 초기화 완료 후 템플릿 로드
+      // API 초기화는 한 번만 실행
+      homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
+      homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
+
+      // API 응답 스트림 구독
       homeRepo.getApiIdResponseStream.listen((response) {
         if (response != null) {
           final apiId = response['if_id']?.toString();
+          final status = response['status'];
           
+          print('🎭 [IDevViewerPlatform] API 응답: $apiId, status: $status');
+          
+          // 실패 응답도 초기화 완료로 간주 (토큰 없어도 뷰어 모드는 동작 가능)
           if (apiId == ApiEndpointIDE.apis && !_apisInitialized) {
             print('🎭 [IDevViewerPlatform] APIs 초기화 완료');
             _apisInitialized = true;
@@ -85,10 +93,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         }
       });
 
-      // API 초기화는 한 번만 실행
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.apis);
-      homeRepo.reqIdeApi('get', ApiEndpointIDE.params);
-
       print('🎭 [IDevViewerPlatform] 뷰어 초기화 완료');
     } catch (e) {
       print('❌ [IDevViewerPlatform] 뷰어 초기화 실패: $e');
@@ -100,9 +104,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
 
   /// APIs와 Params 초기화가 완료되면 템플릿 로드
   void _checkAndLoadTemplate(HomeRepo homeRepo) {
-    if (_apisInitialized && _paramsInitialized && widget.config.template != null) {
-      print('🎭 [IDevViewerPlatform] 초기 템플릿 로드 시작');
-      _updateTemplate(widget.config.template!);
+    if (_apisInitialized && _paramsInitialized) {
+      print('🎭 [IDevViewerPlatform] APIs와 Params 초기화 완료');
       
       setState(() {
         _isReady = true;
