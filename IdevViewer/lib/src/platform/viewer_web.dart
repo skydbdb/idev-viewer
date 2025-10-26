@@ -32,7 +32,6 @@ class IDevViewerPlatform extends StatefulWidget {
 class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   bool _isReady = false;
   String? _error;
-  html.IFrameElement? _iframe;
   late String _containerId;
   js.JsObject? _viewer; // JavaScript IdevViewer 인스턴스
 
@@ -42,9 +41,19 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     _containerId =
         'idev-viewer-container-${DateTime.now().millisecondsSinceEpoch}';
 
+    // 컨테이너를 HTML에 먼저 추가
+    final container = html.DivElement()
+      ..id = _containerId
+      ..style.width = '100%'
+      ..style.height = '100%';
+    
+    html.document.body?.append(container);
+    
     // iframe 생성 및 마운트
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _createAndMountIframe();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _createAndMountIframe();
+      });
     });
   }
 
@@ -66,9 +75,9 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       if (IdevViewerClass == null) {
         throw Exception('IdevViewer JavaScript 라이브러리가 로드되지 않았습니다');
       }
-      
+
       print('✅ IdevViewer 라이브러리 로드 확인');
-      
+
       // 옵션 객체 생성
       final options = js.JsObject.jsify({
         'width': '100%',
@@ -81,7 +90,8 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           'commitInfo': 'viewer-mode'
         },
         'config': {
-          'apiKey': '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50',
+          'apiKey':
+              '7e074a90e6128deeab38d98765e82abe39ec87449f077d7ec85f328357f96b50',
           'theme': 'dark',
           'locale': 'ko'
         },
@@ -104,13 +114,13 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           }
         }),
       });
-      
+
       // IdevViewer 인스턴스 생성
       _viewer = js.JsObject(IdevViewerClass, [options]);
-      
+
       // 뷰어 마운트
       _viewer?.callMethod('mount', ['#$_containerId']);
-      
+
       print('✅ IdevViewer 인스턴스 생성 및 마운트 완료');
     } catch (e) {
       print('❌ iframe 생성 실패: $e');
@@ -133,7 +143,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         'templateNm': widget.config.templateName ?? 'viewer',
         'commitInfo': 'viewer-mode',
       });
-      
+
       _viewer?.callMethod('updateTemplate', [template]);
       print('📝 템플릿 업데이트 전송');
     } catch (e) {
@@ -202,7 +212,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
           ..id = _containerId
           ..style.width = '100%'
           ..style.height = '100%';
-        
+
         if (container.parent == null) {
           html.document.body?.append(container);
         }
@@ -213,10 +223,10 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
   @override
   void dispose() {
     print('🎭 [IDevViewer] dispose');
-    
+
     // IdevViewer 제거
     _viewer?.callMethod('destroy');
-    
+
     super.dispose();
   }
 }
