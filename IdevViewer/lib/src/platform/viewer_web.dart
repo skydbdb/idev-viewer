@@ -93,7 +93,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
       // iframe 로드 리스너
       _iframe!.onLoad.listen((_) {
         print('✅ iframe 로드 완료');
-        
+
         // idev-viewer-js 패턴: postMessage로 초기화 메시지 전송
         Future.delayed(const Duration(milliseconds: 1000), () {
           try {
@@ -103,7 +103,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
             });
             _iframe?.contentWindow?.postMessage(message, '*');
             print('📤 초기화 메시지 전송: init');
-            
+
             // ready 처리 (Flutter 앱이 ready 신호를 보내지 않으므로 강제 처리)
             Future.delayed(const Duration(seconds: 1), () {
               print('✅ iframe 초기화 완료');
@@ -143,7 +143,6 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
     }
   }
 
-
   /// 템플릿 업데이트
   void _updateTemplate() {
     if (_iframe == null || widget.config.template == null) return;
@@ -156,7 +155,11 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         'commitInfo': 'viewer-mode',
       };
 
-      _postMessageToIframe('updateTemplate', template);
+      final message = jsonEncode({
+        'type': 'updateTemplate',
+        'data': template,
+      });
+      _iframe?.contentWindow?.postMessage(message, '*');
       print('📝 템플릿 업데이트 전송');
     } catch (e) {
       print('❌ 템플릿 업데이트 실패: $e');
