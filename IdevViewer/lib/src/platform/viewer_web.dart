@@ -221,43 +221,37 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
-        child: Flexible(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.widgets,
-                size: 24,
-                color: Colors.blue[400],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.widgets,
+              size: 20,
+              color: Colors.blue[400],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '위젯 (${content.runtimeType})',
+              style: TextStyle(
+                color: Colors.blue[600],
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 4),
-              Flexible(
-                child: Text(
-                  '위젯 (${content.runtimeType})',
-                  style: TextStyle(
-                    color: Colors.blue[600],
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            Text(
+              '${item.size.width.toInt()}x${item.size.height.toInt()}',
+              style: TextStyle(
+                color: Colors.blue[500],
+                fontSize: 6,
               ),
-              Flexible(
-                child: Text(
-                  '${item.size.width.toInt()}x${item.size.height.toInt()}',
-                  style: TextStyle(
-                    color: Colors.blue[500],
-                    fontSize: 8,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ],
         ),
       ),
     );
