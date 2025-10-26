@@ -105,6 +105,58 @@
   </div>
 
   <script>
+    // 메시지 큐
+    var messageQueue = [];
+    // 마지막 처리된 템플릿 ID (중복 방지)
+    var lastTemplateId = null;
+
+    // 메시지 처리 함수
+    function handleMessage(message) {
+      try {
+        if (message.type === 'update_template' && message.template) {
+          // 중복 체크: 이미 처리된 템플릿이면 스킵
+          var newTemplateId = message.template.templateId;
+          if (newTemplateId && newTemplateId === lastTemplateId) {
+            return;
+          }
+
+          window._idevTemplate = message.template;
+          lastTemplateId = newTemplateId;
+
+          // CustomEvent 발생 (Flutter가 리스닝)
+          var event = new CustomEvent('idev-template-update', {
+            detail: message.template
+          });
+          window.dispatchEvent(event);
+        } else if (message.type === 'update_config' && message.config) {
+          window._idevConfig = message.config;
+        }
+      } catch (e) {
+        console.error('[viewer-app] 메시지 처리 실패:', e);
+      }
+    }
+
+    // 부모 창으로부터 postMessage 수신 리스너 추가
+    window.addEventListener('message', function (event) {
+      // 자기 자신이 보낸 메시지도 허용 (폴링에서 보낸 메시지)
+      if (event.source !== window && event.source !== window.parent && event.source !== null) {
+        return;
+      }
+
+      try {
+        var message = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+        // Flutter 앱이 로드되었으면 즉시 처리
+        if (window._flutterLoaded) {
+          handleMessage(message);
+        } else {
+          messageQueue.push(message);
+        }
+      } catch (e) {
+        console.error('[viewer-app] 메시지 파싱 실패:', e);
+      }
+    });
+
     window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
@@ -112,14 +164,47 @@
           serviceWorkerVersion: serviceWorkerVersion,
         }
       }).then(function (engineInitializer) {
-        return engineInitializer.initializeEngine();
+        // CanvasKit 렌더러 사용 (새로운 방식)
+        return engineInitializer.initializeEngine({
+          renderer: "canvaskit"
+        });
       }).then(function (appRunner) {
         return appRunner.runApp();
       }).then(function () {
         // Flutter 앱이 완전히 로드되면 로딩 화면 숨기기
         setTimeout(function () {
           document.body.classList.add('flutter-app-loaded');
-        }, 1000); // 1초 후 로딩 화면 숨김
+
+          // Flutter 로드 완료 플래그 설정
+          window._flutterLoaded = true;
+
+          // 큐에 저장된 메시지 처리
+          for (var i = 0; i < messageQueue.length; i++) {
+            handleMessage(messageQueue[i]);
+          }
+          messageQueue = [];
+
+          // 부모 창에 ready 신호 전송
+          if (window.parent !== window) {
+            window.parent.postMessage(JSON.stringify({
+              type: 'flutter-ready',
+              data: { status: 'ready' }
+            }), '*');
+          }
+
+          // 템플릿 폴링 시작
+          setInterval(function () {
+            if (window._idevTemplate) {
+              var currentTemplateId = window._idevTemplate.templateId;
+              if (currentTemplateId && currentTemplateId !== lastTemplateId) {
+                handleMessage({
+                  type: 'update_template',
+                  template: window._idevTemplate
+                });
+              }
+            }
+          }, 500);
+        }, 1000);
       }).catch(function (error) {
         console.error('Flutter 앱 로드 실패:', error);
         // 에러 발생 시에도 로딩 화면 숨기기

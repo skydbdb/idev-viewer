@@ -25,8 +25,18 @@ dev_dependencies:
   freezed: ^2.3.2
 
 flutter:
-  # idev-app assets (iframe으로 로드되는 빌드된 웹 앱)
+  # viewer-app assets (뷰어 전용 - 읽기 전용)
   assets:
+    - assets/viewer-app/
+    - assets/viewer-app/assets/
+    - assets/viewer-app/assets/assets/
+    - assets/viewer-app/assets/assets/icons/
+    - assets/viewer-app/assets/assets/fonts/
+    - assets/viewer-app/assets/fonts/
+    - assets/viewer-app/assets/shaders/
+    - assets/viewer-app/canvaskit/
+    - assets/viewer-app/icons/
+    # idev-app assets (편집 모드 - 백업용)
     - assets/idev-app/
     - assets/idev-app/assets/
     - assets/idev-app/assets/assets/

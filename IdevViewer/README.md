@@ -1,225 +1,180 @@
-# idev_viewer
+# IDevViewer
 
-[![pub package](https://img.shields.io/pub/v/idev_viewer.svg)](https://pub.dev/packages/idev_viewer)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Flutter Web용 iDev 템플릿 뷰어 패키지 (읽기 전용 모드)
 
-Cross-platform UI template viewer for Flutter applications with **100% identical rendering** across all platforms.
+## 🚀 빠른 시작
 
-## Features
-
-- ✅ **Cross-platform**: Android, iOS, Web, Windows, macOS, Linux
-- 🎨 **Identical UI**: Same appearance on all platforms
-- 🚀 **Easy Integration**: Simple Widget API
-- 📦 **Lightweight**: Minimal dependencies
-- 🔧 **Flexible**: Customize via configuration
-- 🔌 **Event-driven**: React to viewer events
-
-## Platforms
-
-| Platform | Status | Implementation |
-|----------|--------|----------------|
-| Web | ✅ Fully Supported | Internal Flutter viewer with TemplateViewerPage |
-| Android | 🚧 Coming Soon | WebView-based viewer |
-| iOS | 🚧 Coming Soon | WebView-based viewer |
-| Windows | 🚧 Coming Soon | WebView-based viewer |
-| macOS | 🚧 Coming Soon | WebView-based viewer |
-| Linux | 🚧 Coming Soon | WebView-based viewer |
-
-## Installation
-
-Add this to your package's `pubspec.yaml` file:
+### 설치
 
 ```yaml
+# pubspec.yaml
 dependencies:
-  idev_viewer: ^1.0.0
+  idev_viewer:
+    path: ../IdevViewer
 ```
 
-Then run:
-
-```bash
-flutter pub get
-```
-
-## Quick Start
+### 기본 사용
 
 ```dart
-import 'package:flutter/material.dart';
 import 'package:idev_viewer/idev_viewer.dart';
 
-class MyViewerPage extends StatelessWidget {
+IDevViewer(
+  config: IDevConfig(
+    templateName: 'my_template',
+  ),
+  onReady: () {
+    print('Viewer is ready!');
+  },
+)
+```
+
+### 템플릿 업데이트
+
+```dart
+class MyPage extends StatefulWidget {
+  @override
+  _MyPageState createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  IDevConfig _config = IDevConfig(
+    templateName: 'initial',
+    template: null,
+  );
+
+  void _updateTemplate() {
+    setState(() {
+      _config = IDevConfig(
+        templateName: 'updated',
+        template: [
+          // 템플릿 데이터
+        ],
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('IDev Viewer')),
-      body: IDevViewer(
-        config: IDevConfig(
-          apiKey: 'your-api-key',
-          template: {
-            'type': 'container',
-            'properties': {
-              'padding': 20,
-              'backgroundColor': '#f0f0f0',
-            },
-            'children': [
-              {
-                'type': 'text',
-                'properties': {
-                  'text': 'Hello from IDev Viewer!',
-                  'fontSize': 24,
-                },
-              },
-            ],
-          },
-        ),
-        onReady: () => print('Viewer is ready!'),
-        onEvent: (event) => print('Event: ${event.type}'),
-      ),
-    );
+    return IDevViewer(config: _config);
   }
 }
 ```
 
-## Configuration
+## 📚 문서
 
-### IDevConfig
+상세한 가이드는 [VIEWER_INTEGRATION_GUIDE.md](./VIEWER_INTEGRATION_GUIDE.md)를 참고하세요.
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `apiKey` | `String?` | No | API key for authentication |
-| `template` | `Map<String, dynamic>?` | No | Template JSON data |
-| `templateName` | `String?` | No | Template name |
-| `viewerUrl` | `String?` | No | Custom viewer URL |
+### 주요 내용
+- ✅ 아키텍처 설명
+- ✅ 설치 및 설정
+- ✅ 템플릿 업데이트 방법
+- ✅ 트러블슈팅
+- ✅ 기술 세부사항
 
-### IDevViewer Widget
+## 🔧 주요 기능
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `config` | `IDevConfig` | Yes | Viewer configuration |
-| `onReady` | `VoidCallback?` | No | Called when viewer is ready |
-| `onEvent` | `Function(IDevEvent)?` | No | Called on viewer events |
-| `loadingWidget` | `Widget?` | No | Custom loading widget |
-| `errorBuilder` | `Widget Function(String)?` | No | Custom error widget |
+- **읽기 전용 모드**: 템플릿을 안전하게 표시
+- **동적 업데이트**: 런타임에 템플릿 변경 가능
+- **iframe 격리**: 메인 앱과 독립적인 실행 환경
+- **Hot Restart 지원**: 개발 중 안정적인 동작
+- **커스터마이징**: 로딩 화면 및 에러 처리 커스터마이징 가능
 
-## Examples
+## 🐛 트러블슈팅
 
-See the [`example`](example) directory for a complete example application.
+### 일반적인 문제
 
-### Basic Usage
+**"Container not found" 에러**
+- 자동으로 재시도하며, 대부분 자동 해결됩니다
 
+**템플릿이 2번 호출됨**
+- 이미 해결됨 - 중복 체크 로직 적용
+
+**404 에러**
+- `pubspec.yaml`에 assets 등록 확인:
+  ```yaml
+  flutter:
+    assets:
+      - assets/viewer-app/
+  ```
+
+더 많은 트러블슈팅 정보는 [가이드 문서](./VIEWER_INTEGRATION_GUIDE.md#트러블슈팅)를 참고하세요.
+
+## 📂 프로젝트 구조
+
+```
+IdevViewer/
+├── lib/
+│   ├── idev_viewer.dart           # Public API
+│   └── src/
+│       ├── models/                # 데이터 모델
+│       └── platform/              # 플랫폼별 구현
+│           └── viewer_web.dart    # Web 구현
+├── assets/
+│   ├── viewer-app/                # 읽기 전용 Flutter 앱
+│   └── idev-app/                  # 편집 모드 (백업용)
+├── example/                       # 예제 앱
+├── VIEWER_INTEGRATION_GUIDE.md    # 상세 가이드
+└── README.md                      # 이 파일
+```
+
+## 🎯 사용 사례
+
+### 1. 템플릿 갤러리
 ```dart
-IDevViewer(
-  config: IDevConfig(
-    template: myTemplateData,
-  ),
+ListView.builder(
+  itemCount: templates.length,
+  itemBuilder: (context, index) {
+    return Card(
+      child: SizedBox(
+        height: 400,
+        child: IDevViewer(
+          config: IDevConfig(
+            templateName: templates[index].name,
+            template: templates[index].data,
+          ),
+        ),
+      ),
+    );
+  },
 )
 ```
 
-### With Callbacks
-
+### 2. 템플릿 미리보기
 ```dart
-IDevViewer(
-  config: IDevConfig(
-    apiKey: 'my-api-key',
-    template: myTemplateData,
-  ),
-  onReady: () {
-    print('Viewer initialized successfully');
-  },
-  onEvent: (event) {
-    print('Received event: ${event.type}');
-    // Handle different event types
-    switch (event.type) {
-      case 'button_click':
-        // Handle button click
-        break;
-      case 'form_submit':
-        // Handle form submission
-        break;
-    }
-  },
-)
-```
-
-### Custom Loading and Error Widgets
-
-```dart
-IDevViewer(
-  config: IDevConfig(template: myTemplateData),
-  loadingWidget: Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircularProgressIndicator(),
-        SizedBox(height: 16),
-        Text('Loading viewer...'),
-      ],
+Dialog(
+  child: SizedBox(
+    width: 800,
+    height: 600,
+    child: IDevViewer(
+      config: IDevConfig(
+        templateName: 'preview',
+        template: selectedTemplate,
+      ),
+      loadingWidget: Center(
+        child: CircularProgressIndicator(),
+      ),
     ),
   ),
-  errorBuilder: (error) => Center(
-    child: Text('Error: $error'),
-  ),
 )
 ```
 
-## Architecture
+## 🔄 업데이트 히스토리
 
-### Web Implementation
+### v1.0.0 (2025-10-26)
+- ✅ 초기 릴리즈
+- ✅ 읽기 전용 뷰어 모드 구현
+- ✅ 동적 템플릿 업데이트
+- ✅ Hot Restart 지원
+- ✅ 중복 템플릿 호출 방지
 
-The web platform uses **TemplateViewerPage** from the internal codebase, providing 100% identical rendering with the original IDE.
+## 📝 라이센스
 
-**Key Components:**
-- **TemplateViewerPage**: Main viewer widget for rendering templates
-- **HomeRepo**: Centralized repository for API management and data handling
-- **Service Locator (GetIt)**: Dependency injection for singleton services
-- **StackBoard**: Layout system for arranging widgets
-- **StackItems**: Various widget types (Frame, Chart, Grid, Search, Text, etc.)
+이 프로젝트는 iDev 프로젝트의 일부입니다.
 
-**Architecture Flow:**
-1. Viewer initialization loads API metadata (`apis` and `params`)
-2. Template data is converted to JSON script format
-3. TemplateViewerPage renders using internal Flutter widgets
-4. All components share a single HomeRepo instance via GetIt
-5. API calls from template widgets are routed through HomeRepo
+## 🤝 기여
 
-### Benefits of Internal Implementation
+이슈 및 PR은 언제나 환영합니다!
 
-- ✅ **No iframe overhead**: Direct Flutter rendering
-- ✅ **Full control**: All source code in Flutter/Dart
-- ✅ **Type safety**: Compile-time error checking
-- ✅ **State management**: Direct integration with Provider pattern
-- ✅ **API handling**: Shared HomeRepo instance across all components
+---
 
-## For JavaScript Frameworks
-
-If you're using React, Vue, Angular, or other JavaScript frameworks, check out our npm package:
-
-```bash
-npm install idev-viewer
-```
-
-See the [idev-viewer-js documentation](../idev-viewer-js/README.md) for more information.
-
-## Documentation
-
-For more detailed documentation, visit:
-- [API Documentation](https://pub.dev/documentation/idev_viewer/latest/)
-- [GitHub Repository](https://github.com/skydbdb/idev-viewer)
-- [Official Website](https://idev.biz)
-
-## Contributing
-
-Contributions are welcome! Please read our [contributing guidelines](../docs/README.md) first.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-- 📧 Email: support@idev.biz
-- 🐛 Issues: [GitHub Issues](https://github.com/skydbdb/idev-viewer/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/skydbdb/idev-viewer/discussions)
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+**더 자세한 정보**: [VIEWER_INTEGRATION_GUIDE.md](./VIEWER_INTEGRATION_GUIDE.md)

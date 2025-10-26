@@ -90,8 +90,10 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "820939264";
+    const serviceWorkerVersion = "956205661";
   </script>
+  <!-- IdevViewer JavaScript Library -->
+  <script src="idev-viewer.js"></script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
@@ -106,18 +108,16 @@
 
   <script>
     window.addEventListener('load', function (ev) {
-      // CanvasKit 렌더러 강제 사용
-      window.flutterConfiguration = {
-        renderer: "canvaskit"
-      };
-
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         }
       }).then(function (engineInitializer) {
-        return engineInitializer.initializeEngine();
+        // CanvasKit 렌더러 사용 (새로운 방식)
+        return engineInitializer.initializeEngine({
+          renderer: "canvaskit"
+        });
       }).then(function (appRunner) {
         return appRunner.runApp();
       }).then(function () {
