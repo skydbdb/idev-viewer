@@ -112,24 +112,31 @@
     function handleMessage(message) {
       console.log('📥 [idev-app] 메시지 처리:', message.type);
 
-      // Flutter 앱 내부로 메시지 전달 (ExternalMessageHandler가 처리)
+      // Flutter 앱이 읽을 수 있도록 window 객체에 저장
       try {
-        // MessageEvent 생성하여 Flutter에 전달
-        var messageEvent = new MessageEvent('message', {
-          data: message,
-          origin: window.location.origin
-        });
-        window.dispatchEvent(messageEvent);
-        console.log('✅ [idev-app] Flutter로 메시지 전달 완료:', message.type);
+        if (message.type === 'update_template' && message.template) {
+          window._idevTemplate = message.template;
+          console.log('✅ [idev-app] 템플릿 저장 완료');
+          
+          // CustomEvent 발생 (Flutter가 리스닝)
+          var event = new CustomEvent('idev-template-update', {
+            detail: message.template
+          });
+          window.dispatchEvent(event);
+          console.log('✅ [idev-app] idev-template-update 이벤트 발생');
+        } else if (message.type === 'update_config' && message.config) {
+          window._idevConfig = message.config;
+          console.log('✅ [idev-app] 설정 저장 완료');
+        }
       } catch (e) {
-        console.error('❌ [idev-app] Flutter로 메시지 전달 실패:', e);
+        console.error('❌ [idev-app] 메시지 처리 실패:', e);
       }
     }
 
     // 부모 창으로부터 postMessage 수신 리스너 추가
     window.addEventListener('message', function (event) {
-      // 자기 자신이 발생시킨 이벤트는 무시 (무한 루프 방지)
-      if (event.source === window) {
+      // 부모 창에서 온 메시지만 처리 (무한 루프 방지)
+      if (!event.source || event.source === window) {
         return;
       }
 
@@ -140,7 +147,7 @@
         console.log('📥 [idev-app] 파싱된 메시지:', message);
 
         // Flutter 앱이 로드되었으면 즉시 처리
-        if (window._flutterApp || window._flutterLoaded) {
+        if (window._flutterLoaded) {
           handleMessage(message);
         } else {
           console.log('⏳ [idev-app] Flutter 앱이 아직 로드되지 않음, 메시지 큐에 저장');
