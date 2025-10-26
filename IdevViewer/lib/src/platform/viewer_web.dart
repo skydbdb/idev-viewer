@@ -66,7 +66,7 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         print('♻️ 기존 iframe 재사용: ${_iframe?.src}');
         return;
       }
-      
+
       print('🎭 [IDevViewer] iframe 생성 시작');
       html.window.console.log('Current URL: ${html.window.location.href}');
 
@@ -93,7 +93,15 @@ class IDevViewerPlatformState extends State<IDevViewerPlatform> {
         ..setAttribute('allowfullscreen', 'true');
 
       // DOM에 추가 (HtmlElementView 사용 안 함)
-      html.document.body?.append(_iframe!);
+      // 이미 DOM에 같은 src의 iframe이 있으면 추가하지 않음
+      final existingSameSrc =
+          html.document.querySelector('iframe[src="$idevAppPath"]');
+      if (existingSameSrc == null) {
+        html.document.body?.append(_iframe!);
+      } else {
+        _iframe = existingSameSrc as html.IFrameElement;
+        print('♻️ 같은 src의 iframe 재사용');
+      }
 
       // iframe 요소 확인
       print('🎭 iframe 요소 확인: ${_iframe?.src}, ${_iframe?.baseUri}');
