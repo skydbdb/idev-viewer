@@ -117,7 +117,7 @@
         if (message.type === 'update_template' && message.template) {
           window._idevTemplate = message.template;
           console.log('✅ [idev-app] 템플릿 저장 완료');
-          
+
           // CustomEvent 발생 (Flutter가 리스닝)
           var event = new CustomEvent('idev-template-update', {
             detail: message.template
@@ -197,6 +197,37 @@
               data: { status: 'ready' }
             }), '*');
           }
+
+          // 템플릿 폴링 시작 (ExternalMessageHandler가 처리할 수 있도록)
+          var lastTemplateId = null;
+          setInterval(function() {
+            if (window._idevTemplate) {
+              var currentTemplateId = window._idevTemplate.templateId;
+              if (currentTemplateId && currentTemplateId !== lastTemplateId) {
+                console.log('🔄 [idev-app] 새 템플릿 감지:', currentTemplateId);
+                lastTemplateId = currentTemplateId;
+                
+                // ExternalMessageHandler가 처리할 수 있는 형식으로 메시지 생성
+                var templateMessage = {
+                  type: 'update_template',
+                  template: window._idevTemplate,
+                  timestamp: Date.now()
+                };
+                
+                console.log('📤 [idev-app] Flutter 앱에 update_template 전송');
+                console.log('📤 [idev-app] 템플릿 데이터:', templateMessage);
+                
+                // MessageEvent로 window.onMessage에 전달
+                var messageEvent = new MessageEvent('message', {
+                  data: templateMessage,
+                  origin: window.location.origin,
+                  source: null  // 외부 소스로 인식되도록
+                });
+                window.dispatchEvent(messageEvent);
+                console.log('✅ [idev-app] MessageEvent 발생 완료');
+              }
+            }
+          }, 500); // 0.5초마다 체크
         }, 1000); // 1초 후 로딩 화면 숨김
       }).catch(function (error) {
         console.error('Flutter 앱 로드 실패:', error);
