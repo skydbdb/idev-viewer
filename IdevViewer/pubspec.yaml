@@ -30,16 +30,12 @@ flutter:
     - assets/idev-app/
     - assets/idev-app/assets/
     - assets/idev-app/assets/assets/
-    - assets/idev-app/assets/icons/
+    - assets/idev-app/assets/assets/icons/
+    - assets/idev-app/assets/assets/fonts/
+    - assets/idev-app/assets/fonts/
+    - assets/idev-app/assets/shaders/
     - assets/idev-app/canvaskit/
-    - assets/idev-app/favicon.png
-    - assets/idev-app/flutter.js
-    - assets/idev-app/flutter_bootstrap.js
-    - assets/idev-app/flutter_service_worker.js
-    - assets/idev-app/index.html
-    - assets/idev-app/main.dart.js
-    - assets/idev-app/manifest.json
-    - assets/idev-app/version.json
+    - assets/idev-app/icons/
 
 topics:
   - flutter
