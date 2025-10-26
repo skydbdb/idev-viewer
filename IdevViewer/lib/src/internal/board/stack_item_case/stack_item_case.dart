@@ -753,7 +753,7 @@ class _StackItemCaseState extends State<StackItemCase> {
   Widget _content(BuildContext context, StackItem<StackItemContent> item) {
     final Widget content = Padding(
         padding: item.padding,
-        child: widget.childBuilder?.call(item) ?? const SizedBox.shrink());
+        child: widget.childBuilder?.call(item) ?? _buildDefaultContent(context, item));
 
     return ConfigBuilder.withItem(
       itemId,
@@ -775,6 +775,45 @@ class _StackItemCaseState extends State<StackItemCase> {
       },
       child: content,
     );
+  }
+
+  /// * Default content when childBuilder is null
+  Widget _buildDefaultContent(BuildContext context, StackItem<StackItemContent> item) {
+    // 뷰어 모드 또는 강제 뷰어 모드에서는 안전한 기본 콘텐츠 제공
+    if (BuildMode.isViewer || widget.forceViewerMode) {
+      return Container(
+        width: item.size.width,
+        height: item.size.height,
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]!, width: 1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.widgets,
+                size: 32,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '위젯',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // 편집 모드에서는 빈 위젯 반환
+    return const SizedBox.shrink();
   }
 
   /// * Delete handle

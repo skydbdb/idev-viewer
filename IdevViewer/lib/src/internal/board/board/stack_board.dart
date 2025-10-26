@@ -261,7 +261,7 @@ class _StackBoardState extends State<StackBoard> {
         children: _controller.value.data.map((item) {
           return StackItemCase(
             stackItem: item,
-            childBuilder: widget.customBuilder,
+            childBuilder: widget.customBuilder ?? _defaultItemBuilder,
             caseStyle: widget.caseStyle,
             onMenu: (v) => widget.onMenu?.call(v),
             onDock: () => widget.onDock?.call(item),
@@ -397,6 +397,12 @@ class _StackBoardState extends State<StackBoard> {
         startX = endX = 0;
       });
     }
+  }
+
+  /// 기본 아이템 빌더 (customBuilder가 null일 때 사용)
+  Widget? _defaultItemBuilder(StackItem<StackItemContent> item) {
+    // 기본적으로는 null을 반환하여 StackItemCase의 _buildDefaultContent가 사용되도록 함
+    return null;
   }
 
   Widget _itemBuilder(StackItem<StackItemContent> item) {
